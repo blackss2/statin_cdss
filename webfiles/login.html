@@ -1,0 +1,28 @@
+<% template "top.html" %>
+<% template "header_logout.html" %>
+
+<div id="container" class="expand clearfix">
+	<div class="login-wrapper">
+		<div class="title-area">
+			<h2 class="title">로그인</h2>
+			<h3 class="sub-title">Account Login</h3>
+		</div>
+		<div class="input-area">
+			<input type="text" class="id" name="id" placeholder="아이디"/>
+			<input type="password" class="passwd" name="passwd" placeholder="패스워드"/>
+			<div class="input-check">
+				<input type="checkbox" class="checkbox" id="save"/>
+				<span class="fakebox"></span>
+				<label for="save">아이디와 패스워드를 저장하시겠습니까?</label>
+			</div>
+			<input type="button" class="btn btn-green btn-full btn-login" value="로그인" onclick="location.href='index.html'"/>
+		</div>
+		<p class="find">
+			<a href="#findpw">비밀번호를 잊어 버리셨습니까?</a>
+		</p>
+	</div>
+	<div id="findpw" class="modal">
+	</div>
+</div>
+
+<% template "bottom.html" %>

@@ -1,0 +1,122 @@
+<% template "top.html" %>
+<% template "header_logout.html" %>
+
+<div id="container" class="expand clearfix">
+	<div class="join-wrapper">
+		<div class="title-area">
+			<h2 class="title">회원가입</h2>
+			<h3 class="sub-title">Create a New Account</h3>
+		</div>
+		<div class="box">
+			<table class="table-id">
+				<colgroup>
+					<col width="25%">
+					<col width="75%">
+				</colgroup>
+				<tr>
+					<th>아이디</th>
+					<td class="row">
+						<div class="col-xs-9"><input type="text" class="id col-xs-12" name="id" placeholder="example@gmail.com"></div>
+						<div class="col-xs-3"><input type="button" class="btn btn-duplcheck col-xs-12" value="중복확인"></div>
+					</td>
+				</tr>
+				<tr>
+					<th>패스워드</th>
+					<td>
+						<div class="col-xs-12"><input type="password" class="passwd col-xs-12" name="passwd"></div>
+					</td>
+				</tr>
+				<tr>
+					<th>패스워드 확인</th>
+					<td>
+						<div class="col-xs-12"><input type="password" class="passwd_check col-xs-12" name="passwd_check"></div>
+					</td>
+				</tr>
+			</table>
+			<hr/>
+			<table class="table-profile">
+				<colgroup>
+					<col width="25%">
+					<col width="75%">
+				</colgroup>
+				<tr>
+					<th>이름</th>
+					<td>
+						<div class="col-xs-12"><input type="text" class="name col-xs-12" name="name" ></div>
+					</td>
+				</tr>
+				<tr>
+					<th>생년월일</th>
+					<td>
+						<div class="col-xs-4">
+							<select class="col-xs-12" placeholder="년">
+								<option></option>
+							</select>
+						</div>
+						<div class="col-xs-4">
+							<select class="col-xs-12" placeholder="월">
+								<option></option>
+							</select>
+						</div>
+						<div class="col-xs-4">
+							<select class="col-xs-12" placeholder="일">
+								<option></option>
+							</select>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<th>휴대폰번호</th>
+					<td>
+						<div class="col-xs-4">
+							<select class="col-xs-12" placeholder="선택">
+								<option></option>
+							</select>
+						</div>
+						<div class="col-xs-4">
+							<input class="col-xs-12" type="text"/>
+						</div>
+						<div class="col-xs-4">
+							<input class="col-xs-12" type="text"/>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<th>근무처</th>
+					<td>
+						<div class="col-xs-8"><input class="col-xs-12" type="text"/></div>
+						<div class="col-xs-4">
+							<select class="col-xs-12" placeholder="선택">
+								<option></option>
+							</select>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<th>역할</th>
+					<td>
+						<div class="col-xs-12">
+							<select class="col-xs-12" placeholder="선택">
+								<option></option>
+							</select>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<th>권한 요청</th>
+					<td>
+						<div class="col-xs-12">
+							<select class="col-xs-12" placeholder="선택">
+								<option></option>
+							</select>
+						</div>
+					</td>
+				</tr>
+			</table>
+			<input type="button" class="btn btn-join btn-green btn-full" value="가입신청" onclick="location.href='join_complete.html'"/>
+		</div>
+	</div>
+</div>
+
+
+<% template "bottom.html" %>

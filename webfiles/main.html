@@ -1,0 +1,182 @@
+<% template "top.html" %>
+<% template "sidebar.html" %>
+
+<div id="container" class="clearfix">
+	<% template "header.html" %>
+	<div class="content-wrapper clearfix">
+		<div class="content">
+		<div class="col-sm-4">
+			<section class="box">
+				<h3 class="title">전체 이상반응</h3>
+				<div class="content"></div>
+			</section>
+		</div>
+		<div class="col-sm-4">
+			<section class="box">
+				<h3 class="title">군별 이상반응</h3>
+				<div class="content"></div>
+			</section>
+		</div>
+		<div class="col-sm-4">
+			<section class="box">
+				<h3 class="title">의무기록 전체 순응도</h3>
+				<div class="content">
+					<table class="table-default table-pagination">
+						<thead>
+							<th>일</th>
+							<th>국소</th>
+							<th>전신</th>
+							<th>생체</th>
+							<th>순응도</th>
+						</thead>
+						<tbody>
+							<tr>
+								<td>1일</td>
+								<td>85%</td>
+								<td>85%</td>
+								<td>85%</td>
+								<td>85%</td>
+							</tr>
+							<tr>
+								<td>2일</td>
+								<td>85%</td>
+								<td>85%</td>
+								<td>85%</td>
+								<td>85%</td>
+							</tr>
+							<tr>
+								<td>3일</td>
+								<td>85%</td>
+								<td>85%</td>
+								<td>85%</td>
+								<td>85%</td>
+							</tr>
+						</tbody>
+						<tfoot>
+							<tr>
+								<td colspan='5'>
+									<div class="pagination">
+										<button type="button" class="btn btn-sm btn-prev" v-on:click="loadPage(start_page-1)">&lt;</button>
+										<button type="button" class="btn btn-sm" v-for="page in pages" v-bind:class="{active: (page==current_page)}" v-on:click="loadPage(page)">{{page}}</button>
+										<button type="button" class="btn btn-sm btn-next" v-on:click="loadPage(end_page+1)">&gt;</button>
+									</div>
+								</td>
+							</tr>
+						</tfoot>
+					</table>
+				</div>
+			</section>
+		</div>
+		</div>
+		<div class="content">
+			<div class="col-sm-8">
+				<section class="box">
+					<h3 class="title">전체 피험자 Enroll 그래프</h3>
+					<div class="content"></div>
+				</section>
+			</div>
+			<div class="col-sm-4">
+				<section class="box">
+					<h3 class="title">
+						예약
+						<span class="right update"> UPDATE : 2016.04.19 </span>
+					</h3>
+					<div class="content">
+						<table class="table-default table-height-full">
+							<thead>
+								<th>대상군</th>
+								<th>예약 인원</th>
+							</thead>
+							<tbody>
+								<tr>
+									<td>전체</td>
+									<td>12명</td>
+								</tr>
+								<tr>
+									<td>실험군</td>
+									<td>5명</td>
+								</tr>
+								<tr>
+									<td>대조군</td>
+									<td>4명</td>
+								</tr>
+								<tr>
+									<td>위약군</td>
+									<td>3명</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</section>
+			</div>
+		</div>
+		<div class="content">
+			<div class="col-sm-12">
+				<section class="box">
+					<h3 class="title">공지사항</h3>
+					<div class="content notice clearfix">
+						<div class="col-xs-7">
+							<textarea></textarea>
+							<div class="btn-grp">
+								<button type="button" class="btn btn-sm btn-aqua">공지사항 내용 등록</button>
+								<div class="right">
+								<button type="button" class="btn btn-sm btn-dark">전송</button>
+								<button type="button" class="btn btn-sm btn-gray">취소</button>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-1">
+							<div class="icon-left">
+								<i class="fa fa-caret-left"></i>
+							</div>
+						</div>
+						<div class="col-xs-4">
+							<table class="table-default table-pagination">
+								<thead>
+									<tr>
+										<th>번호</th>
+										<th>자주 사용하는 공지사항</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>1</td>
+										<td>공지사항 멘트를 저장하면 이 표에 등록이 됩니다.</td>
+									</tr>
+									<tr>
+										<td>2</td>
+										<td>해당 줄을 더블클릭하면 좌측 입력칸에 자동으로 해당 내용이 들어감.</td>
+									</tr>
+									<tr>
+										<td>3</td>
+										<td>공지사항 멘트를 저장하면 이 표에 등록이 됩니다.</td>
+									</tr>
+									<tr>
+										<td>4</td>
+										<td>공지사항 멘트를 저장하면 이 표에 등록이 됩니다.</td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<td colspan='2'>
+											<div class="pagination">
+												<button type="button" class="btn btn-sm btn-prev" v-on:click="loadPage(start_page-1)">&lt;</button>
+												<button type="button" class="btn btn-sm" v-for="page in pages" v-bind:class="{active: (page==current_page)}" v-on:click="loadPage(page)">{{page}}</button>
+												<button type="button" class="btn btn-sm btn-next" v-on:click="loadPage(end_page+1)">&gt;</button>
+											</div>
+										</td>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>
+				</section>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+</script>
+
+<% template "bottom.html" %>

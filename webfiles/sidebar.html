@@ -1,0 +1,175 @@
+<aside id="sidebar" class="clearfix">
+	<div class="logo-wrapper" onclick="location.href='index.html'">1차 임상시험 마스터</div>
+	<section class="search-box">
+		<p class="clearfix">
+			<label class="col-xs-5">이름</label>
+			<input type="text" class="input-search col-xs-7"/>
+		</p>
+		<p class="clearfix">
+			<label class="col-xs-5">피험자 번호</label>
+			<input type="text" class="input-search col-xs-7"/>
+		</p>
+		<p class="clearfix">
+			<label class="col-xs-5">피험자 군</label>
+			<input type="text" class="input-search col-xs-7"/>
+		</p>
+		<p class="clearfix">
+			<button class="btn-search">검색</button>
+		</p>
+		<p class="clearfix">
+			<select class="select-search form-control">
+				<option>전체</option>
+				<option>진행 중 이상반응</option>
+				<option>순응도 저조</option>
+				<option>관리 필요</option>
+			</select>
+		</p>
+	</section>
+	<ul class="subject-list">
+		<li class="clearfix red">
+			<div class="col-xs-3"><i class="fa fa-phone"></i></div>
+			<div class="col-xs-9 info">
+				<span class="col-xs-5 name">김고은</span>
+				<span class="col-xs-7">90/04/15</span>
+				<span class="col-xs-5 age">27/여</span>
+				<span class="col-xs-7">3일차 53%</span>
+			</div>
+		</li>
+		<li class="clearfix yellow">
+			<div class="col-xs-3"><i class="fa fa-phone"></i></div>
+			<div class="col-xs-9 info">
+				<span class="col-xs-5 name">김고은</span>
+				<span class="col-xs-7">90/04/15</span>
+				<span class="col-xs-5 age">27/여</span>
+				<span class="col-xs-7">3일차 53%</span>
+			</div>
+		</li>
+		<li class="clearfix active aqua">
+			<div class="col-xs-3"><i class="fa fa-phone"></i></div>
+			<div class="col-xs-9 info">
+				<span class="col-xs-5 name">김고은</span>
+				<span class="col-xs-7">90/04/15</span>
+				<span class="col-xs-5 age">27/여</span>
+				<span class="col-xs-7">3일차 53%</span>
+			</div>
+		</li>
+		<li class="clearfix sky-blue">
+			<div class="col-xs-3"><i class="fa fa-phone"></i></div>
+			<div class="col-xs-9 info">
+				<span class="col-xs-5 name">김고은</span>
+				<span class="col-xs-7">90/04/15</span>
+				<span class="col-xs-5 age">27/여</span>
+				<span class="col-xs-7">3일차 53%</span>
+			</div>
+		</li>
+	</ul>
+	<div class="add-subject-wrapper">
+		<button class="btn btn-add-subject">신규 피험자 등록</button>
+	</div>
+</aside>
+<div class="modal fade" id="add-subject">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content box">
+			<div class="modal-header">
+				<h5 class="modal-title title">신규 피험자 등록</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="box"></div>
+				<table>
+					<colgroup>
+						<col width="35%"/>
+						<col width="65%"/>
+					</colgroup>
+					<tr>
+						<th>이름</th>
+						<td>
+							<div class="col-xs-7">
+								<input type="text" class="col-xs-12" v-model="name" />
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>대상자 번호</th>
+						<td>
+							<div class="col-xs-3">
+								<input type="text" class="col-xs-12" maxlength="2" />
+							</div>
+							<span class="col-xs-1">-</span>
+							<div class="col-xs-3">
+								<input type="text" class="col-xs-12" maxlength="3" />
+							</div>
+							<span class="col-xs-1">-</span>
+							<div class="col-xs-3">
+								<input type="text" class="col-xs-12" maxlength="3" />
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>성별</th>
+						<td>
+							<div class="input-radio">
+								<input type="radio" name="sex" id="female"/>
+								<label for="female">여자</label>
+							</div>
+							<div class="input-radio">
+								<input type="radio" name="sex" id="male"/>
+								<label for="male">남자</label>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>생년월일</th>
+						<td class="birth">
+							<div class="col-xs-4">
+								<input type="text" class="col-xs-12" maxlength="4" />
+							</div>
+							<span class="col-xs-1">년</span>
+							<div class="col-xs-2">
+								<input type="text" class="col-xs-12" maxlength="2" />
+							</div>
+							<span class="col-xs-1">월</span>
+							<div class="col-xs-2">
+								<input type="text" class="col-xs-12" maxlength="2" />
+							</div>
+							<span class="col-xs-1">일</span>
+						</td>
+					</tr>
+					<tr>
+						<th>피험자군</th>
+						<td>
+							<div class="col-xs-7">
+								<input type="text" class="col-xs-12" v-model="description" />
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-aqua btn-sm" v-on:click="doNew">승인</button>
+				<button type="button" class="btn btn-grey btn-sm" data-dismiss="modal">취소</button>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	$(function(){
+		// var container_height = $("#container").height();
+		// $("#sidebar").css("height", container_height);
+
+		$(".btn-add-subject").click(function(){
+			$("#add-subject").modal('show');
+		})
+
+		var ul_height = $(".add-subject-wrapper").offset().top - $('.subject-list').offset().top;
+		$(".subject-list").height(ul_height);
+
+		$(window).resize(function(){
+			var ul_height = $(".add-subject-wrapper").offset().top - $('.subject-list').offset().top;
+			$(".subject-list").height(ul_height);
+		}).resize();
+
+	})
+</script>
