@@ -1,2 +1,85 @@
+	<a style="float:right;" href="/opensource">Open Source License</a>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<script src="/public/js/vue.js"></script>
+	<script src="https://cdn.jsdelivr.net/vue.resource/1.0.3/vue-resource.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/vee-validate/2.0.0-beta.18/vee-validate.min.js"></script>
+	<script>
+	Vue.use(VeeValidate);
+
+	var convertHash = {
+		header: true,
+		content: true,
+		footer: true
+	};
+	function HTMLtoString(html) {
+		return html.trim().split("\n").join("").split("\t").join("").split('"').join('\\"')
+	}
+	function compileTarget(cont) {
+		var name = cont.get(0).tagName.toLowerCase();
+		var vues = cont.children().filter("script");
+		if(vues.length > 1 ) {
+			console.error("too many vue script");
+			return;
+		} else if (vues.length == 0) {
+			console.error("no vue script");
+			return;
+		}
+		var vue = vues.eq(0).detach().html();
+		cont.find("script[type='vue']").each(function() {
+			compileTarget($(this).parent());
+		});
+		var body = HTMLtoString(cont.html());
+		var compiled = ('Vue.component("' + name + '", {' + vue + ', template: "' + body + '"})');
+		var isEmbedded = (cont.parent().get(0) != document.body);
+		var isSuccess = evalCompileTarget(compiled);
+
+		var msg = "[vue-component](name : " + name + ")(embedded : " + isEmbedded + ")(result : " + isSuccess + ")";
+		if(isSuccess) {
+			if(isEmbedded) {
+				cont.empty();
+			} else {
+				cont.detach();
+			}
+			console.info(msg);
+		} else {
+			cont.detach();
+			console.warn(msg);
+		}
+	}
+	function evalCompileTarget(str) {
+		try {
+			eval(str);
+			return true;
+		} catch(ex) {
+			console.error(ex);
+		}
+		return false;
+	}
+
+	$("body > * > script[type='vue']").each(function() {
+		var cont = $(this).parent();
+		compileTarget(cont);
+	});
+
+	$("[v-root-container]").each(function() {
+		$(this).attr("v-root-container", null);
+		$(this).find("script[type='vue']").each(function() {
+			compileTarget($(this).parent());
+		});
+
+		var body = HTMLtoString($(this).clone().appendTo($('<div/>')).parent().html());
+		var compiled = ('Vue({template: "' + body + '"})');
+		
+		var vm = new Vue({
+			el: $(this).get(0),
+			template:  $(this).clone().appendTo($('<div/>')).parent().html()
+		});
+	});
+	$("[v-module]").each(function() {
+		$(this).attr("v-module", null);
+	});
+	</script>
 </body>
 </html>

@@ -1,30 +1,65 @@
-<aside id="sidebar" class="clearfix">
-	<div class="logo-wrapper" onclick="location.href='index.html'">1차 임상시험 마스터</div>
-	<section class="search-box">
-		<p class="clearfix">
-			<label class="col-xs-5">이름</label>
-			<input type="text" class="input-search col-xs-7"/>
-		</p>
-		<p class="clearfix">
-			<label class="col-xs-5">피험자 번호</label>
-			<input type="text" class="input-search col-xs-7"/>
-		</p>
-		<p class="clearfix">
-			<label class="col-xs-5">피험자 군</label>
-			<input type="text" class="input-search col-xs-7"/>
-		</p>
-		<p class="clearfix">
-			<button class="btn-search">검색</button>
-		</p>
-		<p class="clearfix">
-			<select class="select-search form-control">
-				<option>전체</option>
-				<option>진행 중 이상반응</option>
-				<option>순응도 저조</option>
-				<option>관리 필요</option>
-			</select>
-		</p>
-	</section>
+<aside id="sidebar" class="clearfix" v-root-container>
+	<div class="logo-wrapper" onclick="location.href='/'">1차 임상시험 마스터</div>
+	<subject-search>
+		<section class="search-box">
+			<p class="clearfix">
+				<label class="col-xs-5">이름</label>
+				<input type="text" class="input-search col-xs-7" v-model="input.name" />
+			</p>
+			<p class="clearfix">
+				<label class="col-xs-5">피험자 번호</label>
+				<input type="text" class="input-search col-xs-7" v-model="input.scrno" />
+			</p>
+			<p class="clearfix">
+				<label class="col-xs-5">피험자 군</label>
+				<select class="select-search form-control"  v-model="input.arm_id">
+					<option value="">전체</option>
+					<option v-for="item in constants.arms" v-bind:value="item.id">{item.name}</option>
+				</select>
+			</p>
+			<p class="clearfix">
+				<button class="btn-search" v-on:click="doSearch">검색</button>
+			</p>
+			<p class="clearfix">
+				<select class="select-search form-control">
+					<option value="">전체</option>
+					<option value="1">진행 중 이상반응</option>
+					<option value="2">순응도 저조</option>
+					<option value="3">관리 필요</option>
+				</select>
+			</p>
+		</section>
+		<script type="vue">
+		data: function() {
+			var obj = {
+				constants: {
+					arms: []
+				},
+				input: {
+					name: "",
+					scrno: "",
+					arm_id: ""
+				}
+			};
+			return obj;
+		},
+		methods: {
+			doSearch: function() {
+				this.$http.post("/api/subjects", {
+
+				}).then(function(res) {
+					if(res.body.error != null) {
+						alert(res.body.error);
+					} else {
+						//TODO
+					}
+				}, function(err) {
+					console.error(err.body);
+				});
+			}
+		}
+		</script>
+	</subject-search>
 	<ul class="subject-list">
 		<li class="clearfix red">
 			<div class="col-xs-3"><i class="fa fa-phone"></i></div>

@@ -1,28 +1,91 @@
-<% template "top.html" %>
+<% template "top.html" . %>
 <% template "header_logout.html" %>
 
-<div id="container" class="expand clearfix">
+<div id="container" class="expand clearfix" v-root-container>
 	<div class="login-wrapper">
 		<div class="title-area">
 			<h2 class="title">로그인</h2>
 			<h3 class="sub-title">Account Login</h3>
 		</div>
-		<div class="input-area">
-			<input type="text" class="id" name="id" placeholder="아이디"/>
-			<input type="password" class="passwd" name="passwd" placeholder="패스워드"/>
-			<div class="input-check">
-				<input type="checkbox" class="checkbox" id="save"/>
-				<span class="fakebox"></span>
-				<label for="save">아이디와 패스워드를 저장하시겠습니까?</label>
+		<v-login>
+			<div class="input-area">
+				<input type="text" class="id" placeholder="아이디" v-model="account.userid" v-on:keyup="doNextInput" v-validate data-vv-rules="email" name="userid" />
+				<input type="password" class="passwd" placeholder="패스워드" v-model="account.password" v-on:keyup="doNextInput" name="password" />
+				<input type="button" class="btn btn-login btn-green btn-full" value="로그인" v-on:click="doLogin"/>
 			</div>
-			<input type="button" class="btn btn-green btn-full btn-login" value="로그인" onclick="location.href='index.html'"/>
-		</div>
-		<p class="find">
-			<a href="#findpw">비밀번호를 잊어 버리셨습니까?</a>
-		</p>
-	</div>
-	<div id="findpw" class="modal">
+			<script type="vue">
+			data: function() {
+				var obj = {
+					account: {
+						userid: "",
+						password: ""
+					}
+				};
+				return obj;
+			},
+			methods: {
+				doNextInput: function(e) {
+					if(e.keyCode == 13) {
+						switch($(e.target).attr("name")) {
+							case "userid":
+								$(".passwd").focus();
+								break;
+							case "password":
+								$(".btn-login").click();
+								break;
+							default:
+								console.error("unknown input", e.target);
+						}
+					}
+				},
+				doLogin: function() {
+					if(this.account.userid.length == 0) {
+						alert("아이디를 입력하셔야 합니다.");
+						return;
+					}
+					if(this.account.password.length == 0) {
+						alert("비밀번호를 입력하셔야 합니다.");
+						return;
+					}
+
+					if(this.saveinfo) {
+						$.cookie("/login:account.userid", this.account.userid, {path : "/"});
+						$.cookie("/login:account.password", this.account.password, {path : "/"});
+						$.cookie("/login:saveinfo", this.saveinfo, {path : "/"});
+					} else {
+						$.removeCookie("/login:account.userid", {path : "/"});
+						$.removeCookie("/login:account.password", {path : "/"});
+						$.removeCookie("/login:saveinfo", {path : "/"});
+					}
+
+					Vue.http.post("/login", this.account, {
+						emulateJSON: true
+					}).then(function(res) {
+						if(res.body.error != null) {
+							alert(res.body.error);
+						} else {
+							location.href = "/";
+						}
+					}, function(err) {
+						switch(err.body.error) {
+						case "not exist user":
+							alert("아이디 또는 비밀번호가 올바르지 않습니다.");
+							break;
+						case "invalid password":
+							alert("아이디 또는 비밀번호가 올바르지 않습니다.");
+							break;
+						default:
+							console.error(err.body);
+							break;
+						}
+					});
+					//TODO : login
+					console.log(this,  this.account);
+				}
+			}
+			</script>
+		</v-login>
 	</div>
 </div>
 
-<% template "bottom.html" %>
+<% template "bottom.html" . %>
