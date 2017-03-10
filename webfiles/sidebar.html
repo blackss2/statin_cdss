@@ -12,7 +12,7 @@
 			</p>
 			<p class="clearfix">
 				<label class="col-xs-5">피험자 군</label>
-				<select class="select-search form-control"  v-model="input.arm_id">
+				<select class=" input-search col-xs-7"  v-model="input.arm_id">
 					<option value="">전체</option>
 					<option v-for="item in constants.arms" v-bind:value="item.id">{item.name}</option>
 				</select>
