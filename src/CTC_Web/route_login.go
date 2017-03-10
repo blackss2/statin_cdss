@@ -44,6 +44,8 @@ func route_login(e *echo.Echo, webChecker echo.MiddlewareFunc) {
 	})
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) (err error) {
+			return next(c) //TEMP
+
 			path := c.Request().URL.Path
 			if c.Get(UID_KEY) == nil {
 				if !strings.HasPrefix(path, "/public") && path != "/favicon.ico" {

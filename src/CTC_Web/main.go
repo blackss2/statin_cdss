@@ -74,12 +74,19 @@ func main() {
 		}
 	}, webChecker)
 
+	e.GET("/:filename", func(c echo.Context) error {
+		args := make(map[string]interface{})
+		InitCommonArgs(c, args)
+		filename := c.Param("filename")
+		return c.Render(http.StatusOK, filename, args)
+	}, webChecker)
+
 	e.GET("/favicon.ico", func(c echo.Context) error {
 		return c.NoContent(http.StatusOK)
 	}, webChecker)
 	e.HTTPErrorHandler = func(err error, c echo.Context) {
 		log.Println(err, c.Request().URL.Path)
-		c.String(http.StatusInternalServerError, err.Error())
+		c.String(c.Response().Status, err.Error())
 	}
 
 	if gConfig.SSL.Enable {
