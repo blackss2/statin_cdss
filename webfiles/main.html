@@ -4,71 +4,71 @@
 <div id="container" class="clearfix" v-root-container>
 	<% template "header.html" %>
 	<div class="content-wrapper clearfix">
-		<div class="content">
-		<div class="col-sm-4">
-			<section class="box">
-				<h3 class="title">전체 이상반응</h3>
-				<div class="content"></div>
-			</section>
+		<div class="content clearfix">
+			<div class="col-sm-4">
+				<section class="box">
+					<h3 class="title">전체 이상반응</h3>
+					<div class="content"></div>
+				</section>
+			</div>
+			<div class="col-sm-4">
+				<section class="box">
+					<h3 class="title">군별 이상반응</h3>
+					<div class="content"></div>
+				</section>
+			</div>
+			<div class="col-sm-4">
+				<section class="box">
+					<h3 class="title">의무기록 전체 순응도</h3>
+					<div class="content">
+						<table class="table-default table-pagination">
+							<thead>
+								<th>일</th>
+								<th>국소</th>
+								<th>전신</th>
+								<th>생체</th>
+								<th>순응도</th>
+							</thead>
+							<tbody>
+								<tr>
+									<td>1일</td>
+									<td>85%</td>
+									<td>85%</td>
+									<td>85%</td>
+									<td>85%</td>
+								</tr>
+								<tr>
+									<td>2일</td>
+									<td>85%</td>
+									<td>85%</td>
+									<td>85%</td>
+									<td>85%</td>
+								</tr>
+								<tr>
+									<td>3일</td>
+									<td>85%</td>
+									<td>85%</td>
+									<td>85%</td>
+									<td>85%</td>
+								</tr>
+							</tbody>
+							<tfoot>
+								<tr>
+									<td colspan='5'>
+										<div class="pagination">
+											<button type="button" class="btn btn-sm btn-prev" v-on:click="loadPage(start_page-1)">&lt;</button>
+											<button type="button" class="btn btn-sm" v-for="page in pages" v-bind:class="{active: (page==current_page)}" v-on:click="loadPage(page)">{{page}}</button>
+											<button type="button" class="btn btn-sm btn-next" v-on:click="loadPage(end_page+1)">&gt;</button>
+										</div>
+									</td>
+								</tr>
+							</tfoot>
+						</table>
+					</div>
+				</section>
+			</div>
 		</div>
-		<div class="col-sm-4">
-			<section class="box">
-				<h3 class="title">군별 이상반응</h3>
-				<div class="content"></div>
-			</section>
-		</div>
-		<div class="col-sm-4">
-			<section class="box">
-				<h3 class="title">의무기록 전체 순응도</h3>
-				<div class="content">
-					<table class="table-default table-pagination">
-						<thead>
-							<th>일</th>
-							<th>국소</th>
-							<th>전신</th>
-							<th>생체</th>
-							<th>순응도</th>
-						</thead>
-						<tbody>
-							<tr>
-								<td>1일</td>
-								<td>85%</td>
-								<td>85%</td>
-								<td>85%</td>
-								<td>85%</td>
-							</tr>
-							<tr>
-								<td>2일</td>
-								<td>85%</td>
-								<td>85%</td>
-								<td>85%</td>
-								<td>85%</td>
-							</tr>
-							<tr>
-								<td>3일</td>
-								<td>85%</td>
-								<td>85%</td>
-								<td>85%</td>
-								<td>85%</td>
-							</tr>
-						</tbody>
-						<tfoot>
-							<tr>
-								<td colspan='5'>
-									<div class="pagination">
-										<button type="button" class="btn btn-sm btn-prev" v-on:click="loadPage(start_page-1)">&lt;</button>
-										<button type="button" class="btn btn-sm" v-for="page in pages" v-bind:class="{active: (page==current_page)}" v-on:click="loadPage(page)">{{page}}</button>
-										<button type="button" class="btn btn-sm btn-next" v-on:click="loadPage(end_page+1)">&gt;</button>
-									</div>
-								</td>
-							</tr>
-						</tfoot>
-					</table>
-				</div>
-			</section>
-		</div>
-		</div>
-		<div class="content">
+		<div class="content clearfix">
 			<div class="col-sm-8">
 				<section class="box">
 					<h3 class="title">전체 피험자 Enroll 그래프</h3>
@@ -110,7 +110,7 @@
 				</section>
 			</div>
 		</div>
-		<div class="content">
+		<div class="content clearfix">
 			<div class="col-sm-12">
 				<section class="box">
 					<h3 class="title">공지사항</h3>
