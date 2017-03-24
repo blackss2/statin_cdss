@@ -1,0 +1,203 @@
+<% template "top.html" %>
+<% template "sidebar.html" %>
+
+<div id="container" class="clearfix" v-root-container>
+	<% template "header.html" %>
+	<div class="content-wrapper clearfix">
+		<div class="content">
+			<div class="col-sm-9">
+				<section class="box box-height-sm">
+					<h3 class="title">대상자 관리</h3>
+					<div class="content">
+						<div class="subject-info">
+							<label class="info-title">이름 : </label>
+							<span class="info"> 홍길동 </span>
+							<label class="info-title">/ 대상자 번호 :</label>
+							<span class="info"> 00-000-000 </span>
+							<button class="btn btn-sm btn-aqua" type="button">인증</button>
+							<label class="info-title">/ 성별 : </label>
+							<span class="info">남자 </span>
+							<label class="info-title">/ 생년월일 : </label>
+							<span class="info">1996/05/20</span>
+							<label class="info-title">/ 나이 : </label>
+							<span class="info">31</span>
+							<button class="btn btn-sm btn-dark right" type="button">정보 수정</button>
+						</div>
+					</div>
+				</section>
+				<div class="row">
+					<div class="col-xs-3">
+						<section class="box box-height-lg">
+							<h3 class="title">다이어리</h3>
+							<div class="content">
+								<ul class="daily-list">
+									<li class="daily">
+										<span>1일차</span>
+										<ul class="daily-sub-menu hidden">
+											<li class="sub-item active">국소반응</li>
+											<li class="sub-item">전신반응</li>
+											<li class="sub-item">생체생활정보</li>
+										</ul>
+									</li>
+									<li class="daily">
+										<span>2일차</span>
+										<ul class="daily-sub-menu hidden">
+											<li class="sub-item active">국소반응</li>
+											<li class="sub-item">전신반응</li>
+											<li class="sub-item">생체생활정보</li>
+										</ul>
+									</li>
+									<li class="daily">
+										<span>3일차</span>
+										<ul class="daily-sub-menu hidden">
+											<li class="sub-item active">국소반응</li>
+											<li class="sub-item">전신반응</li>
+											<li class="sub-item">생체생활정보</li>
+										</ul>
+									</li>
+									<li class="daily">
+										<span>4일차</span>
+										<ul class="daily-sub-menu hidden">
+											<li class="sub-item active">국소반응</li>
+											<li class="sub-item">전신반응</li>
+											<li class="sub-item">생체생활정보</li>
+										</ul>
+									</li>
+									<li class="daily">
+										<span>5일차</span>
+										<ul class="daily-sub-menu hidden">
+											<li class="sub-item active">국소반응</li>
+											<li class="sub-item">전신반응</li>
+											<li class="sub-item">생체생활정보</li>
+										</ul>
+									</li>
+									<li class="daily">
+										<span>6일차</span>
+										<ul class="daily-sub-menu hidden">
+											<li class="sub-item active">국소반응</li>
+											<li class="sub-item">전신반응</li>
+											<li class="sub-item">생체생활정보</li>
+										</ul>
+									</li>
+									<li class="daily">
+										<span>7일차</span>
+										<ul class="daily-sub-menu hidden">
+											<li class="sub-item active">국소반응</li>
+											<li class="sub-item">전신반응</li>
+											<li class="sub-item">생체생활정보</li>
+										</ul>
+									</li>
+									<li class="etc active">기타 이상 반응</li>
+									<li class="etc">병용 약물 관리</li>
+									<li class="etc">다이어리 평가</li>
+								</ul>
+							</div>
+						</section>
+					</div>
+					<div class="col-xs-9">
+						<section class="box box-height-lg hidden">
+							<h3 class="title">국소반응</h3>
+							<div class="content clearfix">
+								<div class="content scroll-content">
+									<h4 class="content-header">통증</h4>
+									<p class="ques">Q. 주사부위에서 통증이 느껴집니까?</p>
+									<ul class="answer-list">
+										<li class="answer"><button type="button" class="answer-num">0. </button>없음</li>
+										<li class="answer"><button type="button" class="answer-num">1. </button>활동에 지장 없음</li>
+										<li class="answer"><button type="button" class="answer-num">2. </button>24시간을 초과한 비마약성 진통제의 반복사용 또는 일상 활동을 일부 방해 </li>
+										<li class="answer"><button type="button" class="answer-num">3. </button>마약성 진통제를 사용하거나 일상활동을 심각하게 방해</li>
+									</ul>
+									<div class="right">
+										<strong> 점수 </strong>
+										<input type="text" value="0" class="input-sm center" readonly="readonly" />
+									</div>
+								</div>
+								<div class="btn-grp center">
+									<button class="btn btn-sm btn-dark" type="button">수정</button>
+									<button class="btn btn-sm btn-gray" type="button">취소</button>
+								</div>
+							</div>
+						</section>
+						<section class="box box-height-lg subject_life hidden">
+							<h3 class="title">생체 생활 정보</h3>
+							<div class="content clearfix">
+								<div class="content scroll-content">
+									<div class="content">
+										<h4 class="content-header">심박수</h4>
+										<input type="text" class="input-sm center"/>
+										<span class="unit">bpm</span>
+									</div>
+									<div class="content">
+										<h4 class="content-header">혈압</h4>
+										<p>
+											<label class="input-label" for="min">최저 혈압 : </label>
+											<input type="text" name="min" class="input-sm center"/>
+											<span class="unit">mmHg</span>
+										</p>
+										<p>
+											<label class="input-label" for="max">최고 혈압 : </label>
+											<input type="text" name="max" class="input-sm center"/>
+											<span class="unit">mmHg</span>
+										</p>
+									</div>
+									<div class="content">
+										<h4 class="content-header">음주</h4>
+									</div>
+								</div>
+								<div class="btn-grp center">
+									<button class="btn btn-sm btn-dark" type="button">수정</button>
+									<button class="btn btn-sm btn-gray" type="button">취소</button>
+								</div>
+							</div>
+						</section>
+						<section class="box box-height-lg subject_etc">
+							<h3 class="title">기타 이상 반응</h3>
+							<div class="content clearfix">
+								<div class="row">
+									<div class="col-xs-12">
+										<label class="input-label" for="select-orderby">정렬 : </label>
+										<select name="select-orderby" class="select-orderby">
+											<option> 시작일</option>
+											<option> 종료일</option>
+											<option> 증상명</option>
+											<option> 치료방법</option>
+											<option> 이상증상유무</option>
+										</select>
+									</div>
+								</div>
+							</div>
+						</section>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-3">
+				<section class="box box-height-xlg">
+					<h3 class="title">개인 일차 별 의무기록 순응도</h3>
+					<div class="content"></div>
+				</section>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+$(function(){
+	$('.daily-list').find('.daily span').click(function(){
+		if(!$(this).parent(".daily").hasClass("open")){
+			$('.daily-list').find('.daily').removeClass("open");
+			$('.daily-list').find('.daily .daily-sub-menu').addClass("hidden");
+			$(this).parent(".daily").addClass("open");
+			$(this).siblings(".daily-sub-menu").removeClass("hidden");
+			$(this).siblings(".daily-sub-menu").find(".sub-item").click(function(){
+				$(this).siblings().removeClass("active");
+				$(this).addClass("active");
+			})
+		}else{
+			$(this).parent(".daily").removeClass("open");
+			$(this).siblings(".daily-sub-menu").addClass("hidden");
+		}
+	})
+})
+</script>
+
+<% template "bottom.html" %>
