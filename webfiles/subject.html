@@ -14,20 +14,20 @@
 							<span class="info"> 홍길동 </span>
 							<label class="info-title">/ 대상자 번호 :</label>
 							<span class="info"> 00-000-000 </span>
-							<button class="btn btn-sm btn-aqua" type="button">인증</button>
+							<button class="btn btn-sm btn-aqua" type="button" data-toggle="modal" data-target="#confirm-subject">인증</button>
 							<label class="info-title">/ 성별 : </label>
 							<span class="info">남자 </span>
 							<label class="info-title">/ 생년월일 : </label>
 							<span class="info">1996/05/20</span>
 							<label class="info-title">/ 나이 : </label>
-							<span class="info">31</span>
-							<button class="btn btn-sm btn-dark right" type="button">정보 수정</button>
+							<span class="info">31</span> 
+							<button class="btn btn-sm btn-dark right" type="button" data-toggle="modal" data-target="#edit-subject">정보 수정</button>
 						</div>
 					</div>
 				</section>
 				<div class="row">
 					<div class="col-xs-3">
-						<section class="box box-height-lg">
+						<section class="box box-height-md">
 							<h3 class="title">다이어리</h3>
 							<div class="content">
 								<ul class="daily-list">
@@ -87,15 +87,15 @@
 											<li class="sub-item">생체생활정보</li>
 										</ul>
 									</li>
-									<li class="etc active">기타 이상 반응</li>
-									<li class="etc">병용 약물 관리</li>
-									<li class="etc">다이어리 평가</li>
+									<li class="etc" onclick="location.href='/subject_etc.html'">기타 이상 반응</li>
+									<li class="etc drug " onclick="location.href='/subject_drug.html'">병용 약물 관리</li>
+									<li class="etc diary" onclick="location.href='/subject_diary.html'">다이어리 평가</li>
 								</ul>
 							</div>
 						</section>
 					</div>
 					<div class="col-xs-9">
-						<section class="box box-height-lg hidden">
+						<section class="box box-height-md">
 							<h3 class="title">국소반응</h3>
 							<div class="content clearfix">
 								<div class="content scroll-content">
@@ -118,7 +118,7 @@
 								</div>
 							</div>
 						</section>
-						<section class="box box-height-lg subject_life hidden">
+						<section class="box box-height-md subject_life hidden">
 							<h3 class="title">생체 생활 정보</h3>
 							<div class="content clearfix">
 								<div class="content scroll-content">
@@ -142,6 +142,32 @@
 									</div>
 									<div class="content">
 										<h4 class="content-header">음주</h4>
+										<label class="input-radio">마심
+											<input type="radio" name="drink" class="radio-btn"/>
+											<span class="fake-btn"></span>
+										</label>
+										<label class="input-radio">안마심
+											<input type="radio" name="drink" class="radio-btn"/>
+											<span class="fake-btn"></span>
+										</label>
+									</div>
+									<div class="content">
+										<h4 class="content-header">흡연량</h4>
+										<p>
+											<label class="input-radio">폈음
+												<input type="radio" name="drink" class="radio-btn"/>
+												<span class="fake-btn"></span>
+											</label>
+											<label class="input-radio">피지않음
+												<input type="radio" name="drink" class="radio-btn"/>
+												<span class="fake-btn"></span>
+											</label>
+										</p>
+										<p>
+											<label class="input-label" for="min">하루</label>
+											<input type="text" name="min" class="input-sm center"/>
+											<span class="unit">개피</span>
+										</p>
 									</div>
 								</div>
 								<div class="btn-grp center">
@@ -150,7 +176,7 @@
 								</div>
 							</div>
 						</section>
-						<section class="box box-height-lg subject_etc">
+						<section class="box box-height-md subject_etc hidden">
 							<h3 class="title">기타 이상 반응</h3>
 							<div class="content clearfix">
 								<div class="row">
@@ -165,21 +191,656 @@
 										</select>
 									</div>
 								</div>
+								<div class="row cleafix">
+									<div class="col-xs-12 content">
+										<div class="scroll-tbody clearfix">
+											<table class="table-default clearfix" id="table-etc">
+												<thead>
+													<tr>
+														<th>
+															<label class="input-check no-label">
+																<input type="checkbox" name="test" class="check-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</th>
+														<th>시작일</th>
+														<th>종료일</th>
+														<th>증상명</th>
+														<th>치료방법</th>
+														<th>이상증상유무</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>
+															<label class="input-check no-label">
+																<input type="checkbox" name="test" class="check-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+														<td>2016/04/16</td>
+														<td>2016/04/17</td>
+														<td>식욕부진</td>
+														<td>약물복용</td>
+														<td>
+															<label class="input-radio">인가
+																<input type="radio" name="test" class="radio-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+															<label class="input-radio">비인가
+																<input type="radio" name="test" class="radio-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<label class="input-check no-label">
+																<input type="checkbox" name="test" class="check-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+														<td>2016/04/16</td>
+														<td>2016/04/17</td>
+														<td>식욕부진</td>
+														<td>약물복용</td>
+														<td>
+															<label class="input-radio">인가
+																<input type="radio" name="test" class="radio-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+															<label class="input-radio">비인가
+																<input type="radio" name="test" class="radio-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<label class="input-check no-label">
+																<input type="checkbox" name="test" class="check-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+														<td>2016/04/16</td>
+														<td>2016/04/17</td>
+														<td>식욕부진</td>
+														<td>약물복용</td>
+														<td>
+															<label class="input-radio">인가
+																<input type="radio" name="test" class="radio-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+															<label class="input-radio">비인가
+																<input type="radio" name="test" class="radio-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<label class="input-check no-label">
+																<input type="checkbox" name="test" class="check-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+														<td>2016/04/16</td>
+														<td>2016/04/17</td>
+														<td>식욕부진</td>
+														<td>약물복용</td>
+														<td>
+															<label class="input-radio">인가
+																<input type="radio" name="test" class="radio-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+															<label class="input-radio">비인가
+																<input type="radio" name="test" class="radio-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<label class="input-check no-label">
+																<input type="checkbox" name="test" class="check-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+														<td>2016/04/16</td>
+														<td>2016/04/17</td>
+														<td>식욕부진</td>
+														<td>약물복용</td>
+														<td>
+															<label class="input-radio">인가
+																<input type="radio" name="test" class="radio-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+															<label class="input-radio">비인가
+																<input type="radio" name="test" class="radio-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<label class="input-check no-label">
+																<input type="checkbox" name="test" class="check-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+														<td>2016/04/16</td>
+														<td>2016/04/17</td>
+														<td>식욕부진</td>
+														<td>약물복용</td>
+														<td>
+															<label class="input-radio">인가
+																<input type="radio" name="test" class="radio-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+															<label class="input-radio">비인가
+																<input type="radio" name="test" class="radio-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<label class="input-check no-label">
+																<input type="checkbox" name="test" class="check-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+														<td>2016/04/16</td>
+														<td>2016/04/17</td>
+														<td>식욕부진</td>
+														<td>약물복용</td>
+														<td>
+															<label class="input-radio">인가
+																<input type="radio" name="test" class="radio-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+															<label class="input-radio">비인가
+																<input type="radio" name="test" class="radio-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<label class="input-check no-label">
+																<input type="checkbox" name="test" class="check-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+														<td>2016/04/16</td>
+														<td>2016/04/17</td>
+														<td>식욕부진</td>
+														<td>약물복용</td>
+														<td>
+															<label class="input-radio">인가
+																<input type="radio" name="test" class="radio-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+															<label class="input-radio">비인가
+																<input type="radio" name="test" class="radio-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<label class="input-check no-label">
+																<input type="checkbox" name="test" class="check-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+														<td>2016/04/16</td>
+														<td>2016/04/17</td>
+														<td>식욕부진</td>
+														<td>약물복용</td>
+														<td>
+															<label class="input-radio">인가
+																<input type="radio" name="test" class="radio-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+															<label class="input-radio">비인가
+																<input type="radio" name="test" class="radio-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<label class="input-check no-label">
+																<input type="checkbox" name="test" class="check-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+														<td>2016/04/16</td>
+														<td>2016/04/17</td>
+														<td>식욕부진</td>
+														<td>약물복용</td>
+														<td>
+															<label class="input-radio">인가
+																<input type="radio" name="test" class="radio-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+															<label class="input-radio">비인가
+																<input type="radio" name="test" class="radio-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<label class="input-check no-label">
+																<input type="checkbox" name="test" class="check-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+														<td>2016/04/16</td>
+														<td>2016/04/17</td>
+														<td>식욕부진</td>
+														<td>약물복용</td>
+														<td>
+															<label class="input-radio">인가
+																<input type="radio" name="test" class="radio-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+															<label class="input-radio">비인가
+																<input type="radio" name="test" class="radio-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<label class="input-check no-label">
+																<input type="checkbox" name="test" class="check-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+														<td>2016/04/16</td>
+														<td>2016/04/17</td>
+														<td>식욕부진</td>
+														<td>약물복용</td>
+														<td>
+															<label class="input-radio">인가
+																<input type="radio" name="test" class="radio-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+															<label class="input-radio">비인가
+																<input type="radio" name="test" class="radio-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+													</tr>
+
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-12 btn-grp">
+										<button class="btn btn-sm btn-aqua" type="button">추가</button>
+										<div class="right">
+											<button class="btn btn-sm btn-dark" type="button">수정</button>
+											<button class="btn btn-sm btn-gray" type="button">삭제</button>
+										</div>
+								</div>
+							</div>
+						</section>
+						<section class="box box-height-md subject_drug hidden">
+							<h3 class="title">병용 약물 관리</h3>
+							<div class="content clearfix">
+								<div class="row">
+									<div class="col-xs-12">
+										<label class="input-label" for="select-orderby">정렬 : </label>
+										<select name="select-orderby" class="select-orderby">
+											<option> 시작일</option>
+											<option> 종료일</option>
+											<option> 증상명</option>
+											<option> 치료방법</option>
+											<option> 이상증상유무</option>
+										</select>
+									</div>
+								</div>
+								<div class="row cleafix">
+									<div class="col-xs-12 content">
+										<div class="scroll-tbody clearfix">
+											<table class="table-default clearfix" id="table-drug">
+												<thead>
+													<tr>
+														<th>
+															<label class="input-check no-label">
+																<input type="checkbox" name="test" class="check-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</th>
+														<th>시작일</th>
+														<th>종료일</th>
+														<th>증상명</th>
+														<th>약물정보(이름, 용량&단위, 횟수, 사유, 비고)</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>
+															<label class="input-check no-label">
+																<input type="checkbox" name="test" class="check-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+														<td>2016/04/16</td>
+														<td>201604/17</td>
+														<td>식욕부진</td>
+														<td>(훼스탈,2정,2회,속메스꺼움)</td>
+													</tr>
+													<tr>
+														<td>
+															<label class="input-check no-label">
+																<input type="checkbox" name="test" class="check-btn"/>
+																<span class="fake-btn"></span>
+															</label>
+														</td>
+														<td>2016/04/16</td>
+														<td>201604/17</td>
+														<td>식욕부진</td>
+														<td>(훼스탈,2정,2회,속메스꺼움)</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-12 btn-grp">
+										<button class="btn btn-sm btn-aqua" type="button">추가</button>
+										<div class="right">
+											<button class="btn btn-sm btn-dark" type="button">수정</button>
+											<button class="btn btn-sm btn-gray" type="button">삭제</button>
+										</div>
+								</div>
+							</div>
+						</section>
+						<section class="box box-height-xlg subject_diary hidden">
+							<h3 class="title">다이어리 평가</h3>
+							<div class="content clearfix">
+								<div class="row">
+									<div class="col-xs-12 content">
+										<canvas id="line-chart"></canvas>
+									</div>
+								</div>
+								<div class="row cleafix">
+									<div class="col-xs-12">
+										
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-12">
+										<div class="scroll-tbody">
+											<table class="table-default table-left" id="table-diary">
+												<tr>
+													<th>2016.04.16</th>
+												</tr>
+												<tr>
+													<td>
+														<div class="col-xs-4">증상명 : 식욕부진 </div>
+														<div class="col-xs-8">치료방법 : 약물복용</div>
+													</td>
+												</tr>
+												<tr>
+													<td>
+														<div class="col-xs-4">증상명 : 식욕부진 </div>
+														<div class="col-xs-8">치료방법 : 약물복용</div>
+													</td>
+												</tr>
+												<tr>
+													<th>2016.04.16</th>
+												</tr>
+												<tr>
+													<td>
+														<div class="col-xs-4">증상명 : 식욕부진 </div>
+														<div class="col-xs-8">치료방법 : 약물복용</div>
+													</td>
+												</tr>
+												<tr>
+													<td>
+														<div class="col-xs-4">증상명 : 식욕부진 </div>
+														<div class="col-xs-8">치료방법 : 약물복용</div>
+													</td>
+												</tr>
+
+												<tr>
+													<th>2016.04.16</th>
+												</tr>
+												<tr>
+													<td>
+														<div class="col-xs-4">증상명 : 식욕부진 </div>
+														<div class="col-xs-8">치료방법 : 약물복용</div>
+													</td>
+												</tr>
+												<tr>
+													<td>
+														<div class="col-xs-4">증상명 : 식욕부진 </div>
+														<div class="col-xs-8">치료방법 : 약물복용</div>
+													</td>
+												</tr>
+												<tr>
+													<th>2016.04.16</th>
+												</tr>
+												<tr>
+													<td>
+														<div class="col-xs-4">증상명 : 식욕부진 </div>
+														<div class="col-xs-8">치료방법 : 약물복용</div>
+													</td>
+												</tr>
+												<tr>
+													<td>
+														<div class="col-xs-4">증상명 : 식욕부진 </div>
+														<div class="col-xs-8">치료방법 : 약물복용</div>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-12">
+										<div class="right">
+											<button class="btn btn-sm btn-aqua" type="button">완료</button>
+										</div>
+									</div>
+								</div>
 							</div>
 						</section>
 					</div>
 				</div>
 			</div>
 			<div class="col-sm-3">
-				<section class="box box-height-xlg">
+				<section class="box box-height-lg">
 					<h3 class="title">개인 일차 별 의무기록 순응도</h3>
-					<div class="content"></div>
+					<div class="content">
+						<canvas id="bar-chart" height=500></canvas>
+					</div>
 				</section>
 			</div>
 		</div>
 	</div>
 </div>
-
+<div class="modal fade" id="confirm-subject">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content box">
+			<div class="modal-header">
+				<h5 class="modal-title title">대상자 확인 비밀번호</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<table>
+					<colgroup>
+						<col width="28%"/>
+						<col width="72%"/>
+					</colgroup>
+					<tr>
+						<th>비밀번호</th>
+						<td>
+							<div class="col-xs-12">
+								<input type="text" class="col-xs-12" placeholder="비밀번호를 입력해 주세요." />
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-aqua btn-sm" v-on:click="doNew">승인</button>
+				<button type="button" class="btn btn-grey btn-sm" data-dismiss="modal">취소</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="edit-subject">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content box">
+			<div class="modal-header">
+				<h5 class="modal-title title">대상자 정보 수정</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="box"></div>
+				<table>
+					<colgroup>
+						<col width="35%"/>
+						<col width="65%"/>
+					</colgroup>
+					<tr>
+						<th>이름</th>
+						<td>
+							<div class="col-xs-7">
+								<input type="text" class="col-xs-12" v-model="name" />
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>대상자 번호</th>
+						<td>
+							<div class="col-xs-3">
+								<input type="text" class="col-xs-12" maxlength="2" />
+							</div>
+							<span class="col-xs-1">-</span>
+							<div class="col-xs-3">
+								<input type="text" class="col-xs-12" maxlength="3" />
+							</div>
+							<span class="col-xs-1">-</span>
+							<div class="col-xs-3">
+								<input type="text" class="col-xs-12" maxlength="3" />
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>성별</th>
+						<td>
+							<label class="input-radio">여자
+								<input type="radio" name="sex" value="female" class="radio-btn"/>
+								<span class="fake-btn"></span>
+							</label>
+							<label class="input-radio">남자
+								<input type="radio" name="sex" value="male" class="radio-btn"/>
+								<span class="fake-btn"></span>
+							</label>
+						</td>
+					</tr>
+					<tr>
+						<th>생년월일</th>
+						<td class="birth">
+							<div class="col-xs-4">
+								<input type="text" class="col-xs-12" maxlength="4" />
+							</div>
+							<span class="col-xs-1">년</span>
+							<div class="col-xs-2">
+								<input type="text" class="col-xs-12" maxlength="2" />
+							</div>
+							<span class="col-xs-1">월</span>
+							<div class="col-xs-2">
+								<input type="text" class="col-xs-12" maxlength="2" />
+							</div>
+							<span class="col-xs-1">일</span>
+						</td>
+					</tr>
+					<tr>
+						<th>접종일</th>
+						<td class="birth">
+							<div class="col-xs-4">
+								<input type="text" class="col-xs-12" maxlength="4" />
+							</div>
+							<span class="col-xs-1">년</span>
+							<div class="col-xs-2">
+								<input type="text" class="col-xs-12" maxlength="2" />
+							</div>
+							<span class="col-xs-1">월</span>
+							<div class="col-xs-2">
+								<input type="text" class="col-xs-12" maxlength="2" />
+							</div>
+							<span class="col-xs-1">일</span>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-aqua btn-sm" v-on:click="doNew">승인</button>
+				<button type="button" class="btn btn-grey btn-sm" data-dismiss="modal">취소</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="add-schedule">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content box">
+			<div class="modal-header">
+				<h5 class="modal-title title">방문 예약 일정 추가</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<table>
+					<colgroup>
+						<col width="35%"/>
+						<col width="65%"/>
+					</colgroup>
+					<tr>
+						<th>예약시간</th>
+						<td>
+							<div class="col-xs-3">
+								<input type="text" class="col-xs-12" maxlength="2" />
+							</div>
+							<span class="col-xs-1">:</span>
+							<div class="col-xs-3">
+								<input type="text" class="col-xs-12" maxlength="3" />
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>예약자명</th>
+						<td>
+							<div class="col-xs-12">
+								<input type="text" class="col-xs-12" />
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-aqua btn-sm" v-on:click="doNew">승인</button>
+				<button type="button" class="btn btn-grey btn-sm" data-dismiss="modal">취소</button>
+			</div>
+		</div>
+	</div>
+</div>
 <script type="text/javascript">
 $(function(){
 	$('.daily-list').find('.daily span').click(function(){
@@ -196,8 +857,126 @@ $(function(){
 			$(this).parent(".daily").removeClass("open");
 			$(this).siblings(".daily-sub-menu").addClass("hidden");
 		}
-	})
-})
+	});
+
+	$(".daily-list").find("li")
+});
+var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        var config = {
+            type: 'line',
+            data: {
+                labels: ["January", "February", "March", "April", "May", "June", "July"],
+                datasets: [{
+                    label: "My First dataset",
+                    backgroundColor: window.chartColors.yellow,
+                    borderColor: window.chartColors.yellow,
+                    data: [
+                        randomScalingFactor(), 
+                        randomScalingFactor(), 
+                        randomScalingFactor(), 
+                        randomScalingFactor(), 
+                        randomScalingFactor(), 
+                        randomScalingFactor(), 
+                        randomScalingFactor()
+                    ],
+                    fill: false,
+                }, {
+                    label: "My Second dataset",
+                    fill: false,
+                    backgroundColor: window.chartColors.blue,
+                    borderColor: window.chartColors.blue,
+                    data: [
+                        randomScalingFactor(), 
+                        randomScalingFactor(), 
+                        randomScalingFactor(), 
+                        randomScalingFactor(), 
+                        randomScalingFactor(), 
+                        randomScalingFactor(), 
+                        randomScalingFactor()
+                    ],
+                }]
+            },
+            options: {
+                responsive: true,
+                title:{
+                    display:false,
+                    text:'Chart.js Line Chart'
+                },
+                legend : {
+                	position : 'bottom'
+                },
+                tooltips: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                hover: {
+                    mode: 'nearest',
+                    intersect: true
+                },
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Month'
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Value'
+                        }
+                    }]
+                }
+            }
+        };
+var config3 = {
+    type: 'horizontalBar',
+    data: {
+		    labels: ["1일", "2일", "3일 ", "4일", "5일", "6일", "7일"],
+		    datasets: [
+		        {
+		            backgroundColor: [
+                		window.chartColors.red,
+		                window.chartColors.yellow,
+                		window.chartColors.blue,
+                		window.chartColors.green,
+                		window.chartColors.purple,
+                		window.chartColors.orange,
+                		window.chartColors.red
+		            ],
+		            borderColor: [
+                		window.chartColors.red,
+		                window.chartColors.yellow,
+                		window.chartColors.blue,
+                		window.chartColors.green,
+                		window.chartColors.purple,
+                		window.chartColors.orange,
+                		window.chartColors.red
+		            ],
+                borderWidth: 1,
+		            data: [65, 59, 80, 81, 56, 63, 70],
+		        }
+		    ]
+		},
+    options: {
+        responsive: true,
+        legend: {
+            display : false
+        },
+        animation: {
+            animateScale: true,
+            animateRotate: true
+        },
+    }
+};
+window.onload = function() {
+    var ctx = document.getElementById("line-chart").getContext("2d");
+    var ctx3 = document.getElementById("bar-chart").getContext("2d");
+    window.myDoughnut = new Chart(ctx, config);
+    window.myDoughnut = new Chart(ctx3, config3);
+};
 </script>
 
 <% template "bottom.html" %>

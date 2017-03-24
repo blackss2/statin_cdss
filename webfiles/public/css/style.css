@@ -21,7 +21,13 @@ a:hover{text-overflow:none;}
 .btn-dark:hover, .btn-dark:focus{color:#fff !important;}
 .btn-full{width:100%;}
 .btn-50{width:48.5%;}
-.btn-sm{padding:7px 10px; border-radius:0px !important;}
+.btn-sm{padding:3px 15px !important; border-radius:0px !important;}
+.no-padding{
+	padding:0 !important;
+	table{
+		border:none;
+	}
+}
 
 body.breakpoint{
 	width:1280px;
@@ -44,7 +50,7 @@ body.breakpoint{
 	z-index:10;
 	.menu-wrapper{
 		text-align:center;
-		margin-left:-110px;
+		margin-left:-150px;
 		a{
 			display:inline-block;
 			margin-right:35px;
@@ -148,10 +154,11 @@ body.breakpoint{
 		padding:10px;
 		width:$sidebar-width;
 		.btn-add-subject{
-			background:$main-color;
-			color:#fff;
 			width:100%;
+			background:$main-color;
 			border-radius:0;
+			color:#fff;
+			padding:10px;
 		}
 	}
 	.subject-list{
@@ -284,12 +291,18 @@ body.breakpoint{
 				text-align:center;
 				margin-top:40px;
 			}
-			textarea{
-				width:100%;
-				height:70%;
-				border:1px solid $gray;
-				margin:0 0 10px 0;
-				resize:none;
+		}
+		textarea{
+			width:100%;
+			height:70%;
+			border:1px solid $gray;
+			margin:0 0 10px 0;
+			padding:10px;
+			resize:none;
+			&.evaluation{
+				border:2px solid #dadada;
+				background: #f4f7fa;
+
 			}
 		}
 		.content{
@@ -303,7 +316,7 @@ body.breakpoint{
 			}
 			h4.content-header{
 				font-weight:700;
-				margin: 15px 0;
+				margin: 15px 0 15px -5px;
 				color:$color-dark;
 			}
 			.ques{
@@ -324,11 +337,14 @@ body.breakpoint{
 		&.box-height-sm{
 			height:120px;
 		}
-		&.box-height-lg{
+		&.box-height-md{
 			height:540px;
 		}
-		&.box-height-xlg{
+		&.box-height-lg{
 			height:680px;
+		}
+		&.box-height-xlg{
+			height:830px;
 		}
 	}
 	.subject-info{
@@ -343,41 +359,41 @@ body.breakpoint{
 	.weeks{
 		list-style:none;
 	}
-	.input-check{
-		display:inline-block;
-		position:relative;
-		overflow:hidden;
-		.checkbox{
-			cursor:pointer;
-			z-index:100;
-			opacity:0;
-			width:18px;
-			height:18px;
-			&+ .fakebox {
-				display:inline-block;
-				border:2px solid #000;
-				border-radius:2px;
-				width: 18px; 
-				height:18px;
-				position:absolute;
-				top:0;
-				left:0;
-			}
-			&:checked + .fakebox{
-				background:#000;
-				&:before{
-					position:absolute;
-					font-family: FontAwesome;
-					font-size:17px;
-					content:"\f00c";
-					color:#fff;
-					top:-5px; 
-					left:-1px;
-					-webkit-text-stroke: 1px #000;
-				}
-			}
-		}
-	}
+	// .input-check{
+	// 	display:inline-block;
+	// 	position:relative;
+	// 	overflow:hidden;
+	// 	.checkbox{
+	// 		cursor:pointer;
+	// 		z-index:100;
+	// 		opacity:0;
+	// 		width:18px;
+	// 		height:18px;
+	// 		&+ .fakebox {
+	// 			display:inline-block;
+	// 			border:2px solid #000;
+	// 			border-radius:2px;
+	// 			width: 18px; 
+	// 			height:18px;
+	// 			position:absolute;
+	// 			top:0;
+	// 			left:0;
+	// 		}
+	// 		&:checked + .fakebox{
+	// 			background:#000;
+	// 			&:before{
+	// 				position:absolute;
+	// 				font-family: FontAwesome;
+	// 				font-size:17px;
+	// 				content:"\f00c";
+	// 				color:#fff;
+	// 				top:-5px; 
+	// 				left:-1px;
+	// 				-webkit-text-stroke: 1px #000;
+	// 			}
+	// 		}
+	// 	}
+	// }
 	
 	.right{
 		i{
@@ -480,6 +496,10 @@ table{
 		div[class*="col-"]{
 			padding:0 5px;	
 		}
+		[class*="fa-"]{
+			cursor:pointer;
+			vertical-align:middle;
+		}
 	}
 }
 
@@ -522,14 +542,77 @@ table{
 		.spinner-grp{
 			width:80%;
 		}
+		.reserve-status{
+			cursor:pointer;
+			&.scheduling{
+				&:before{
+					text-decoration : underline;
+					font-weight:700;
+					color:$red;
+					content:"예약 중"
+				}
+			}
+			&.holding{
+				&:before{
+					text-decoration : underline;
+					font-weight:700;
+					color:$aqua;
+					content:"예약 대기"
+				}
+			}
+		}
+		[class*="fa-"]{
+			font-size:1.3em;
+		}
+	}
+}
+.table-left{
+	text-align:left;
+	th{
+		text-align:left;
+		text-indent:10px;
 	}
 }
 .th-dark{
 	th{background: #dde3e9;}
 }
-.table-height-full{
-	td,th{
-		padding:1.5rem 0;
+.scroll-tbody{
+	thead{
+		width:100%;
+		float:left;
+		display:table;
+		th{
+			border:none;
+			border-bottom:1px solid $gray;
+			text-indent:-1%;
+			&:first-child{
+				text-indent:0;
+			}
+		}
+	}
+	tbody{
+		overflow-y:auto;
+		overflow-x:hidden;
+		float:left;
+		width:100%;
+		height:330px;
+		tr{
+			display:table;
+			width:100%;
+			&.active{
+				td{
+					background-color:#feffe8;
+				}
+			}
+			&:hover{
+				td{
+					background-color:#ffe9e8;
+				}
+			}
+			td{
+				border-top:none;
+			}
+		}
 	}
 }
 .table-pagination{
@@ -564,7 +647,12 @@ table{
 		}
 	}
 }
-
+.table-schedule{
+	th,td{
+		border-top:none;
+		border-left:none;
+	}
+}
 .modal{
 	.modal-dialog{
 		margin: 80px auto;
@@ -609,7 +697,7 @@ table{
 					padding:0;
 					margin:0;
 				}
-				padding:7px 3px !important;
+				padding:5px 3px !important;
 				font-size:0.8em;
 				color:#949191;
 			}
@@ -633,6 +721,19 @@ table{
 				padding-right:0;
 			}
 		}
+		p.align-center{
+			padding:20px;
+			margin-bottom:0;
+			text-align:center;
+			color: #949191;
+			font-weight:700;
+			font-size:1.1em;
+		}
+		textarea{
+			resize:none;
+			border:1px solid $gray;
+			padding:5px;
+		}
 	}
 	.modal-footer{
 		border-top:none;
@@ -647,31 +748,188 @@ table{
 .input-radio{
 	display:inline-block;
 	position:relative;
-	overflow:hidden;
-	vertical-align:middle;
-	.radiobtn{
-		cursor:pointer;
-		z-index:100000;
+	padding-left:24px;
+	margin-right:5px; 
+	margin-bottom:0;
+	cursor:pointer;
+	.radio-btn{
+		position:absolute;
+		margin:0;
+		top:0;
+		left:0;
+		z-index:-1;
+		opacity:0;
+		&:checked{
+			& + .fake-btn{
+				&:before{
+					content:"";
+					background:#000;
+					width:10px;
+					height:10px;
+					border-radius:50%;
+					left: 3px;
+			    top: 3px;
+			    position: absolute;
+				}
+			}
+		}
+	}
+	.fake-btn{
+		position:absolute;
+		left:0;
+		top:0;
 		width:20px;
 		height:20px;
 		margin:0;
-		display:block;
 		border:2px solid #000;
-		border-radius:18px;
+		border-radius:50%;
+	}
+}
+.input-check{
+	@extend .input-radio;
+	&.no-label{
+		padding-left:0;
+		margin-right:0;
+		width:12px;
+		height:12px;
+		vertical-align:middle;
+	}
+	.check-btn{
+		position:absolute;
+		margin:0;
+		top:0;
+		left:0;
+		z-index:-1;
+		opacity:0;
+		&:checked{
+			& + .fake-btn{
+				&:before{
+					content:"\f00c";
+					color:#5a6779;
+					font-size:9px;
+					font-family: FontAwesome;
+					background:none;
+					left: 0px;
+			    top: -2px;
+			    position: absolute;
+				}
+			}
+		}
+	}
+	.fake-btn{
+		width:12px;
+		height:12px;
+		border:1px solid #5a6779;
+		border-radius:0;
+	}
+}
+.select-orderby{
+	padding:3px 10px;
+	margin:5px;
+	border-radius:0;
+	border-color:$gray;
+	color:#5a6779;
+	font-weight:600;
+	font-size:0.9em;
+}
+
+#table-etc{
+
+	th:nth-of-type(1), td:nth-of-type(1){
+		width:4%;
+		border-left:none;
+	}
+	th:nth-of-type(2), td:nth-of-type(2),
+	th:nth-of-type(3), td:nth-of-type(3),
+	th:nth-of-type(4), td:nth-of-type(4),
+	th:nth-of-type(5), td:nth-of-type(5){
+		width:16.25%;
+	}
+	th:last-child{
+		width:30%;
+	}
+	td:last-child{
+		width: calc(30% - 14px;)
+	}
+}
+
+#table-drug{
+	th:nth-of-type(1), td:nth-of-type(1){
+		width:4%;
+		border-left:none;
+	}
+	th:nth-of-type(2), td:nth-of-type(2),
+	th:nth-of-type(3), td:nth-of-type(3)
+	{
+		width:16%;
+	}
+	th:nth-of-type(4), td:nth-of-type(4){
+		width:20%;
+	}
+	th:last-child,td:last-child{
+		width:auto;
+	}
+}
+
+#table-diary{
+	border:none;
+	tbody{
+		height:220px;
+		tr:hover{
+			td{
+				background:none;
+			}
+		}
+	}
+	margin-bottom:20px;
+}
+
+#calendar{
+	margin:30px 0 0;
+	.fc-day-header{
+		background : #f4f7fa !important;
+		padding:7px;
+	}
+	.fc-toolbar{
+	 	width:200px;
+	 	margin: 1.1em auto;
+	 	h2{
+			font-size:18px;
+			font-weight:700;
+			margin-top:4px;
+		}
+	}
+		
+	.fc-state-default{
+		background: #f4f7fa;
+		box-shadow:none;
+		border-color:$gray;
+		border-radius:0;
+		padding:0 .3em;
+	}
+	.fc-sun{
+		color:#ff1800;
+	}
+	.fc-day-top{
+		padding:3px;
+	}
+	.fc-day{
 		&.active{
-			&:before{
-				content:"";
-				position:absolute;
-				background:#000;
-				width:12px;
-				height:12px; 
-				border-radius:100%;
-				top:4px; 
-				left:4px;
+			background:#fcf8e3;
+			.cal-edit-btngrp{
+				display:inline-block !important;
 			}
 		}
 	}
 }
-.radio-label{
-	padding: 0 7px 0 5px;
+.fc-ltr .fc-basic-view .fc-day-top .fc-day-number{
+	float:left;
+	font-weight:600;
+	font-size:0.9em;
+}
+.fc-unthemed td.fc-today{
+	background:#f4f7fa;
+}
+.fc-row .fc-content-skeleton td, .fc-row .fc-helper-skeleton td{
+	background:none;
 }

@@ -99,7 +99,7 @@
 		</li>
 	</ul>
 	<div class="add-subject-wrapper">
-		<button class="btn btn-add-subject">신규 피험자 등록</button>
+		<button class="btn btn-add-subject" type="button" data-toggle="modal" data-target="#add-subject" >신규 피험자 등록</button>
 	</div>
 </aside>
 <div class="modal fade" id="add-subject">
@@ -145,14 +145,14 @@
 					<tr>
 						<th>성별</th>
 						<td>
-							<div class="input-radio">
-								<input type="radio" name="sex" id="female"/>
-								<label for="female">여자</label>
-							</div>
-							<div class="input-radio">
-								<input type="radio" name="sex" id="male"/>
-								<label for="male">남자</label>
-							</div>
+							<label class="input-radio">여자
+								<input type="radio" name="sex" value="female" class="radio-btn"/>
+								<span class="fake-btn"></span>
+							</label>
+							<label class="input-radio">남자
+								<input type="radio" name="sex" value="male" class="radio-btn"/>
+								<span class="fake-btn"></span>
+							</label>
 						</td>
 					</tr>
 					<tr>
@@ -180,6 +180,23 @@
 							</div>
 						</td>
 					</tr>
+					<tr>
+						<th>접종일</th>
+						<td class="birth">
+							<div class="col-xs-4">
+								<input type="text" class="col-xs-12" maxlength="4" />
+							</div>
+							<span class="col-xs-1">년</span>
+							<div class="col-xs-2">
+								<input type="text" class="col-xs-12" maxlength="2" />
+							</div>
+							<span class="col-xs-1">월</span>
+							<div class="col-xs-2">
+								<input type="text" class="col-xs-12" maxlength="2" />
+							</div>
+							<span class="col-xs-1">일</span>
+						</td>
+					</tr>
 				</table>
 			</div>
 			<div class="modal-footer">
@@ -191,13 +208,6 @@
 </div>
 <script type="text/javascript">
 	$(function(){
-		// var container_height = $("#container").height();
-		// $("#sidebar").css("height", container_height);
-
-		$(".btn-add-subject").click(function(){
-			$("#add-subject").modal('show');
-		})
-
 		var ul_height = $(".add-subject-wrapper").offset().top - $('.subject-list').offset().top;
 		$(".subject-list").height(ul_height);
 

@@ -1,0 +1,358 @@
+<% template "top.html" %>
+<% template "sidebar.html" %>
+
+<div id="container" class="clearfix" v-root-container>
+	<% template "header.html" %>
+	<div class="content-wrapper clearfix">
+			<div class="content">
+				<div class="col-sm-9">
+					<section class="box box-height-lg">
+						<h3 class="title">월별 일정</h3>
+						<div class="content">
+							<div class="subject-info">
+								<label class="info-title">근무시작 : </label>
+								<span class="info"> 08:00 </span>
+								<label class="info-title">/ 중식 :</label>
+								<span class="info"> 12:00~13:00 </span>
+								<label class="info-title">/ 근무종료 : </label>
+								<span class="info">19:00 </span>
+								<button class="btn btn-sm btn-aqua right" data-toggle="modal" data-target="#edit-business" type="button">수정</button>
+							</div>
+						</div>
+						<div class="content">
+							<div id="calendar"></div>
+						</div>
+					</section>
+				</div>
+				<div class="col-sm-3">
+					<section class="box box-height-lg">
+						<h3 class="title">방문 예약 목록</h3>
+						<div class="content">
+							<div class="subject-info date-info">
+								<label class="info-title">일자 : </label>
+								<span class="info"> </span>
+							</div>
+						</div>
+						<div class="content scroll-content no-padding">
+							<table class="table-default table-schedule">
+								<thead>
+									<tr>
+										<th>시간</th>
+										<th>예약자</th>
+										<th>예약상태</th>
+										<th>수정</th>
+										<th>삭제</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>10:00</td>
+										<td>홍길동</td>
+										<td><span class="reserve-status scheduling" data-toggle="modal" data-target="#edit-status-holding"></span></td>
+										<td><i class="fa fa-edit" data-toggle="modal" data-target="#edit-schedule"></i></td>
+										<td><i class="fa fa-trash"></i></td>
+									</tr>
+									<tr>
+										<td>10:00</td>
+										<td>홍길동</td>
+										<td><span class="reserve-status holding" data-toggle="modal" data-target="#edit-status-scheduling"></span></td>
+										<td><i class="fa fa-edit"></i></td>
+										<td><i class="fa fa-trash"></i></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="content center">
+							<button class="btn btn-sm btn-aqua btn-add" type="button" data-toggle="modal" data-target="#add-schedule" >추가</button>
+						</div>
+					</section>
+				</div>
+			</div>
+	</div>
+</div>
+<div class="modal fade" id="add-schedule">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content box">
+			<div class="modal-header">
+				<h5 class="modal-title title">방문 예약 일정 추가</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<table>
+					<colgroup>
+						<col width="35%"/>
+						<col width="65%"/>
+					</colgroup>
+					<tr>
+						<th>예약시간</th>
+						<td>
+							<div class="col-xs-3">
+								<input type="text" class="col-xs-12" maxlength="2" />
+							</div>
+							<span class="col-xs-1">:</span>
+							<div class="col-xs-3">
+								<input type="text" class="col-xs-12" maxlength="3" />
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>예약자명</th>
+						<td>
+							<div class="col-xs-12">
+								<input type="text" class="col-xs-12" />
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-aqua btn-sm" v-on:click="doNew">승인</button>
+				<button type="button" class="btn btn-grey btn-sm" data-dismiss="modal">취소</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="edit-schedule">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content box">
+			<div class="modal-header">
+				<h5 class="modal-title title">방문 예약 일정 변경</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<table>
+					<colgroup>
+						<col width="35%"/>
+						<col width="65%"/>
+					</colgroup>
+					<tr>
+						<th>예약시간</th>
+						<td>
+							<div class="col-xs-3">
+								<input type="text" class="col-xs-12" maxlength="2" />
+							</div>
+							<span class="col-xs-1">:</span>
+							<div class="col-xs-3">
+								<input type="text" class="col-xs-12" maxlength="3" />
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>예약자명</th>
+						<td>
+							<div class="col-xs-12">
+								<input type="text" class="col-xs-12" />
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-aqua btn-sm" v-on:click="doNew">승인</button>
+				<button type="button" class="btn btn-grey btn-sm" data-dismiss="modal">취소</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="edit-status-scheduling">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content box">
+			<div class="modal-header">
+				<h5 class="modal-title title">예약 대기 승인</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<p class="align-center">
+					해당 대상자의 예약을<br/> 승인하시겠습니까?
+				</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-aqua btn-sm" v-on:click="doNew">승인</button>
+				<button type="button" class="btn btn-grey btn-sm" data-dismiss="modal">취소</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="edit-status-holding">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content box">
+			<div class="modal-header">
+				<h5 class="modal-title title">예약 대기 변경</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<p class="align-center">
+					해당 대상자의 예약을<br/> 예약 대기로 변경 하시겠습니까?
+				</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-aqua btn-sm" v-on:click="doNew">승인</button>
+				<button type="button" class="btn btn-grey btn-sm" data-dismiss="modal">취소</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="edit-business">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content box">
+			<div class="modal-header">
+				<h5 class="modal-title title">근무 시간 변경</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<table>
+					<colgroup>
+						<col width="35%"/>
+						<col width="65%"/>
+					</colgroup>
+					<tr>
+						<th>근무시작</th>
+						<td>
+							<div class="col-xs-2">
+								<input type="text" class="col-xs-12" maxlength="2" />
+							</div>
+							<span class="col-xs-1">:</span>
+							<div class="col-xs-2">
+								<input type="text" class="col-xs-12" maxlength="2" />
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>중  식</th>
+						<td>
+							<div class="col-xs-2">
+								<input type="text" class="col-xs-12" maxlength="2" />
+							</div>
+							<span class="col-xs-1">:</span>
+							<div class="col-xs-2">
+								<input type="text" class="col-xs-12" maxlength="2" />
+							</div>
+							<span class="col-xs-1">~</span>
+							<div class="col-xs-2">
+								<input type="text" class="col-xs-12" maxlength="2" />
+							</div>
+							<span class="col-xs-1">:</span>
+							<div class="col-xs-2">
+								<input type="text" class="col-xs-12" maxlength="2" />
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>근무종료</th>
+						<td>
+							<div class="col-xs-2">
+								<input type="text" class="col-xs-12" maxlength="2" />
+							</div>
+							<span class="col-xs-1">:</span>
+							<div class="col-xs-2">
+								<input type="text" class="col-xs-12" maxlength="2" />
+							</div>
+						</td>
+				</table>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-aqua btn-sm" v-on:click="doNew">승인</button>
+				<button type="button" class="btn btn-grey btn-sm" data-dismiss="modal">취소</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="edit-monthly-schedule">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content box">
+			<div class="modal-header">
+				<h5 class="modal-title title">월별 일정 내용 수정</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<table>
+					<tr>
+						<th>내용</th>
+					</tr>
+					<tr>
+						<td>
+							<div class="col-xs-12">
+								<textarea class="col-xs-12 event-content"></textarea>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-aqua btn-sm" v-on:click="doNew">승인</button>
+				<button type="button" class="btn btn-grey btn-sm" data-dismiss="modal">취소</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="date-span-container" style="display:none">
+		<span class="right cal-edit-btngrp" style="position:absolute; cursor:pointer; color:#000 !important; padding:3px; z-index:100"><i class="fa fa-edit" onclick="deligateDateEdit(spanRenderFunc.time)"></i>&nbsp;<i class="fa fa-trash"></i></span>
+</div>
+
+<script>
+	function deligateDateEdit(time) {
+		console.log(new Date(time));
+		$("#edit-monthly-schedule").modal('show');
+	}
+	function spanRenderFunc(time, left, top){
+		spanRenderFunc.time = time;
+		$("#date-span-container").show();
+		var _this = $("#date-span-container span");
+		_this.css("left", left - _this.width() + "px").css("top", top + "px");
+	}
+	$(document).ready(function() {
+		$('#calendar').fullCalendar({
+			header: {
+				left:'prev',
+				center: 'title',
+				right:'next'
+			},
+			locale: 'ko',
+			contentHeight : 500,
+			editable: true,
+			events: [
+				{
+					title: '1차 예약 방문',
+					start: '2017-03-28'
+				}
+			],
+			dayClick: function(date, jsEvent, view, resourceObj ) {
+				console.log(resourceObj);
+				var time = date._d.getTime();
+				var _this = $(this);
+				spanRenderFunc(time, _this.offset().left + _this.width() - 5, _this.offset().top + 3);
+				$('.date-info').find('.info').text(date.format());
+				$('.fc-day').removeClass("active");
+				_this.addClass("active");
+			}
+		});
+		$('.fc-prev-button').click(function(){
+			$("#date-span-container").hide();
+		});
+		$('.fc-next-button').click(function(){
+			$("#date-span-container").hide();
+		})
+		var m = $.fullCalendar.moment();
+		var today = m.format().substring(0,10);
+		$('.date-info').find('.info').text(today);
+
+		$('.table-schedule').find('td').find('.fa-trash').click(function(){
+			$(this).parents('tr').detach();
+		});
+	});
+
+</script>
+
+<% template "bottom.html" %>

@@ -8,13 +8,17 @@
 			<div class="col-sm-4">
 				<section class="box">
 					<h3 class="title">전체 이상반응</h3>
-					<div class="content"></div>
+					<div class="content">
+						<canvas id="chart-area" height="150"/>
+					</div>
 				</section>
 			</div>
 			<div class="col-sm-4">
 				<section class="box">
 					<h3 class="title">군별 이상반응</h3>
-					<div class="content"></div>
+					<div class="content">
+						<canvas id="chart-area2" height="150"/>
+					</div>
 				</section>
 			</div>
 			<div class="col-sm-4">
@@ -72,7 +76,9 @@
 			<div class="col-sm-8">
 				<section class="box">
 					<h3 class="title">전체 피험자 Enroll 그래프</h3>
-					<div class="content"></div>
+					<div class="content">
+						<canvas id="bar-chart" height="70"/>
+					</div>
 				</section>
 			</div>
 			<div class="col-sm-4">
@@ -177,6 +183,118 @@
 </div>
 
 <script type="text/javascript">
-</script>
+var randomScalingFactor = function() {
+        return Math.round(Math.random() * 100);
+    };
+    var config = {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [
+                    randomScalingFactor(),
+                    randomScalingFactor(),
+                ],
+                backgroundColor: [
+                    window.chartColors.yellow,
+                    window.chartColors.blue,
+                ],
+                label: 'Dataset 1'
+            }],
+        },
+        options: {
+            responsive: true,
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: false,
+                text: 'Chart.js Doughnut Chart'
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true
+            },
+            cutoutPercentage: 55
+        }
+    };
+    var config2 = {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [
+                    randomScalingFactor(),
+                    randomScalingFactor(),
+                ],
+                backgroundColor: [
+                    window.chartColors.yellow,
+                    window.chartColors.blue,
+                ],
+                label: 'Dataset 1'
+            }],
+        },
+        options: {
+            responsive: true,
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: false,
+                text: 'Chart.js Doughnut Chart'
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true
+            },
+            cutoutPercentage: 55
+        }
+    };
+    var config3 = {
+        type: 'bar',
+        data: {
+				    labels: ["전체", "이상반응", "이행률 저조", "관리필요", "오늘 예약", "중도 탈락"],
+				    datasets: [
+				        {
+				            backgroundColor: [
+				                'rgba(255, 99, 132, 0.2)',
+				                'rgba(54, 162, 235, 0.2)',
+				                'rgba(255, 206, 86, 0.2)',
+				                'rgba(75, 192, 192, 0.2)',
+				                'rgba(153, 102, 255, 0.2)',
+				                'rgba(255, 159, 64, 0.2)'
+				            ],
+				            borderColor: [
+				                'rgba(255,99,132,1)',
+				                'rgba(54, 162, 235, 1)',
+				                'rgba(255, 206, 86, 1)',
+				                'rgba(75, 192, 192, 1)',
+				                'rgba(153, 102, 255, 1)',
+				                'rgba(255, 159, 64, 1)'
+				            ],
+				            borderWidth: 1,
+				            data: [65, 59, 80, 81, 56, 55, 40],
+				        }
+				    ]
+				},
+        options: {
+            responsive: true,
+            legend: {
+                display : false
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true
+            },
+        }
+    };
+    window.onload = function() {
+        var ctx = document.getElementById("chart-area").getContext("2d");
+        var ctx2 = document.getElementById("chart-area2").getContext("2d");
+        var ctx3 = document.getElementById("bar-chart").getContext("2d");
+        window.myDoughnut = new Chart(ctx, config);
+        window.myDoughnut = new Chart(ctx2, config2);
+        window.myDoughnut = new Chart(ctx3, config3);
+    };
+
+    </script>
 
 <% template "bottom.html" %>
