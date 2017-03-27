@@ -1,0 +1,31 @@
+<!-- Page, data-page contains page name-->
+<div data-page="form" class="page">
+	<!-- Top Navbar-->
+	<div class="navbar {{ .Style.navbar }}">
+		<div class="navbar-inner">
+			<div class="left sliding">
+				<a href="/main" class="back link {{ .Style.icon_only }}">
+					<i class="icon icon-back"></i>
+				</a>
+			</div>
+			<div class="center sliding">항목 입력</div>
+			<div class="right sliding"></div>
+		</div>
+	</div>
+	
+	<!-- Scrollable page content-->
+	<div class="page-content bg-white page-content-form" style="padding-bottom: 280px;">
+		{{ .FormHtml }}
+	</div>
+	
+	<div class="toolbar toolbar-bottom">
+	    <div class="toolbar-inner">
+	    	{{ if .IsNew }}
+	    	<div class="form-submit">작성 완료</div>
+	    	{{ else }}
+	    	<div class="form-delete">삭제</div>
+	    	<div class="form-modify active">수정</div>
+	    	{{ end }}
+	    </div>
+	</div>
+</div>

@@ -1,4 +1,6 @@
-port: 80
+port:
+  web: 80
+  mobile: 8080
 store_url: rethinkdb://tnicdev.co.kr:28015/trial_diary
 study_id: 825feec8-3cc3-43a1-9123-2d5f4cff2811
 ssl:

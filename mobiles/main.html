@@ -1,0 +1,634 @@
+{{ $g := . }}
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>{{ .Title }}</title>
+		<!-- We will include related CSS styles using JavaScript -->
+		<link rel="stylesheet" href="public/css/framework7.material.min.css">
+		<link rel="stylesheet" href="public/css/framework7.material.colors.min.css">
+		<link rel="stylesheet" href="public/css/my-app.css">
+		<link rel="stylesheet" href="public/font-awesome/css/font-awesome.min.css">
+		<style>
+		.navbar {
+			background-color: rgb(255, 80, 80);
+			height: 50px;
+			text-align: center;
+		}
+		.navbar .center {
+			height: 50px;
+			line-height: 50px;
+			font-size: 0.7em;
+			width: 100%;
+			text-align: center;
+			color: white;
+			display: inline-block;
+		}
+		.navbar a.link {
+    		line-height: 50px;
+    		height: 50px;
+    	}
+		.navbar .left, .navbar .right {
+    		height: 50px;
+    		width: 50px;
+    	}
+		.navbar-fixed .page-content {
+			padding-top: 50px;
+		}
+		
+    	.content-block-title {
+    		height:44px;
+    		line-height:44px;
+    		padding: 0px;
+    		margin: 0px;
+    		text-align: center;
+    		color: rgb(255, 80, 80);
+    		font-size: 0.85em;
+    		border-top: solid 2px rgb(255, 80, 80);
+    		border-bottom: solid 2px rgb(255, 80, 80);
+    		font-weight: bold;
+    	}
+    	
+    	.list-block {
+    		margin: 0px !important;
+    	}
+    	.list-block .item-media {
+			width: 32px;
+    	}
+    	.list-block .item-inner {
+			font-size: 0.9em;
+			margin-left: 12px;
+    	}
+    	.list-block .item-inner:after {
+    		display: none;
+    	}
+    	.page-content > .list-block > ul:before {
+    		background-color: rgb(100, 100, 100);
+    	}
+    	.page-content > .list-block > ul:after {
+    		background-color: transparent;
+    	}
+    	.page-content > .list-block > ul > li:not(:last-child) .item-content {
+			border-bottom: solid 1px rgb(200, 200, 200);
+    	}
+    	.list-block .item-content:not(.saved) {
+			color: rgb(125, 125, 125);
+    	}
+    	.list-block .item-content.saved {
+			color: rgb(64, 212, 182);
+    	}
+    	.list-block .item-content .left {
+			font-size: 0.9em;
+			font-weight: bold;
+		}
+    	.list-block .item-content .right {
+			font-size: 0.85em;
+		}
+    	.list-block .item-content.active-state, .list-block .item-content.active {
+			background-color: rgb(0, 126, 242);
+    	}
+    	.list-block .item-content.active-state, .list-block .item-content.active {
+			color: white;
+			font-weight: bold;
+    	}
+    	.visit-disabled {
+    		background-color: #E0E0E0;
+    	}
+    	.page-content-form .form-grp .guide {
+			height:100%;
+    		position: relative;
+    		background-color: white;
+			margin: 0px;
+			padding: 0px;
+    	}
+    	.page-content-form .form-grp .guide.fold {
+    		height: 100px;
+    		overflow: hidden;
+    	}
+		.page-content-form .form-grp .guide:after {
+			content: '▲';
+			color: rgb(255, 80, 80);
+			text-align: center;
+			position: absolute;
+			left: 49%;
+			bottom: 2px;
+		}
+		.page-content-form .form-grp .guide.fold:after {
+			content: '▼';
+			color: rgb(255, 80, 80);
+			text-align: center;
+			position: absolute;
+			left: 49%;
+			bottom: 2px;
+		}
+    	.page-content-form .form-grp .guide .guide-wrapper {
+			margin: 0px;
+    		margin: 24px 24px 48px 24px;
+    		color: black;
+    		text-align: left;
+			word-wrap: break-word;
+			word-break: break-all;
+    	}
+    	.page-content-form .form-grp .guide.fold .guide-wrapper {
+    		height: 48px;
+    		overflow: hidden;
+    	}
+    	.page-content-form .form-grp .content-block-inner {
+    		padding: 0px;
+    	}
+    	.page-content-form .form-grp .content-block-inner {
+    		background-color: rgb(255, 80, 80);
+    		color: white;
+			margin: 0px;
+			text-align: center;
+			padding: 12px 0px;
+    		font-size: 0.8em;
+    	}
+    	.page-content-form .form-grp .list-block .item-inner {
+			font-size: 0.83em;
+			margin-left: 12px;
+    	}
+    	.page-content-form .form-grp .list-block .content-block-inner {
+    		background-color: white;
+    		color: black;
+			margin: 0px;
+			text-align: center;
+			padding: 0px;
+    		font-size: 0.8em;
+    		border-top: solid 2px rgb(255, 80, 80);
+    		border-bottom: solid 2px rgb(255, 80, 80);
+    	}
+    	.page-content-form .form-grp .list-block .content-block-inner .item-category {
+    		color: rgb(255, 80, 80);
+    		font-weight: bold;
+    		min-width: 48px;
+    		padding: 0px 6px;
+    	}
+    	.page-content-form .form-grp hr {
+    		margin: 4px 20px;
+    		border-color: rgb(255, 80, 80);
+    	}
+    	.page-content-form .form-grp .list-block .content-block-inner table {
+    		padding: 8px 4px;
+    		min-height:70px;
+    	}
+    	.page-content-form .form-grp .list-block .content-block-inner td {
+    		text-align: left;
+    		padding-right: 12px;
+    	}
+    	.page-content-form .form-grp .list-block .item-content {
+	    	padding: 0px;
+		    font-weight: bold;
+		    font-size: 1.05em;
+    	}
+    	.page-content-form .form-grp .list-block .item-content .item-inner {
+			padding: 0px;
+			margin: 0px;
+    	}
+    	.page-content-form .form-grp .list-block .item-content .item-inner ul > li:not(:last-child) .item-content:not(.saved) {
+			border-bottom: solid 1px rgb(200, 200, 200);
+    	}
+    	.page-content-form .form-grp .list-block .item-content .item-inner ul > li:not(:last-child) .item-content.saved {
+			border-bottom: solid 1px rgb(64, 212, 182);
+    	}
+    	.page-content-form .form-grp .list-block .item-content .item-inner .item-content {
+			padding: 0px 0px 0px 45px;
+		    min-height: 40px;
+    	}
+    	.page-content-form .form-grp .list-block .item-content .item-inner .item-content .item-inner {
+		    min-height: 40px;
+    	}
+    	.toolbar {
+    		height: 46px;
+    	}
+    	.toolbar .toolbar-inner {
+    		padding: 0px;
+    	}
+    	.toolbar .form-submit {
+    		height: 46px;
+			line-height: 44px;
+			font-size: 0.9em;
+			font-weight: bold;
+			width: 100%;
+			text-align: center;
+			color: white;
+			background-color: #D0D0D0;
+    	}
+    	.toolbar .form-submit.active {
+    		background-color: rgb(64, 212, 182);
+    	}
+    	.toolbar .form-delete {
+    		height: 46px;
+			line-height: 44px;
+			font-size: 0.9em;
+			font-weight: bold;
+			width: 100%;
+			text-align: center;
+			color: white;
+			background-color: rgb(255, 80, 80);
+    	}
+    	.toolbar .form-modify {
+    		height: 46px;
+			line-height: 44px;
+			font-size: 0.9em;
+			font-weight: bold;
+			width: 100%;
+			text-align: center;
+			color: white;
+			background-color: rgb(255, 226, 122);
+    	}
+    	.toolbar .form-add {
+    		height: 46px;
+			line-height: 44px;
+			font-size: 0.9em;
+			font-weight: bold;
+			width: 100%;
+			text-align: center;
+			color: white;
+    		background-color: rgb(64, 212, 182);
+    	}
+    	
+    	.page-content-list .item-content.active-state {
+    		background-color: white !important;
+    		color: rgb(125, 125, 125);
+    		font-weight: normal;
+    	}
+    	.page-content-list .list-block > ul > li:first-child  {
+    		font-weight: bold;
+    	}
+    	.page-content-list .list-block > ul  {
+    		border-bottom: solid 2px #C0C0C0;
+    	}
+    	.page-content-list .list-block .item-block:not(:last-child) {
+    		border-bottom: solid 1px #DDDDDD;
+    	}
+    	.page-content-list .list-block .item-content {
+    		min-height: 35px;
+    	}
+    	.page-content-list .list-block .item-content .item-inner {
+    		min-height: 35px;
+    		font-size: 0.8em;
+    		margin-left: 20px;
+    		margin-right: 20px;
+    	}
+    	.page-content-list .group-list.active {
+    		background-color: rgb(0, 126, 242);
+    	}
+    	.page-content-list .group-list.active .item-inner {
+    		color: white;
+    	}
+    	
+    	.page-content-list .form-grp .list-block .item-content .item-inner .item-content {
+    		padding: 0px;
+    	}
+    	.page-content-form .form-grp .group-list .content-block-inner {
+    		background-color: rgb(255, 80, 80);
+    		margin: 0px;
+			text-align: center;
+			padding: 12px 0px;
+    		font-size: 0.8em;
+    		font-weight: bold;
+    	}
+    	.page-content-form .form-grp .group-list .list-block .content-block-inner {
+    		background-color: white;
+    		color: rgb(255, 80, 80);
+			margin: 0px;
+			text-align: center;
+			padding: 0px;
+    		font-size: 0.8em;
+    		border-top: solid 2px rgb(255, 80, 80);
+    		border-bottom: solid 1px #C0C0C0;
+    	}
+    	.page-content-form .form-grp .group-list .list-block .content-block-inner .item-category {
+    		color: rgb(255, 80, 80);
+    		font-weight: bold;
+    		min-width: 48px;
+    		padding: 0px 6px;
+    	}
+    	.page-content-form .form-grp .group-list hr {
+    		margin: 4px 20px;
+    		border-color: rgb(255, 80, 80);
+    	}
+    	.page-content-form .form-grp .group-list .list-block .content-block-inner table {
+    		padding: 8px 4px;
+    		min-height: 35px;
+    		margin-left: 14px;
+    	}
+    	.page-content-form .form-grp .group-list .list-block .content-block-inner td {
+    		text-align: left;
+    		padding-right: 12px;
+    	}
+    	.page-content-form .form-grp .group-list .list-block .item-content {
+	    	padding: 0px;
+		    font-weight: bold;
+		    font-size: 1.05em;
+    	}
+    	.page-content-form .form-grp .group-list .list-block .item-inner input {
+			font-size: 0.9em;
+			margin-left: 12px;
+			color: rgb(125, 125, 125);
+    	}
+    	.page-content-form .form-grp .group-list .list-block .item-inner textarea {
+			font-size: 0.9em;
+			margin-left: 12px;
+			color: rgb(125, 125, 125);
+    	}
+    	.page-content-form .form-grp .group-list .list-block .item-content .item-inner {
+			padding: 0px;
+			margin: 0px;
+			font-size: 0.83em;
+    	}
+    	.page-content-form .form-grp .group-list .list-block .item-content .item-inner ul > li:not(:last-child) .item-content:not(.saved) {
+			border-bottom: solid 1px rgb(200, 200, 200);
+    	}
+    	.page-content-form .form-grp .group-list .list-block .item-content .item-inner ul > li:not(:last-child) .item-content.saved {
+			border-bottom: solid 1px rgb(64, 212, 182);
+    	}
+    	.page-content-form .form-grp .group-list .list-block .item-content .item-inner .item-content {
+			padding: 0px 0px 0px 20px;
+		    min-height: 40px;
+    	}
+    	.page-content-form .form-grp .group-list .list-block .item-content .item-inner .item-content .item-inner {
+		    min-height: 40px;
+    	}
+    	.page-content-form .form-grp .group-list .item-block > .item-content > .item-inner input {
+			margin-left: 20px;
+    	}
+    	.page-content-form .form-grp .group-list .item-block > .item-content > .item-inner textarea {
+			margin-left: 20px;
+    	}
+		</style>
+	</head>
+	<body>
+		<div class="statusbar-overlay"></div>
+		<div class="views">
+			<div class="view view-main">
+				<div class="pages {{ .Style.pages_style }}">
+					<!-- Page, data-page contains page name-->
+					<div data-page="main" class="page">
+						<!-- Top Navbar-->
+						<div class="navbar {{ .Style.navbar }}">
+							<div class="navbar-inner">
+								<div class="left sliding">
+									<!-- 
+									<a href="/index" class="back link {{ .Style.icon_only }}">
+										<i class="icon icon-back"></i>
+									</a>
+									 -->
+								</div>
+								<div class="center sliding">일자 선택</div>
+								<div class="right sliding"></div>
+							</div>
+						</div>
+					
+						<!-- Scrollable page content-->
+						<div class="page-content bg-white">
+							{{ range $idx, $form := .Forms }}
+							{{ if .Extra.label }}
+								{{ if ne .Extra.label "hidden" }}
+							<div class="content-block-title">{{ .Name }}</div>
+								{{ end }}
+							{{ else }}
+							<div class="content-block-title">{{ .Name }}</div>
+							{{ end }}
+							<div class="list-block">
+								<ul>
+									{{ if eq .Type "visit" }}
+										{{ range $g.VisitList }}
+									<li>
+											{{ if .Active }}
+												{{ if .Saved }}
+										<a href="/form?id={{ $form.Id }}&position={{ .Position }}" data-ignore-cache="true" class="item-content saved">
+											<i class="fa fa-check"></i>
+												{{ else }}
+										<a href="/form?id={{ $form.Id }}&position={{ .Position }}" data-ignore-cache="true" class="item-content">
+											<i class="fa fa-check" style="color:transparent;"></i>
+												{{ end }}
+											{{ else }}
+										<a href="javascript:alert('아직 입력하실 수 없습니다.');" class="item-content visit-disabled">
+											<i class="fa fa-check" style="color:transparent;"></i>
+											{{ end }}
+											<div class="item-inner">
+												<div class="left">{{ .Name }}</div>
+												<div class="right">{{ .Date }}</div>
+											</div>
+										</a>
+									</li>
+										{{ end }}
+									{{ else }}
+										{{ range .Groups }}
+									<li>
+											{{ if eq .Type "list" }}
+										<a href="/list?id={{ $form.Id }}&gid={{ .Id }}" data-ignore-cache="true" class="item-content">
+											{{ else }}
+										<a href="/form?id={{ $form.Id }}" data-ignore-cache="true" class="item-content">
+											{{ end }}
+											<i class="fa fa-check" style="color:transparent;"></i>
+											<div class="item-inner">
+												<div class="left">{{ .Name }}</div>
+											</div>
+										</a>
+										{{ end }}
+									</li>
+									{{ end }}
+								</ul>
+							</div>
+							{{ end }}
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+		<script src="public/js/framework7.min.js"></script>
+		<script>
+		// Determine theme depending on device
+		// Set Template7 global devices flags
+		Template7.global = {
+			android: true
+		};
+		 
+		// Define Dom7
+		var $$ = Dom7;
+		 
+		// Change class
+		$$('.view.navbar-through').removeClass('navbar-through').addClass('navbar-fixed');
+		// And move Navbar into Page
+		$$('.view .navbar').prependTo('.view .page');
+		 
+		// Init App
+		var myApp = new Framework7({
+			material: true,
+			template7Pages: true,
+			pushState: true
+		});
+		
+		 
+		// Init View
+		var mainView = myApp.addView('.view-main', {
+			dynamicNavbar: false
+		});
+		
+		myApp.onPageInit("list", function(page) {
+			$$(".group-list").touchstart(function() {
+				$$(this).addClass("active");
+			});
+			$$(".group-list").touchend(function() {
+				$$(this).removeClass("active");
+			});
+			$$(".group-list").click(function() {
+				var formid = $$(this).attr("formid");
+				var rowindex = $$(this).attr("rowindex");
+				mainView.router.load({url:"/form?id=" + formid + "&rowindex=" + rowindex, ignoreCache: true});
+			});
+		});
+		
+		myApp.onPageInit("form", function(page) {
+			$$(".guide").click(function() {
+				if($$(this).hasClass("fold")) {
+					$$(this).removeClass("fold");
+				} else {
+					$$(this).addClass("fold");
+				}
+			});
+			
+			var jFormGroup = $$(".page-content-form .form-grp");
+			var isListForm = (jFormGroup.find(".group-list").length > 0);
+			if(isListForm) {
+				$$(".form-submit").addClass("active");
+			}
+			var ignoreMove = false;
+			$$(".page-content-form .form-grp .list-block .item-content .item-inner li input[type='radio']").change(function() {
+				if($$(this).prop("checked")) {
+					var jLi = $$(this).parent().parent();
+					jLi.parent().children().find(".item-content.active").removeClass("active");
+					jLi.find(".item-content").addClass("active");
+					
+					if(!ignoreMove && !isListForm) {
+						var pageTop = $$(".page-content-form").scrollTop();
+						var itemBlocks = $$(".page-content-form .form-grp .item-block");
+						var findBlock = null;
+						itemBlocks.each(function(idx) {
+							if(findBlock == null && $$(this).find(".label-radio").length > 0) {
+								if($$(this).find(".active").length == 0) {
+									findBlock = $$(this);
+								}
+							}
+						});
+						if(findBlock != null) {
+							$$(".page-content-form").scrollTop(pageTop + findBlock.offset().top - 70, 500);
+							$$(".form-submit").removeClass("active");
+						} else {
+							$$(".form-submit").addClass("active");
+						}
+					}
+				}
+			});
+			setTimeout(function() {
+				ignoreMove = true;
+				$$(".page-content-form .form-grp .list-block .item-content .item-inner li input[type='radio']").change();
+				ignoreMove = false;
+			}, 0);
+			if(!isListForm) {
+				setTimeout(function() {
+					$$(".page-content-form .form-grp .list-block .item-content .item-inner li input[type='radio']").change();
+				}, 500);
+			}
+			
+			$$(".form-delete").click(function() {
+				var data = {};
+				var jFormGroup = $$(".page-content-form .form-grp");
+				var formid = jFormGroup.attr("formid");
+				var groupid = jFormGroup.find("[groupid]").attr("groupid");
+				var position = jFormGroup.attr("position");
+				var rowindex = jFormGroup.attr("rowindex");
+				$$.ajax({
+					url: "/form?id=" + formid + "&position=" + position + "&rowindex=" + rowindex,
+					method: "DELETE",
+					success: function() {
+						alert("삭제 되었습니다.");
+						mainView.router.back({url:"/list?id=" + formid + "&gid=" + groupid, ignoreCache: true, force: true});
+					},
+					error: function() {
+						alert("삭제 되었습니다.");
+						mainView.router.back({url:"/list?id=" + formid + "&gid=" + groupid, ignoreCache: true, force: true});
+					}
+				});
+			});
+			$$(".form-submit, .form-modify").click(function() {
+				if(!$$(this).hasClass("active")) {
+					alert("모든 내역을 작성하여야 합니다.");
+					return false;
+				}
+				var nameHash = {};
+				var dataHash = {};
+				$$(".page-content-form .form-grp [name]").each(function() {
+					var type = $$(this).attr("type");
+					var isSendable = true;
+					var isEnable = true;
+					if(type == "radio" || type == "checkbox") {
+						if(!$$(this).prop("checked")) {
+							isEnable = false;
+						}
+					}
+					if($$(this).attr("disabled") != null) {
+						isSendable = false;
+					}
+					
+					if(isSendable) {
+						var name = $$(this).attr("name");
+						nameHash[name] = true;
+						
+						if(isEnable) {
+							var value = $$(this).val();
+							var list = dataHash[name];
+							if(list == null) {
+								list = [];
+								dataHash[name] = list;
+							}
+							list.push(value);
+						}
+					}
+				});
+				
+				var params = [];
+				for(var name in nameHash) {
+					var list = dataHash[name];
+					if(list != null) {
+						for(var i=0; i<list.length; ++i) {
+							var value = list[i];
+							if(value == null) {
+								value = "";
+							}
+							params.push(name + "=" + encodeURIComponent(value));
+						}
+					} else {
+						params.push(name + "=");
+					}
+				}
+				
+				var data = {};
+				var jFormGroup = $$(".page-content-form .form-grp");
+				var formid = jFormGroup.attr("formid");
+				var groupid = jFormGroup.find("[groupid]").attr("groupid");
+				var position = jFormGroup.attr("position");
+				var rowindex = jFormGroup.attr("rowindex");
+				var isListForm = (jFormGroup.find(".group-list").length > 0);
+				$$.post("/form?id=" + formid + "&position=" + position + "&rowindex=" + rowindex, params.join("&"), function(res) {
+					alert("작성 완료 되었습니다.");
+					
+					if(isListForm) {
+						mainView.router.back({url:"/list?id=" + formid + "&gid=" + groupid, ignoreCache: true, force: true});
+					} else {
+						mainView.router.back({url:"main", ignoreCache: true, force: true});
+					}
+				});
+			});
+		});
+		</script>
+	</body>
+</html>

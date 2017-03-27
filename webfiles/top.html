@@ -17,5 +17,64 @@
 	<script src="../public/js/fullcalendar/fullcalendar.js" type="text/javascript"></script>
 	<script src="../public/js/fullcalendar/locale-all.js" type="text/javascript"></script>
 
+	<style>
+	/* Temp */
+	[v-root-container] {
+		display: none !important;
+	}
+	[v-module] {
+		display: none !important;
+	}
+	</style>
+	<script>
+	if(window.console == null) {
+		window.console = {
+			log: function(msg) {
+			},
+			info: function(msg) {
+			},
+			warn: function(msg) {
+			},
+			error: function(msg) {
+			}
+		};
+	}
+	</script>
+	<script>
+	function formatDate(date) {
+		var d = new Date(date),
+			month = '' + (d.getMonth() + 1),
+			day = '' + d.getDate(),
+			year = d.getFullYear();
+
+		if (month.length < 2) month = '0' + month;
+		if (day.length < 2) day = '0' + day;
+
+		return [year, month, day].join('-');
+	}
+	</script>
+	<script>
+	function KVStore() {
+		this.hash = {};
+	}
+	KVStore.prototype.share = function(key, newval) {
+		var value = this.get(key);
+		if(value === undefined) {
+			value = newval;
+			this.set(key, value);
+		}
+		return value;
+	}
+	KVStore.prototype.get = function(key) {
+		return this.hash[key];
+	}
+	KVStore.prototype.set = function(key, value) {
+		this.hash[key] = value;
+	}
+	window.Store = new KVStore();
+	</script>
+	<script>
+	Store.set("page-initial", <% marshal .page_initial %>);
+	</script>
 </head>
 <body class="clearfix">

@@ -14,7 +14,7 @@
 				<label class="col-xs-5">피험자 군</label>
 				<select class=" input-search col-xs-7"  v-model="input.arm_id">
 					<option value="">전체</option>
-					<option v-for="item in constants.arms" v-bind:value="item.id">{item.name}</option>
+					<option v-for="item in constants.arms" v-bind:value="item.id">{{item.name}}</option>
 				</select>
 			</p>
 			<p class="clearfix">
@@ -60,44 +60,77 @@
 		}
 		</script>
 	</subject-search>
-	<ul class="subject-list">
-		<li class="clearfix red">
-			<div class="col-xs-3"><i class="fa fa-phone"></i></div>
-			<div class="col-xs-9 info">
-				<span class="col-xs-5 name">김고은</span>
-				<span class="col-xs-7">90/04/15</span>
-				<span class="col-xs-5 age">27/여</span>
-				<span class="col-xs-7">3일차 53%</span>
-			</div>
-		</li>
-		<li class="clearfix yellow">
-			<div class="col-xs-3"><i class="fa fa-phone"></i></div>
-			<div class="col-xs-9 info">
-				<span class="col-xs-5 name">김고은</span>
-				<span class="col-xs-7">90/04/15</span>
-				<span class="col-xs-5 age">27/여</span>
-				<span class="col-xs-7">3일차 53%</span>
-			</div>
-		</li>
-		<li class="clearfix active aqua">
-			<div class="col-xs-3"><i class="fa fa-phone"></i></div>
-			<div class="col-xs-9 info">
-				<span class="col-xs-5 name">김고은</span>
-				<span class="col-xs-7">90/04/15</span>
-				<span class="col-xs-5 age">27/여</span>
-				<span class="col-xs-7">3일차 53%</span>
-			</div>
-		</li>
-		<li class="clearfix sky-blue">
-			<div class="col-xs-3"><i class="fa fa-phone"></i></div>
-			<div class="col-xs-9 info">
-				<span class="col-xs-5 name">김고은</span>
-				<span class="col-xs-7">90/04/15</span>
-				<span class="col-xs-5 age">27/여</span>
-				<span class="col-xs-7">3일차 53%</span>
-			</div>
-		</li>
-	</ul>
+	<subject-list>
+		<ul class="subject-list">
+			<li class="clearfix red active" v-for="subject in constants.subjects">
+				<div class="col-xs-3"><i class="fa fa-phone"></i></div>
+				<div class="col-xs-9 info">
+					<span class="col-xs-5 name">{{subject.name}}</span>
+					<span class="col-xs-7">{{subject.t_create}}</span>
+					<span class="col-xs-5 age">{{subject.age}}/{{subject.sex}}</span>
+					<span class="col-xs-7">{{subject.progress}}</span>
+				</div>
+			</li>
+			<li class="clearfix yellow">
+				<div class="col-xs-3"><i class="fa fa-phone"></i></div>
+				<div class="col-xs-9 info">
+					<span class="col-xs-5 name">김고은</span>
+					<span class="col-xs-7">90/04/15</span>
+					<span class="col-xs-5 age">27/여</span>
+					<span class="col-xs-7">3일차 53%</span>
+				</div>
+			</li>
+			<li class="clearfix aqua">
+				<div class="col-xs-3"><i class="fa fa-phone"></i></div>
+				<div class="col-xs-9 info">
+					<span class="col-xs-5 name">김고은</span>
+					<span class="col-xs-7">90/04/15</span>
+					<span class="col-xs-5 age">27/여</span>
+					<span class="col-xs-7">3일차 53%</span>
+				</div>
+			</li>
+			<li class="clearfix sky-blue">
+				<div class="col-xs-3"><i class="fa fa-phone"></i></div>
+				<div class="col-xs-9 info">
+					<span class="col-xs-5 name">김고은</span>
+					<span class="col-xs-7">90/04/15</span>
+					<span class="col-xs-5 age">27/여</span>
+					<span class="col-xs-7">3일차 53%</span>
+				</div>
+			</li>
+		</ul>
+		<script type="vue">
+		data: function() {
+			var obj = {
+				constants: {
+					subjects: Store.get("page-initial").sidebar.subjects,
+					arms: []
+				},
+				input: {
+					name: "",
+					scrno: "",
+					arm_id: ""
+				}
+			};
+			return obj;
+		},
+		methods: {
+			doSearch: function() {
+				this.$http.post("/api/subjects", {
+
+				}).then(function(res) {
+					if(res.body.error != null) {
+						alert(res.body.error);
+					} else {
+						//TODO
+					}
+				}, function(err) {
+					console.error(err.body);
+				});
+			}
+		}
+		</script>
+	</subject-list>
 	<div class="add-subject-wrapper">
 		<button class="btn btn-add-subject" type="button" data-toggle="modal" data-target="#add-subject" >신규 피험자 등록</button>
 	</div>
