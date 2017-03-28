@@ -6,12 +6,10 @@ import (
 	"net/http"
 	"strings"
 	"sync"
-	"time"
 
 	"git.tnicdev.co.kr/hami/CTC_Web/pkg/user"
 	"git.tnicdev.co.kr/hami/CTC_Web/pkg/util"
 
-	"github.com/blackss2/utility/convert"
 	"github.com/labstack/echo"
 )
 
@@ -30,6 +28,7 @@ func main_web(wg sync.WaitGroup) {
 		}
 	})
 	route_api_subjects(g)
+	route_api_notices(g)
 
 	//Web Pages
 	web := util.NewWebServer(e, "./webfiles")
@@ -63,9 +62,40 @@ func main_web(wg sync.WaitGroup) {
 			return c.JSON(http.StatusInternalServerError, &Result{Error: err})
 		}
 
-		if args["IsLogin"] == true {
-			args["page_initial"] = map[string]interface{}{}
+		type Compliance struct {
+			Day      int64   `json:"day"`
+			Local    float64 `json:"local"`
+			Sysmetic float64 `json:"sysmetic"`
+			Vital    float64 `json:"vital"`
+			Ratio    float64 `json:"ratio"`
+		}
 
+		if args["IsLogin"] == true {
+			total_ae := make(map[string]int)
+			//TODO
+			arm_ae := make(map[string]int)
+			//TODO
+			compliance := make([]*Compliance, 0)
+			//TODO
+			enrollment := make(map[string]int)
+			//TODO
+			reservation := make(map[string]int)
+			//TODO
+
+			notices, notice_count, err := Search_Notices(0, 5)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, &Result{Error: err})
+			}
+
+			args["page_initial"] = map[string]interface{}{
+				"total_ae":     total_ae,
+				"arm_ae":       arm_ae,
+				"compliance":   compliance,
+				"enrollment":   enrollment,
+				"reservation":  reservation,
+				"notices":      notices,
+				"notice_count": notice_count,
+			}
 			InitSidebarArgs(c, user, args)
 			return c.Render(http.StatusOK, "main.html", args)
 		} else {
@@ -197,9 +227,9 @@ func InitUserArgs(c echo.Context, args map[string]interface{}) (*user.User, erro
 
 // 반드시 page-initial 초기화 한 후에 실행되어야 함
 func InitSidebarArgs(c echo.Context, user *user.User, args map[string]interface{}) error {
-	retCode, subjects := Sidebar_Subjects(c, user)
-	if err, is := subjects.(error); is {
-		return c.JSON(retCode, &Result{Error: err})
+	subjects, err := Search_Subjects("", "", "")
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, &Result{Error: err})
 	}
 	if _, has := args["page_initial"]; has {
 		args["page_initial"].(map[string]interface{})["sidebar"] = map[string]interface{}{
@@ -213,47 +243,6 @@ func InitSidebarArgs(c echo.Context, user *user.User, args map[string]interface{
 		}
 	}
 	return nil
-}
-
-type DAO_Sidebar_Subject struct {
-	Id       string `json:"id,omitempty"`
-	Name     string `json:"name"`
-	Age      string `json:"age"`
-	Sex      string `json:"sex"`
-	Progress string `json:"progress"`
-	TCreate  string `json:"t_create"`
-}
-
-func Sidebar_Subjects(c echo.Context, user *user.User) (int, interface{}) {
-	list, err := gAPI.SubjectTable.List(gConfig.StudyId)
-	if err != nil {
-		return http.StatusInternalServerError, err
-	}
-
-	daos := make([]*DAO_Sidebar_Subject, 0)
-	for _, v := range list {
-		Age := ""
-		t := convert.Time(v.BirthDate)
-		if t != nil {
-			now := time.Now()
-			c := 0
-			if int(now.Month())*100+int(now.Day()) >= int(t.Month())*100+int(t.Day()) {
-				c++
-			}
-			Age = convert.String((now.Year() - t.Year()) + c)
-		}
-
-		dao := &DAO_Sidebar_Subject{
-			Id:       v.Id,
-			Name:     v.Name,
-			Age:      Age,
-			Sex:      v.Sex,
-			Progress: "X일차YY3%", //TEMP
-			TCreate:  convert.String(v.TCreate)[:10],
-		}
-		daos = append(daos, dao)
-	}
-	return http.StatusOK, daos
 }
 
 func IsAdmin(c echo.Context) (bool, error) {

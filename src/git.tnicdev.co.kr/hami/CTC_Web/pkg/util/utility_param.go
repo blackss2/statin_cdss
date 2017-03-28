@@ -12,14 +12,10 @@ import (
 	"github.com/labstack/echo"
 )
 
-func PathToString(c echo.Context, name string, require bool) (string, error) {
+func PathToString(c echo.Context, name string) (string, error) {
 	param := c.Param(name)
 	if len(param) == 0 {
-		if require {
-			return "", errors.New("require param missing : " + name)
-		} else {
-			return "", nil
-		}
+		return "", errors.New("require param missing : " + name)
 	}
 	value, err := url.QueryUnescape(param)
 	if err != nil {
@@ -60,14 +56,10 @@ func BodyToString(body map[string]interface{}, name string, require bool) (strin
 	}
 }
 
-func PathToStringList(c echo.Context, name string, require bool) ([]string, error) {
+func PathToStringList(c echo.Context, name string) ([]string, error) {
 	param := c.Param(name)
 	if len(param) == 0 {
-		if require {
-			return nil, errors.New("require param missing : " + name)
-		} else {
-			return nil, nil
-		}
+		return nil, errors.New("require param missing : " + name)
 	}
 	value, err := url.QueryUnescape(param)
 	if err != nil {
@@ -118,14 +110,10 @@ func BodyToStringList(body map[string]interface{}, name string, require bool) ([
 	}
 }
 
-func PathToInt(c echo.Context, name string, require bool) (int64, error) {
+func PathToInt(c echo.Context, name string) (int64, error) {
 	param := c.Param(name)
 	if len(param) == 0 {
-		if require {
-			return 0, errors.New("require param missing : " + name)
-		} else {
-			return 0, nil
-		}
+		return 0, errors.New("require param missing : " + name)
 	}
 
 	comp := int64(0x12345678)
@@ -171,14 +159,10 @@ func BodyToInt(body map[string]interface{}, name string, require bool) (int64, e
 	}
 }
 
-func PathToFloat(c echo.Context, name string, require bool) (float64, error) {
+func PathToFloat(c echo.Context, name string) (float64, error) {
 	param := c.Param(name)
 	if len(param) == 0 {
-		if require {
-			return 0, errors.New("require param missing : " + name)
-		} else {
-			return 0, nil
-		}
+		return 0, errors.New("require param missing : " + name)
 	}
 
 	comp := float64(0x12345678)
@@ -224,14 +208,10 @@ func BodyToFloat(body map[string]interface{}, name string, require bool) (float6
 	}
 }
 
-func PathToBool(c echo.Context, name string, require bool) (bool, error) {
+func PathToBool(c echo.Context, name string) (bool, error) {
 	param := c.Param(name)
 	if len(param) == 0 {
-		if require {
-			return false, errors.New("require param missing : " + name)
-		} else {
-			return false, nil
-		}
+		return false, errors.New("require param missing : " + name)
 	}
 
 	param = strings.ToLower(param)
@@ -282,14 +262,10 @@ func BodyToBool(body map[string]interface{}, name string, require bool) (bool, e
 	}
 }
 
-func PathToTime(c echo.Context, name string, require bool) (NullTime, error) {
+func PathToTime(c echo.Context, name string) (NullTime, error) {
 	param := c.Param(name)
 	if len(param) == 0 {
-		if require {
-			return NullTime{}, errors.New("require param missing : " + name)
-		} else {
-			return NullTime{}, nil
-		}
+		return NullTime{}, errors.New("require param missing : " + name)
 	}
 
 	value := convert.Time(param)

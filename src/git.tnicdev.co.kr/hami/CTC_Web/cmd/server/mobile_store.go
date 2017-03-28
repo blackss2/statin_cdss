@@ -58,7 +58,14 @@ func (st *StudyTable) Study(StudyId string) (*Study, error) {
 		return nil, fmt.Errorf("not found")
 	} else {
 		study := &Study{}
-		res.One(&study)
+		err = res.One(&study)
+		if err != nil {
+			if err == gorethink.ErrEmptyResult {
+				return nil, ErrNotExist
+			} else {
+				return nil, err
+			}
+		}
 
 		return study, nil
 	}
@@ -155,9 +162,13 @@ func (st *SubjectTable) Subject(SubjectId string) (*Subject, error) {
 	}
 
 	var subject *Subject
-	res.One(&subject)
-	if len(subject.Id) == 0 {
-		return nil, ErrNotExist
+	err = res.One(&subject)
+	if err != nil {
+		if err == gorethink.ErrEmptyResult {
+			return nil, ErrNotExist
+		} else {
+			return nil, err
+		}
 	}
 	return subject, nil
 }
@@ -229,8 +240,14 @@ func (st *StackTable) Stack(SubjectId string, FormId string) (*Stack, error) {
 	}
 
 	var stack *Stack
-	res.One(&stack)
-
+	err = res.One(&stack)
+	if err != nil {
+		if err == gorethink.ErrEmptyResult {
+			return nil, ErrNotExist
+		} else {
+			return nil, err
+		}
+	}
 	return stack, nil
 }
 
@@ -325,8 +342,14 @@ func (st *VisitTable) Visit(StackId string, Position string) (*Visit, error) {
 	}
 
 	var visit *Visit
-	res.One(&visit)
-
+	err = res.One(&visit)
+	if err != nil {
+		if err == gorethink.ErrEmptyResult {
+			return nil, ErrNotExist
+		} else {
+			return nil, err
+		}
+	}
 	return visit, nil
 }
 
@@ -501,8 +524,14 @@ func (st *FormTable) Form(FormId string) (*Form, error) {
 		return nil, fmt.Errorf("not found")
 	} else {
 		form := &Form{}
-		res.One(&form)
-
+		err = res.One(&form)
+		if err != nil {
+			if err == gorethink.ErrEmptyResult {
+				return nil, ErrNotExist
+			} else {
+				return nil, err
+			}
+		}
 		st.FillGroup(form)
 
 		return form, nil

@@ -1,7 +1,6 @@
 <% template "top.html" . %>
-<% template "sidebar.html" . %>
 
-<div id="container" class="clearfix" v-root-container>
+<div id="container" style="margin-left:0px;" class="clearfix" v-root-container>
 	<% template "header.html" . %>
 	<div class="content-wrapper clearfix">
 		<div class="content clearfix">
@@ -118,65 +117,166 @@
 		</div>
 		<div class="content clearfix">
 			<div class="col-sm-12">
-				<section class="box">
-					<h3 class="title">공지사항</h3>
-					<div class="content notice clearfix">
-						<div class="col-xs-7">
-							<textarea></textarea>
-							<div class="btn-grp">
-								<button type="button" class="btn btn-sm btn-aqua">공지사항 내용 등록</button>
-								<div class="right">
-								<button type="button" class="btn btn-sm btn-dark">전송</button>
-								<button type="button" class="btn btn-sm btn-gray">취소</button>
+				<notices>
+					<section class="box">
+						<h3 class="title">공지사항</h3>
+						<div class="content notice clearfix">
+							<div class="col-xs-7">
+								<textarea v-model="input.content"></textarea>
+								<div class="btn-grp">
+									<button type="button" class="btn btn-sm btn-aqua" v-on:click="saveNotice">공지사항 내용 등록</button>
+									<div class="right">
+									<button type="button" class="btn btn-sm btn-dark" v-on:click="sendNotice">전송</button>
+									</div>
 								</div>
 							</div>
-						</div>
-						<div class="col-xs-1">
-							<div class="icon-left">
-								<i class="fa fa-caret-left"></i>
+							<div class="col-xs-1">
+								<div class="icon-left">
+									<i class="fa fa-caret-left"></i>
+								</div>
+							</div>
+							<div class="col-xs-4">
+								<table class="table-default table-pagination">
+									<thead>
+										<tr>
+											<th>자주 사용하는 공지사항</th>
+											<th>삭제</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="item in constants.notices">
+											<td v-on:click="readNotice(item)" style="cursor:pointer;">{{item.content}}</td>
+											<td><button type="button" class="btn btn-sm btn-danger" v-on:click="deleteNotice(item)">삭제</button></td>
+										</tr>
+									</tbody>
+									<tfoot>
+										<tr>
+											<td colspan='2'>
+												<div class="pagination">
+													<button type="button" class="btn btn-sm btn-prev" v-on:click="loadPage(start_page-1)">&lt;</button>
+													<button type="button" class="btn btn-sm" v-for="page in pages" v-bind:class="{active: (page==current_page)}" v-on:click="loadPage(page)">{{page}}</button>
+													<button type="button" class="btn btn-sm btn-next" v-on:click="loadPage(end_page+1)">&gt;</button>
+												</div>
+											</td>
+										</tr>
+									</tfoot>
+								</table>
 							</div>
 						</div>
-						<div class="col-xs-4">
-							<table class="table-default table-pagination">
-								<thead>
-									<tr>
-										<th>번호</th>
-										<th>자주 사용하는 공지사항</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td>1</td>
-										<td>공지사항 멘트를 저장하면 이 표에 등록이 됩니다.</td>
-									</tr>
-									<tr>
-										<td>2</td>
-										<td>해당 줄을 더블클릭하면 좌측 입력칸에 자동으로 해당 내용이 들어감.</td>
-									</tr>
-									<tr>
-										<td>3</td>
-										<td>공지사항 멘트를 저장하면 이 표에 등록이 됩니다.</td>
-									</tr>
-									<tr>
-										<td>4</td>
-										<td>공지사항 멘트를 저장하면 이 표에 등록이 됩니다.</td>
-									</tr>
-								</tbody>
-								<tfoot>
-									<tr>
-										<td colspan='2'>
-											<div class="pagination">
-												<button type="button" class="btn btn-sm btn-prev" v-on:click="loadPage(start_page-1)">&lt;</button>
-												<button type="button" class="btn btn-sm" v-for="page in pages" v-bind:class="{active: (page==current_page)}" v-on:click="loadPage(page)">{{page}}</button>
-												<button type="button" class="btn btn-sm btn-next" v-on:click="loadPage(end_page+1)">&gt;</button>
-											</div>
-										</td>
-									</tr>
-								</tfoot>
-							</table>
-						</div>
-					</div>
-				</section>
+					</section>
+					<script type="vue">
+					data: function() {
+						var obj = {
+							constants: {
+								notices: Store.get("page-initial").notices,
+								count: Store.get("page-initial").notice_count,
+							},
+							input: {
+								content: ""
+							},
+							offset: 0,
+							limit: 15,
+							current_page: 1
+						};
+						return obj;
+					},
+					computed: {
+						max_page: function() {
+							if(this.constants.count == 0) {
+								return 1;
+							} else {
+								return Math.floor((this.constants.count - 1)/this.limit) + 1;
+							}
+						},
+						start_page: function() {
+							return Math.floor((this.current_page - 1)/5)*5 + 1;
+						},
+						end_page: function() {
+							return Math.min(this.max_page, Math.floor((this.current_page - 1)/5)*5 + 5);
+						},
+						pages: function() {
+							var pages = [];
+							for(var i=this.start_page; i<=this.end_page; i++) {
+								pages.push(i);
+							}
+							return pages;
+						}
+					},
+					methods: {
+						readNotice: function(item) {
+							this.input.content = item.content;
+						},
+						loadPage: function(page) {
+							if(page < 1) {
+								page = 1;
+							} else if(page > this.max_page) {
+								page = this.max_page;
+							}
+							this.current_page = page;
+							this.offset = this.limit*(page - 1);
+							this.$http.get("/api/notices?offset=" + this.offset + "&limit=" + this.limit).then(function(res) {
+								if(res.body.error != null) {
+									alert(res.body.error);
+								} else {
+									this.constants.notices = res.body.result.notices;
+									this.constants.count = res.body.result.notice_count;
+								}
+							}, function(err) {
+								console.error(err.body);
+							});
+						},
+						saveNotice: function() {
+							if(this.input.content.length == 0) {
+								alert("공지사항 내용을 입력해주세요");
+								return;
+							}
+							this.$http.post("/api/notices", {
+								content: this.input.content
+							}).then(function(res) {
+								if(res.body.error != null) {
+									alert(res.body.error);
+								} else {
+									alert("등록되었습니다.");
+									this.loadPage(this.current_page);
+								}
+							}, function(err) {
+								console.error(err.body);
+							});
+						},
+						sendNotice: function() {
+							if(this.input.content.length == 0) {
+								alert("공지사항 내용을 입력해주세요");
+								return;
+							}
+							this.$http.post("/api/notice_push", {
+								content: this.input.content
+							}).then(function(res) {
+								if(res.body.error != null) {
+									alert(res.body.error);
+								} else {
+									alert("전송되었습니다,");
+								}
+							}, function(err) {
+								console.error(err.body);
+							});
+						},
+						deleteNotice: function(item) {
+							if(window.confirm("정말 삭제하시겠습니까?")) {
+								this.$http.delete("/api/notices/" + item.id).then(function(res) {
+									if(res.body.error != null) {
+										alert(res.body.error);
+									} else {
+										alert("삭제되었습니다,");
+										this.loadPage(this.current_page);
+									}
+								}, function(err) {
+									console.error(err.body);
+								});
+							}
+						},
+					}
+					</script>
+				</notices>
 			</div>
 		</div>
 	</div>

@@ -6,93 +6,141 @@
 	<div class="content-wrapper clearfix">
 		<div class="content">
 			<div class="col-sm-9">
-				<section class="box box-height-sm">
-					<h3 class="title">대상자 관리</h3>
-					<div class="content">
-						<div class="subject-info">
-							<label class="info-title">이름 : </label>
-							<span class="info"> 홍길동 </span>
-							<label class="info-title">/ 대상자 번호 :</label>
-							<span class="info"> 00-000-000 </span>
-							<button class="btn btn-sm btn-aqua" type="button" data-toggle="modal" data-target="#confirm-subject">인증</button>
-							<label class="info-title">/ 성별 : </label>
-							<span class="info">남자 </span>
-							<label class="info-title">/ 생년월일 : </label>
-							<span class="info">1996/05/20</span>
-							<label class="info-title">/ 나이 : </label>
-							<span class="info">31</span> 
-							<button class="btn btn-sm btn-dark right" type="button" data-toggle="modal" data-target="#edit-subject">정보 수정</button>
+				<subject-info>
+					<section class="box box-height-sm">
+						<h3 class="title">대상자 관리</h3>
+						<div class="content" v-if="constants.subject != null">
+							<div class="subject-info">
+								<label class="info-title">이름 : </label>
+								<span class="info"> {{constants.subject.is_auth ? constants.subject.name : "인증필요"}}</span>
+								<button class="btn btn-sm btn-aqua" type="button" v-on:click="openAuthModal">인증</button>
+								<label class="info-title">/ 대상자 번호 :</label>
+								<span class="info"> {{constants.subject.scrno}} </span>
+								<label class="info-title">/ 성별 : </label>
+								<span class="info">{{constants.subject.sex == "M" ? "남성" : "여성"}} </span>
+								<label class="info-title">/ 생년월일 : </label>
+								<span class="info">{{constants.subject.birth_date}}</span>
+								<label class="info-title">/ 나이 : </label>
+								<span class="info">{{constants.subject.age}}</span> 
+								<button class="btn btn-sm btn-dark right" type="button" v-on:click="openEditModal">정보 수정</button>
+							</div>
 						</div>
-					</div>
-				</section>
+						<div class="content" v-else>
+							대상자를 선택해주세요.
+						</div>
+					</section>
+					<script type="vue">
+					data: function() {
+						var obj = {
+							constants: {
+								subject_of_list: null,
+								subject: null
+							}
+						};
+						Callback.add("select-subject", this.selectSubject);
+						return obj;
+					},
+					watch: {
+						"constants.subject.scrno": function() {
+							this.constants.subject_of_list.scrno = this.constants.subject.scrno;
+						},
+						"constants.subject.first_date": function() {
+							this.constants.subject_of_list.first_date = this.constants.subject.first_date;
+						},
+						"constants.subject.age": function() {
+							this.constants.subject_of_list.age = this.constants.subject.age;
+						},
+						"constants.subject.sex": function() {
+							this.constants.subject_of_list.sex = this.constants.subject.sex;
+						}
+					},
+					methods: {
+						selectSubject: function(item) {
+							this.constants.subject_of_list = item;
+							if(item == null) {
+								this.constants.subject = null;
+							} else {
+								this.$http.get("/api/subjects/" + item.id).then(function(res) {
+									if(res.body.error != null) {
+										alert(res.body.error);
+									} else {
+										this.constants.subject = res.body.result;
+										Callback.call("load-subject", this.constants.subject);
+									}
+								}, function(err) {
+									console.error(err.body);
+								});
+							}
+						},
+						openAuthModal: function() {
+							$("#confirm-subject").modal("show");
+						},
+						openEditModal: function() {
+							$("#edit-subject").modal("show");
+						}
+					}
+					</script>
+				</subject-info>
 				<div class="row">
 					<div class="col-xs-3">
-						<section class="box box-height-md">
-							<h3 class="title">다이어리</h3>
-							<div class="content">
-								<ul class="daily-list">
-									<li class="daily">
-										<span>1일차</span>
-										<ul class="daily-sub-menu hidden">
-											<li class="sub-item active">국소반응</li>
-											<li class="sub-item">전신반응</li>
-											<li class="sub-item">생체생활정보</li>
-										</ul>
-									</li>
-									<li class="daily">
-										<span>2일차</span>
-										<ul class="daily-sub-menu hidden">
-											<li class="sub-item active">국소반응</li>
-											<li class="sub-item">전신반응</li>
-											<li class="sub-item">생체생활정보</li>
-										</ul>
-									</li>
-									<li class="daily">
-										<span>3일차</span>
-										<ul class="daily-sub-menu hidden">
-											<li class="sub-item active">국소반응</li>
-											<li class="sub-item">전신반응</li>
-											<li class="sub-item">생체생활정보</li>
-										</ul>
-									</li>
-									<li class="daily">
-										<span>4일차</span>
-										<ul class="daily-sub-menu hidden">
-											<li class="sub-item active">국소반응</li>
-											<li class="sub-item">전신반응</li>
-											<li class="sub-item">생체생활정보</li>
-										</ul>
-									</li>
-									<li class="daily">
-										<span>5일차</span>
-										<ul class="daily-sub-menu hidden">
-											<li class="sub-item active">국소반응</li>
-											<li class="sub-item">전신반응</li>
-											<li class="sub-item">생체생활정보</li>
-										</ul>
-									</li>
-									<li class="daily">
-										<span>6일차</span>
-										<ul class="daily-sub-menu hidden">
-											<li class="sub-item active">국소반응</li>
-											<li class="sub-item">전신반응</li>
-											<li class="sub-item">생체생활정보</li>
-										</ul>
-									</li>
-									<li class="daily">
-										<span>7일차</span>
-										<ul class="daily-sub-menu hidden">
-											<li class="sub-item active">국소반응</li>
-											<li class="sub-item">전신반응</li>
-											<li class="sub-item">생체생활정보</li>
-										</ul>
-									</li>
-									<li class="etc" onclick="location.href='/subject_etc.html'">기타 이상 반응</li>
-									<li class="etc drug " onclick="location.href='/subject_drug.html'">병용 약물 관리</li>
-									<li class="etc diary" onclick="location.href='/subject_diary.html'">다이어리 평가</li>
-								</ul>
-							</div>
-						</section>
+						<diary>
+							<section class="box box-height-md">
+								<h3 class="title">다이어리</h3>
+								<div class="content">
+									<ul class="daily-list" v-if="constants.subject != null">
+										<li class="daily" v-for="position in positions">
+											<span>{{position}}일차</span>
+											<ul class="daily-sub-menu" v-bind:class="{hidden:selected.position != position}">
+												<li class="sub-item" v-bind:class="{active:selected.group == 'g-2'}" v-on:click="selectForm('f-1', 'g-2')">국소반응</li>
+												<li class="sub-item" v-bind:class="{active:selected.group == 'g-3'}" v-on:click="selectForm('f-1', 'g-3')">전신반응</li>
+												<li class="sub-item" v-bind:class="{active:selected.group == 'g-7'}" v-on:click="selectForm('f-1', 'g-8')">생체생활정보</li>
+												<li class="sub-item" v-bind:class="{active:selected.group == 'g-7'}" v-on:click="selectForm('f-2', 'g-4')">기타 이상 반응</li>
+											</ul>
+										</li>
+										<li class="etc"  v-on:click="selectForm('f-3', 'g-5')">기타 이상 반응</li>
+										<li class="etc drug"  v-on:click="selectForm('f-4', 'g-6')">병용 약물 관리</li>
+										<li class="etc diary"  v-on:click="selectForm('f-5', 'g-7')">다이어리 평가</li>
+									</ul>
+									<div v-else>
+									대상자를 선택해주세요.
+									</div>
+								</div>
+							</section>
+							<script type="vue">
+							data: function() {
+								var obj = {
+									constants: {
+										subject: null
+									},
+									selected: {
+										position: 1,
+										group: ""
+									}
+								};
+								Callback.add("load-subject", this.loadSubject);
+								return obj;
+							},
+							computed: {
+								positions: function() {
+									var list = [];
+									if(this.constants.subject != null) {
+										for(var i=0; i<this.constants.subject.max_position; i++) {
+											list.push(i+1);
+										}
+									}
+									return list;
+								}
+							},
+							methods: {
+								loadSubject: function(item) {
+									this.constants.subject = item;
+								},
+								selectForm: function(formid, groupid) {
+									console.log(formid, groupid);
+								}
+							}
+							</script>
+						</diary>
 					</div>
 					<div class="col-xs-9">
 						<section class="box box-height-md">
@@ -669,133 +717,338 @@
 		</div>
 	</div>
 </div>
-<div class="modal fade" id="confirm-subject">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content box">
-			<div class="modal-header">
-				<h5 class="modal-title title">대상자 확인 비밀번호</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<div class="modal-body">
-				<table>
-					<colgroup>
-						<col width="28%"/>
-						<col width="72%"/>
-					</colgroup>
-					<tr>
-						<th>비밀번호</th>
-						<td>
-							<div class="col-xs-12">
-								<input type="text" class="col-xs-12" placeholder="비밀번호를 입력해 주세요." />
-							</div>
-						</td>
-					</tr>
-				</table>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-aqua btn-sm" v-on:click="doNew">승인</button>
-				<button type="button" class="btn btn-grey btn-sm" data-dismiss="modal">취소</button>
+<div class="modal fade" id="confirm-subject" v-root-container>
+	<auth-subject>
+		<div class="modal-dialog" role="document">
+			<div class="modal-content box">
+				<div class="modal-header">
+					<h5 class="modal-title title">대상자 확인 비밀번호</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<table>
+						<colgroup>
+							<col width="28%"/>
+							<col width="72%"/>
+						</colgroup>
+						<tr>
+							<th>비밀번호</th>
+							<td>
+								<div class="col-xs-12">
+									<input type="password" class="col-xs-12" placeholder="비밀번호를 입력해 주세요." v-model="input.password" />
+									* 인증은 30분간 지속됩니다.
+								</div>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-aqua btn-sm" v-on:click="doNew">승인</button>
+					<button type="button" class="btn btn-grey btn-sm" data-dismiss="modal">취소</button>
+				</div>
 			</div>
 		</div>
-	</div>
+		<script type="vue">
+		data: function() {
+			var obj = {
+				constants: {
+					subject: null
+				},
+				input: {
+					password: ""
+				}
+			};
+			Callback.add("load-subject", this.loadSubject);
+			return obj;
+		},
+		methods: {
+			loadSubject: function(item) {
+				this.constants.subject = item;
+				for(var key in this.input) {
+					this.input[key] = "";
+				}
+			},
+			doNew: function() {
+				$("#confirm-subject").modal("hide");
+				//TODO
+				console.log(this.input.password);
+			}
+		}
+		</script>
+	</auth-subject>
 </div>
-<div class="modal fade" id="edit-subject">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content box">
-			<div class="modal-header">
-				<h5 class="modal-title title">대상자 정보 수정</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<div class="modal-body">
-				<div class="box"></div>
-				<table>
-					<colgroup>
-						<col width="35%"/>
-						<col width="65%"/>
-					</colgroup>
-					<tr>
-						<th>이름</th>
-						<td>
-							<div class="col-xs-7">
-								<input type="text" class="col-xs-12" v-model="name" />
-							</div>
-						</td>
-					</tr>
-					<tr>
-						<th>대상자 번호</th>
-						<td>
-							<div class="col-xs-3">
-								<input type="text" class="col-xs-12" maxlength="2" />
-							</div>
-							<span class="col-xs-1">-</span>
-							<div class="col-xs-3">
-								<input type="text" class="col-xs-12" maxlength="3" />
-							</div>
-							<span class="col-xs-1">-</span>
-							<div class="col-xs-3">
-								<input type="text" class="col-xs-12" maxlength="3" />
-							</div>
-						</td>
-					</tr>
-					<tr>
-						<th>성별</th>
-						<td>
-							<label class="input-radio">여자
-								<input type="radio" name="sex" value="female" class="radio-btn"/>
-								<span class="fake-btn"></span>
-							</label>
-							<label class="input-radio">남자
-								<input type="radio" name="sex" value="male" class="radio-btn"/>
-								<span class="fake-btn"></span>
-							</label>
-						</td>
-					</tr>
-					<tr>
-						<th>생년월일</th>
-						<td class="birth">
-							<div class="col-xs-4">
-								<input type="text" class="col-xs-12" maxlength="4" />
-							</div>
-							<span class="col-xs-1">년</span>
-							<div class="col-xs-2">
-								<input type="text" class="col-xs-12" maxlength="2" />
-							</div>
-							<span class="col-xs-1">월</span>
-							<div class="col-xs-2">
-								<input type="text" class="col-xs-12" maxlength="2" />
-							</div>
-							<span class="col-xs-1">일</span>
-						</td>
-					</tr>
-					<tr>
-						<th>접종일</th>
-						<td class="birth">
-							<div class="col-xs-4">
-								<input type="text" class="col-xs-12" maxlength="4" />
-							</div>
-							<span class="col-xs-1">년</span>
-							<div class="col-xs-2">
-								<input type="text" class="col-xs-12" maxlength="2" />
-							</div>
-							<span class="col-xs-1">월</span>
-							<div class="col-xs-2">
-								<input type="text" class="col-xs-12" maxlength="2" />
-							</div>
-							<span class="col-xs-1">일</span>
-						</td>
-					</tr>
-				</table>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-aqua btn-sm" v-on:click="doNew">승인</button>
-				<button type="button" class="btn btn-grey btn-sm" data-dismiss="modal">취소</button>
+<div class="modal fade" id="edit-subject" v-root-container>
+	<edit-subject>
+		<div class="modal-dialog" role="document">
+			<div class="modal-content box">
+				<div class="modal-header">
+					<h5 class="modal-title title">대상자 정보 수정</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="box"></div>
+					<table>
+						<colgroup>
+							<col width="35%"/>
+							<col width="65%"/>
+						</colgroup>
+						<tr v-if="constants.subject != null && constants.subject.is_auth">
+							<th>이름</th>
+							<td>
+								<div class="col-xs-7">
+									<input type="text" class="col-xs-12" v-model="input.name" />
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th>대상자번호</th>
+							<td>
+								<div class="col-xs-3">
+									<input type="text" class="col-xs-12" maxlength="2" v-model="input.scrno_1" />
+								</div>
+								<span class="col-xs-1">-</span>
+								<div class="col-xs-3">
+									<input type="text" class="col-xs-12" maxlength="3" v-model="input.scrno_2" />
+								</div>
+								<span class="col-xs-1">-</span>
+								<div class="col-xs-3">
+									<input type="text" class="col-xs-12" maxlength="3" v-model="input.scrno_3" />
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th>성별</th>
+							<td>
+								<label class="input-radio">남자
+									<input type="radio" name="sex" value="M" class="radio-btn" v-model="input.sex" />
+									<span class="fake-btn"></span>
+								</label>
+								<label class="input-radio">여자
+									<input type="radio" name="sex" value="F" class="radio-btn" v-model="input.sex" />
+									<span class="fake-btn"></span>
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<th>생년월일</th>
+							<td class="birth">
+								<div class="col-xs-4">
+									<select v-on:change="doUpdateBirthDay" v-model="input.birth_year">
+										<option value="">[년]</option>
+										<option v-for="item in constants.birth.years" v-bind:value="item">{{item}}</option>
+									</select>
+								</div>
+								<div class="col-xs-4">
+									<select v-on:change="doUpdateBirthDay" v-model="input.birth_month">
+										<option value="">[월]</option>
+										<option v-for="item in constants.birth.months" v-bind:value="item">{{item}}</option>
+									</select>
+								</div>
+								<div class="col-xs-4">
+									<select v-model="input.birth_day">
+										<option value="">[일]</option>
+										<option v-for="item in constants.birth.days" v-bind:value="item">{{item}}</option>
+									</select>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th>접종일</th>
+							<td class="birth">
+								<div class="col-xs-4">
+									<select v-on:change="doUpdateFirstDay" v-model="input.first_year">
+										<option value="">[년]</option>
+										<option v-for="item in constants.first.years" v-bind:value="item">{{item}}</option>
+									</select>
+								</div>
+								<div class="col-xs-4">
+									<select v-on:change="doUpdateFirstDay" v-model="input.first_month">
+										<option value="">[월]</option>
+										<option v-for="item in constants.first.months" v-bind:value="item">{{item}}</option>
+									</select>
+								</div>
+								<div class="col-xs-4">
+									<select v-model="input.first_day">
+										<option value="">[일]</option>
+										<option v-for="item in constants.first.days" v-bind:value="item">{{item}}</option>
+									</select>
+								</div>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-aqua btn-sm" v-on:click="doApply">수정</button>
+					<button type="button" class="btn btn-grey btn-sm" data-dismiss="modal">취소</button>
+				</div>
 			</div>
 		</div>
-	</div>
+		<script type="vue">
+		data: function() {
+			var nowYear = new Date().getFullYear();
+			var birth_years = [];
+			for(var i=1900; i<= nowYear; i++) {
+				birth_years.push(i);
+			}
+			var first_years = [];
+			for(var i=1900; i<= nowYear; i++) {
+				first_years.push(i);
+			}
+
+			var obj = {
+				constants: {
+					subject: null,
+					birth: {
+						years: birth_years,
+						months: ["01","02","03","04","05","06","07","08","09","10","11","12"],
+						days: []
+					},
+					first: {
+						years: first_years,
+						months: ["01","02","03","04","05","06","07","08","09","10","11","12"],
+						days: []
+					},
+					arms: []
+				},
+				input: {
+					name: "",
+					scrno_1: "",
+					scrno_2: "",
+					scrno_3: "",
+					sex: "",
+					birth_year: "",
+					birth_month: "",
+					birth_day: "",
+					first_year: "",
+					first_month: "",
+					first_day: ""
+				}
+			};
+			Callback.add("load-subject", this.loadSubject);
+			return obj;
+		},
+		methods: {
+			loadSubject: function(item) {
+				this.constants.subject = item;
+				this.input.name = item.name;
+				this.input.scrno_1 = item.scrno.split("-")[0];
+				this.input.scrno_2 = item.scrno.split("-")[1];
+				this.input.scrno_3 = item.scrno.split("-")[2];
+				this.input.sex = item.sex;
+				console.log(item);
+				this.input.birth_year = item.birth_date.split("-")[0];
+				this.input.birth_month = item.birth_date.split("-")[1];
+				this.doUpdateBirthDay();
+				this.input.birth_day = item.birth_date.split("-")[2];
+				this.input.first_year = item.first_date.split("-")[0];
+				this.input.first_month = item.first_date.split("-")[1];
+				this.doUpdateFirstDay();
+				this.input.first_day = item.first_date.split("-")[2];
+				console.log(this.input);
+			},
+			doUpdateBirthDay: function() {
+				var year = parseInt(this.input.birth_year);
+				var month = parseInt(this.input.birth_month);
+				if(!isNaN(year) && !isNaN(month)) {
+					var dt = new Date(year + "-01-01");
+					dt.setMonth(parseInt(month));
+					dt.setDate(0);
+					var maxDate = dt.getDate();
+					var days = [];
+					var hasSelectedDay = false;
+					for(var i=1; i<=maxDate; i++) {
+						days.push(i < 10 ? "0" + i : "" + i);
+						if(this.input.birth_day == i) {
+							hasSelectedDay = true;
+						}
+					}
+					this.constants.birth.days = days;
+					if(!hasSelectedDay) {
+						this.input.birth_day = "";
+					}
+				} else {
+					this.constants.birth.days = [];
+					this.input.birth_Day = "";
+				}
+			},
+			doUpdateFirstDay: function() {
+				var year = parseInt(this.input.first_year);
+				var month = parseInt(this.input.first_month);
+				if(!isNaN(year) && !isNaN(month)) {
+					var dt = new Date(year + "-01-01");
+					dt.setMonth(parseInt(month));
+					dt.setDate(0);
+					var maxDate = dt.getDate();
+					var days = [];
+					var hasSelectedDay = false;
+					for(var i=1; i<=maxDate; i++) {
+						days.push(i < 10 ? "0" + i : "" + i);
+						if(this.input.first_day == i) {
+							hasSelectedDay = true;
+						}
+					}
+					this.constants.first.days = days;
+					if(!hasSelectedDay) {
+						this.input.first_day = "";
+					}
+				} else {
+					this.constants.first.days = [];
+					this.input.birth_Day = "";
+				}
+			},
+			doApply: function() {
+				if(this.constants.subject.is_auth && this.input.name.length == 0) {
+					alert("이름을 입력하셔야 합니다.");
+					return;
+				}
+				if(this.input.scrno_1.length != 2 || this.input.scrno_2.length != 3 || this.input.scrno_3.length != 3) {
+					alert("대상자번호(OO-OOO-OOO)를 올바르게 입력하셔야 합니다.");
+					return;
+				}
+				if(this.input.sex.length == 0) {
+					alert("성별을 입력하셔야 합니다.");
+					return;
+				}
+				if(this.input.birth_year.length == 0 || this.input.birth_month.length == 0 || this.input.birth_day.length == 0) {
+					alert("생년월일을 입력하셔야 합니다.");
+					return;
+				}
+				if(this.input.first_year.length == 0 || this.input.first_month.length == 0 || this.input.first_day.length == 0) {
+					alert("접종일을 입력하셔야 합니다.");
+					return;
+				}
+				var scrno = this.input.scrno_1 + "-" + this.input.scrno_2 + "-" + this.input.scrno_3;
+				var birth_date = this.input.birth_year + "-" + this.input.birth_month + "-" + this.input.birth_day;
+				var first_date = this.input.first_year + "-" + this.input.first_month + "-" + this.input.first_day;
+
+				this.$http.put("/api/subjects/" + this.constants.subject.id, {
+					name: this.input.name,
+					scrno: scrno,
+					sex: this.input.sex,
+					birth_date: birth_date,
+					first_date: first_date
+				}).then(function(res) {
+					if(res.body.error != null) {
+						alert(res.body.error);
+					} else {
+						$("#edit-subject").modal("hide");
+						this.constants.subject.name = this.input.name;
+						this.constants.subject.scrno = scrno;
+						this.constants.subject.sex = this.input.sex;
+						this.constants.subject.birth_date = birth_date;
+						this.constants.subject.first_date = first_date;
+					}
+				}, function(err) {
+					console.error(err.body);
+				});
+			}
+		}
+		</script>
+	</edit-subject>
 </div>
 <div class="modal fade" id="add-schedule">
 	<div class="modal-dialog" role="document">

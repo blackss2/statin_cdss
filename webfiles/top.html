@@ -74,6 +74,26 @@
 	window.Store = new KVStore();
 	</script>
 	<script>
+	function Callback() {
+		this.store = new KVStore();
+	}
+	Callback.prototype.add = function(key, func) {
+		var list = this.store.share(key, []);
+			list.push({
+			func: func
+		});
+	}
+	Callback.prototype.call = function(key) {
+		var list = this.store.share(key, []);
+		Array.prototype.splice.apply(arguments, [0, 1]);
+		for(var i=0; i<list.length; i++) {
+			var item = list[i];
+			item.func.apply(item.caller, arguments);
+		}
+	}
+	window.Callback = new Callback();
+	</script>
+	<script>
 	Store.set("page-initial", <% marshal .page_initial %>);
 	</script>
 </head>

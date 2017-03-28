@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 
+	"git.tnicdev.co.kr/hami/CTC_Web/pkg/notice"
 	"git.tnicdev.co.kr/hami/CTC_Web/pkg/user"
 
 	"github.com/dancannon/gorethink"
@@ -21,6 +22,7 @@ var gAPI = struct {
 	DataTable    *DataTable
 	HistoryTable *HistoryTable
 	UserStore    *user.Store
+	NoticeStore  *notice.Store
 }{}
 
 var gFormListCache []*Form
@@ -63,6 +65,10 @@ func init() {
 	gAPI.HistoryTable = NewHistoryTable(session, db)
 
 	gAPI.UserStore, err = user.NewStore(u, "user")
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	gAPI.NoticeStore, err = notice.NewStore(u, "notice")
 	if err != nil {
 		log.Fatalln(err.Error())
 	}

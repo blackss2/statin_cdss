@@ -21,11 +21,11 @@
 				<button class="btn-search" v-on:click="doSearch">검색</button>
 			</p>
 			<p class="clearfix">
-				<select class="select-search form-control">
+				<select class="select-search form-control" v-model="input.type">
 					<option value="">전체</option>
-					<option value="1">진행 중 이상반응</option>
-					<option value="2">순응도 저조</option>
-					<option value="3">관리 필요</option>
+					<option value="ae">진행 중 이상반응</option>
+					<option value="low">순응도 저조</option>
+					<option value="warn">관리 필요</option>
 				</select>
 			</p>
 		</section>
@@ -38,20 +38,24 @@
 				input: {
 					name: "",
 					scrno: "",
-					arm_id: ""
+					arm_id: "",
+					type: ""
 				}
 			};
 			return obj;
 		},
 		methods: {
 			doSearch: function() {
-				this.$http.post("/api/subjects", {
-
-				}).then(function(res) {
+				this.$http.get("/api/subjects?name=" + this.input.name + 
+					"&scrno=" + this.input.scrno +
+					"&arm_id=" + this.input.arm_id +
+					"&type=" + this.input.type
+				).then(function(res) {
 					if(res.body.error != null) {
 						alert(res.body.error);
 					} else {
-						//TODO
+						Callback.call("update-subject-list", res.body.result);
+						Callback.call("select-subject", null);
 					}
 				}, function(err) {
 					console.error(err.body);
@@ -62,40 +66,18 @@
 	</subject-search>
 	<subject-list>
 		<ul class="subject-list">
-			<li class="clearfix red" v-bind:class="{active:(selected.id==subject.id)}" v-for="subject in constants.subjects">
-				<div class="col-xs-3"><i class="fa fa-phone"></i></div>
-				<div class="col-xs-9 info">
-					<span class="col-xs-5 name">{{subject.name}}</span>
-					<span class="col-xs-7">{{subject.t_create}}</span>
-					<span class="col-xs-5 age">{{subject.age}}/{{subject.sex}}</span>
-					<span class="col-xs-7">{{subject.progress}}</span>
-				</div>
-			</li>
-			<li class="clearfix yellow">
-				<div class="col-xs-3"><i class="fa fa-phone"></i></div>
-				<div class="col-xs-9 info">
-					<span class="col-xs-5 name">김고은</span>
-					<span class="col-xs-7">90/04/15</span>
-					<span class="col-xs-5 age">27/여</span>
-					<span class="col-xs-7">3일차 53%</span>
-				</div>
-			</li>
-			<li class="clearfix aqua">
-				<div class="col-xs-3"><i class="fa fa-phone"></i></div>
-				<div class="col-xs-9 info">
-					<span class="col-xs-5 name">김고은</span>
-					<span class="col-xs-7">90/04/15</span>
-					<span class="col-xs-5 age">27/여</span>
-					<span class="col-xs-7">3일차 53%</span>
-				</div>
-			</li>
-			<li class="clearfix sky-blue">
-				<div class="col-xs-3"><i class="fa fa-phone"></i></div>
-				<div class="col-xs-9 info">
-					<span class="col-xs-5 name">김고은</span>
-					<span class="col-xs-7">90/04/15</span>
-					<span class="col-xs-5 age">27/여</span>
-					<span class="col-xs-7">3일차 53%</span>
+			<!--
+			red
+			yellow
+			aqua
+			sky-blue
+			-->
+			<li class="clearfix" v-bind:class="{'active':(selected.id==item.id), 'red':getColor(item, 'red'), 'yellow':getColor(item, 'yellow'), 'aqua':getColor(item, 'aqua'), 'sky-blue':getColor(item, 'sky-blue')}" v-for="item in constants.subjects" v-on:click="selectSubject(item)">
+				<div class="col-xs-12 info">
+					<span class="col-xs-6 name">{{item.scrno}}</span>
+					<span class="col-xs-6">{{item.t_create}}</span>
+					<span class="col-xs-6 age">{{item.age}}/{{(item.sex == "M" ? "남성" : "여성")}}</span>
+					<span class="col-xs-6">{{item.progress}}</span>
 				</div>
 			</li>
 		</ul>
@@ -108,28 +90,22 @@
 				},
 				selected: {
 					id: ""
-				},
-				input: {
-					name: "",
-					scrno: "",
-					arm_id: ""
 				}
 			};
+			Callback.add("update-subject-list", this.updateSubjectList);
 			return obj;
 		},
 		methods: {
-			doSearch: function() {
-				this.$http.post("/api/subjects", {
-
-				}).then(function(res) {
-					if(res.body.error != null) {
-						alert(res.body.error);
-					} else {
-						//TODO
-					}
-				}, function(err) {
-					console.error(err.body);
-				});
+			getColor: function(item, color) {
+				//TODO
+				return true;
+			},
+			selectSubject: function(item) {
+				this.selected.id = item.id;
+				Callback.call("select-subject", item);
+			},
+			updateSubjectList: function(list) {
+				this.constants.subjects = list;
 			}
 		}
 		</script>
@@ -145,7 +121,7 @@
 		},
 		methods: {
 			openModal: function() {
-				Store.get("add-subject-reset")();
+				Callback.call("add-subject-reset");
 				$("#add-subject").modal("show");
 			}
 		}
@@ -241,7 +217,7 @@
 							</td>
 						</tr>
 						<tr>
-							<th>생년월일</th>
+							<th>접종일</th>
 							<td class="birth">
 								<div class="col-xs-4">
 									<select v-on:change="doUpdateFirstDay" v-model="input.first_year">
@@ -312,15 +288,15 @@
 					first_day: ""
 				}
 			};
-			Store.set("add-subject", obj);
-			Store.set("add-subject-reset", function() {
-				for(var key in obj.input) {
-					obj.input[key] = "";
-				}
-			});
+			Callback.add("add-subject-reset", this.reset);
 			return obj;
 		},
 		methods: {
+			reset: function() {
+				for(var key in this.input) {
+					this.input[key] = "";
+				}
+			},
 			doUpdateBirthDay: function() {
 				var year = parseInt(this.input.birth_year);
 				var month = parseInt(this.input.birth_month);
