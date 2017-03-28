@@ -77,18 +77,17 @@ func (st *StudyTable) List() ([]*Study, error) {
 }
 
 type Subject struct {
-	Id              string    `json:"id,omitempty" gorethink:"id,omitempty"`
-	Name            string    `json:"name" gorethink:"name"`
-	ScrNo           string    `json:"scrno" gorethink:"scrno"`
-	Sex             string    `json:"sex" gorethink:"sex"`
-	BirthDate       string    `json:"birth_date" gorethink:"birth_date"`
-	ArmId           string    `json:"arm_id" gorethink:"arm_id"`
-	InoculationDate string    `json:"inoculation_date" gorethink:"inoculation_date"`
-	FirstDate       string    `json:"first_date" gorethink:"first_date"`
-	IsDelete        bool      `json:"is_delete" gorethink:"is_delete"`
-	TCreate         time.Time `json:"t_create" gorethink:"t_create"`
-	ActorId         string    `json:"actor_id" gorethink:"actor_id"`
-	StudyId         string    `json:"study_id" gorethink:"study_id"`
+	Id        string    `json:"id,omitempty" gorethink:"id,omitempty"`
+	Name      string    `json:"name" gorethink:"name"`
+	ScrNo     string    `json:"scrno" gorethink:"scrno"`
+	Sex       string    `json:"sex" gorethink:"sex"`
+	BirthDate string    `json:"birth_date" gorethink:"birth_date"`
+	ArmId     string    `json:"arm_id" gorethink:"arm_id"`
+	FirstDate string    `json:"first_date" gorethink:"first_date"`
+	IsDelete  bool      `json:"is_delete" gorethink:"is_delete"`
+	TCreate   time.Time `json:"t_create" gorethink:"t_create"`
+	ActorId   string    `json:"actor_id" gorethink:"actor_id"`
+	StudyId   string    `json:"study_id" gorethink:"study_id"`
 }
 
 type SubjectTable struct {
@@ -113,21 +112,21 @@ func (st *SubjectTable) Insert(
 	Sex string,
 	BirthDate string,
 	ArmId string,
-	InoculationDate string,
+	FirstDate string,
 	TCreate time.Time,
 	ActorId string,
 ) (*Subject, error) {
 	subject := &Subject{
-		Name:            Name,
-		ScrNo:           ScrNo,
-		Sex:             Sex,
-		BirthDate:       BirthDate,
-		ArmId:           ArmId,
-		InoculationDate: InoculationDate,
-		IsDelete:        false,
-		TCreate:         TCreate,
-		ActorId:         ActorId,
-		StudyId:         StudyId,
+		Name:      Name,
+		ScrNo:     ScrNo,
+		Sex:       Sex,
+		BirthDate: BirthDate,
+		ArmId:     ArmId,
+		FirstDate: FirstDate,
+		IsDelete:  false,
+		TCreate:   TCreate,
+		ActorId:   ActorId,
+		StudyId:   StudyId,
 	}
 
 	_, err := st.SubjectByScrNo(ScrNo)
@@ -172,9 +171,13 @@ func (st *SubjectTable) SubjectByScrNo(ScrNo string) (*Subject, error) {
 	}
 
 	var subject *Subject
-	res.One(&subject)
-	if len(subject.Id) == 0 {
-		return nil, ErrNotExist
+	err = res.One(&subject)
+	if err != nil {
+		if err == gorethink.ErrEmptyResult {
+			return nil, ErrNotExist
+		} else {
+			return nil, err
+		}
 	}
 	return subject, nil
 }

@@ -58,7 +58,7 @@ func main_web(wg sync.WaitGroup) {
 
 	e.GET("/", func(c echo.Context) error {
 		args := make(map[string]interface{})
-		user, err := InitCommonArgs(c, args)
+		user, err := InitUserArgs(c, args)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, &Result{Error: err})
 		}
@@ -76,7 +76,7 @@ func main_web(wg sync.WaitGroup) {
 
 	e.GET("/subject", func(c echo.Context) error {
 		args := make(map[string]interface{})
-		user, err := InitCommonArgs(c, args)
+		user, err := InitUserArgs(c, args)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, &Result{Error: err})
 		}
@@ -89,7 +89,7 @@ func main_web(wg sync.WaitGroup) {
 
 	e.GET("/schedule", func(c echo.Context) error {
 		args := make(map[string]interface{})
-		user, err := InitCommonArgs(c, args)
+		user, err := InitUserArgs(c, args)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, &Result{Error: err})
 		}
@@ -102,7 +102,7 @@ func main_web(wg sync.WaitGroup) {
 
 	e.GET("/export", func(c echo.Context) error {
 		args := make(map[string]interface{})
-		user, err := InitCommonArgs(c, args)
+		user, err := InitUserArgs(c, args)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, &Result{Error: err})
 		}
@@ -115,7 +115,7 @@ func main_web(wg sync.WaitGroup) {
 
 	e.GET("/:filename", func(c echo.Context) error {
 		args := make(map[string]interface{})
-		InitCommonArgs(c, args)
+		InitUserArgs(c, args)
 		filename := c.Param("filename")
 		return c.Render(http.StatusOK, filename, args)
 	}, webChecker)
@@ -167,7 +167,7 @@ type DAO_Common_UserInfo struct {
 	Role         string `json:"role"`
 }
 
-func InitCommonArgs(c echo.Context, args map[string]interface{}) (*user.User, error) {
+func InitUserArgs(c echo.Context, args map[string]interface{}) (*user.User, error) {
 	Uid := c.Get(UID_KEY)
 	args["IsLogin"] = (Uid != nil)
 	if Uid != nil {

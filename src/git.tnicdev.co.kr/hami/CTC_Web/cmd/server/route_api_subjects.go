@@ -15,12 +15,12 @@ func route_api_subjects(g *echo.Group) {
 
 		retCode, retValue := (func() (int, interface{}) {
 			var item struct {
-				Name            string `json:"name"`
-				ScrNo           string `json:"scrno"`
-				Sex             string `json:"sex"`
-				BirthDate       string `json:"birth_date"`
-				ArmId           string `json:"arm_id"`
-				InoculationDate string `json:"inoculation_date"`
+				Name      string `json:"name"`
+				ScrNo     string `json:"scrno"`
+				Sex       string `json:"sex"`
+				BirthDate string `json:"birth_date"`
+				ArmId     string `json:"arm_id"`
+				FirstDate string `json:"first_date"`
 			}
 			err := util.BodyToStruct(c.Request().Body, &item)
 			if err != nil {
@@ -28,7 +28,7 @@ func route_api_subjects(g *echo.Group) {
 			}
 			//////////////////////////////////////////////////
 
-			_, err = gAPI.SubjectTable.Insert(gConfig.StudyId, item.Name, item.ScrNo, item.Sex, item.BirthDate, item.ArmId, item.InoculationDate, time.Now(), Uid)
+			_, err = gAPI.SubjectTable.Insert(gConfig.StudyId, item.Name, item.ScrNo, item.Sex, item.BirthDate, item.ArmId, item.FirstDate, time.Now(), Uid)
 			if err != nil {
 				return http.StatusInternalServerError, err
 			}

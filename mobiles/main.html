@@ -1,4 +1,4 @@
-{{ $g := . }}
+<% $g := . %>
 
 <!DOCTYPE html>
 <html>
@@ -7,7 +7,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black">
-		<title>{{ .Title }}</title>
+		<title>CTC</title>
 		<!-- We will include related CSS styles using JavaScript -->
 		<link rel="stylesheet" href="public/css/framework7.material.min.css">
 		<link rel="stylesheet" href="public/css/framework7.material.colors.min.css">
@@ -367,15 +367,15 @@
 		<div class="statusbar-overlay"></div>
 		<div class="views">
 			<div class="view view-main">
-				<div class="pages {{ .Style.pages_style }}">
+				<div class="pages <% .Style.pages_style %>">
 					<!-- Page, data-page contains page name-->
 					<div data-page="main" class="page">
 						<!-- Top Navbar-->
-						<div class="navbar {{ .Style.navbar }}">
+						<div class="navbar <% .Style.navbar %>">
 							<div class="navbar-inner">
 								<div class="left sliding">
 									<!-- 
-									<a href="/index" class="back link {{ .Style.icon_only }}">
+									<a href="/index" class="back link <% .Style.icon_only %>">
 										<i class="icon icon-back"></i>
 									</a>
 									 -->
@@ -387,57 +387,57 @@
 					
 						<!-- Scrollable page content-->
 						<div class="page-content bg-white">
-							{{ range $idx, $form := .Forms }}
-							{{ if .Extra.label }}
-								{{ if ne .Extra.label "hidden" }}
-							<div class="content-block-title">{{ .Name }}</div>
-								{{ end }}
-							{{ else }}
-							<div class="content-block-title">{{ .Name }}</div>
-							{{ end }}
+							<% range $idx, $form := .Forms %>
+							<% if .Extra.label %>
+								<% if ne .Extra.label "hidden" %>
+							<div class="content-block-title"><% .Name %></div>
+								<% end %>
+							<% else %>
+							<div class="content-block-title"><% .Name %></div>
+							<% end %>
 							<div class="list-block">
 								<ul>
-									{{ if eq .Type "visit" }}
-										{{ range $g.VisitList }}
+									<% if eq .Type "visit" %>
+										<% range $g.VisitList %>
 									<li>
-											{{ if .Active }}
-												{{ if .Saved }}
-										<a href="/form?id={{ $form.Id }}&position={{ .Position }}" data-ignore-cache="true" class="item-content saved">
+											<% if .Active %>
+												<% if .Saved %>
+										<a href="/form?id=<% $form.Id %>&position=<% .Position %>" data-ignore-cache="true" class="item-content saved">
 											<i class="fa fa-check"></i>
-												{{ else }}
-										<a href="/form?id={{ $form.Id }}&position={{ .Position }}" data-ignore-cache="true" class="item-content">
+												<% else %>
+										<a href="/form?id=<% $form.Id %>&position=<% .Position %>" data-ignore-cache="true" class="item-content">
 											<i class="fa fa-check" style="color:transparent;"></i>
-												{{ end }}
-											{{ else }}
+												<% end %>
+											<% else %>
 										<a href="javascript:alert('아직 입력하실 수 없습니다.');" class="item-content visit-disabled">
 											<i class="fa fa-check" style="color:transparent;"></i>
-											{{ end }}
+											<% end %>
 											<div class="item-inner">
-												<div class="left">{{ .Name }}</div>
-												<div class="right">{{ .Date }}</div>
+												<div class="left"><% .Name %></div>
+												<div class="right"><% .Date %></div>
 											</div>
 										</a>
 									</li>
-										{{ end }}
-									{{ else }}
-										{{ range .Groups }}
+										<% end %>
+									<% else %>
+										<% range .Groups %>
 									<li>
-											{{ if eq .Type "list" }}
-										<a href="/list?id={{ $form.Id }}&gid={{ .Id }}" data-ignore-cache="true" class="item-content">
-											{{ else }}
-										<a href="/form?id={{ $form.Id }}" data-ignore-cache="true" class="item-content">
-											{{ end }}
+											<% if eq .Type "list" %>
+										<a href="/list?id=<% $form.Id %>&gid=<% .Id %>" data-ignore-cache="true" class="item-content">
+											<% else %>
+										<a href="/form?id=<% $form.Id %>" data-ignore-cache="true" class="item-content">
+											<% end %>
 											<i class="fa fa-check" style="color:transparent;"></i>
 											<div class="item-inner">
-												<div class="left">{{ .Name }}</div>
+												<div class="left"><% .Name %></div>
 											</div>
 										</a>
-										{{ end }}
+										<% end %>
 									</li>
-									{{ end }}
+									<% end %>
 								</ul>
 							</div>
-							{{ end }}
+							<% end %>
 						</div>
 					</div>
 
