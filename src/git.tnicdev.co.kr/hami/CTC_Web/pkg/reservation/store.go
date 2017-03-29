@@ -1,4 +1,4 @@
-package notice
+package reservation
 
 import (
 	"net/url"
@@ -8,12 +8,19 @@ import (
 	_ "git.tnicdev.co.kr/hami/CTC_Web/pkg/store/driver/rethinkdb"
 )
 
-type Notice struct {
-	Id      string    `json:"id,omitempty"`
-	StudyId string    `json:"study_id"`
-	Content string    `json:"content"`
-	TCreate time.Time `json:"t_create"`
-	ActorId string    `json:"actor_id"`
+type Reservation struct {
+	Id       string    `json:"id,omitempty"`
+	StudyId  string    `json:"study_id"`
+	TDate    time.Time `json:"t_date"`
+	Subjects []*ReservationSubject
+	TCreate  time.Time `json:"t_create"`
+	ActorId  string    `json:"actor_id"`
+}
+
+type ReservationSubject struct {
+	SubjectId    string    `json:"subject_id"`
+	TReservation time.Time `json:"t_reservation"`
+	Status       string    `json:"status"`
 }
 
 type Store struct {
@@ -46,12 +53,13 @@ func NewStore(u *url.URL, tableName string) (*Store, error) {
 	return st, nil
 }
 
-func (st *Store) Insert(StudyId string, Content string, t_create time.Time, ActorId string) (string, error) {
-	item := &Notice{
-		StudyId: StudyId,
-		Content: Content,
-		TCreate: t_create,
-		ActorId: ActorId,
+func (st *Store) Insert(StudyId string, TDate time.Time, t_create time.Time, ActorId string) (string, error) {
+	item := &Reservation{
+		StudyId:  StudyId,
+		TDate:    TDate,
+		Subjects: make([]*ReservationSubject, 0),
+		TCreate:  t_create,
+		ActorId:  ActorId,
 	}
 
 	id, err := st.Store.Insert(item)
@@ -61,16 +69,16 @@ func (st *Store) Insert(StudyId string, Content string, t_create time.Time, Acto
 	return id, nil
 }
 
-func (st *Store) Update(id string, Content string) error {
-	var item Notice
+func (st *Store) Update(id string, TDate time.Time) error {
+	var item Reservation
 	err := st.Get(id, &item)
 	if err != nil {
 		return err
 	}
 
 	isChanged := false
-	if len(Content) > 0 && item.Content != Content {
-		item.Content = Content
+	if !item.TDate.Equal(TDate) {
+		item.TDate = TDate
 		isChanged = true
 	}
 

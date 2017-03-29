@@ -226,7 +226,6 @@ func route_api_subjects(g *echo.Group) {
 					jFormGrp := doc.Find(".form-grp")
 
 					jFormGrp.SetAttr("rowindex", convert.String(r))
-					//TODO : rowindex based iteration
 					for _, data := range list {
 						if len(data.Value) > 0 || len(data.CodeId) > 0 {
 							item, has := itemHash[data.ItemId]
@@ -254,17 +253,8 @@ func route_api_subjects(g *echo.Group) {
 							case "checkbox":
 								fallthrough
 							case "radio":
-								/*
-									jTarget.Filter(fmt.Sprintf(":not([value='%s'])", Value)).Parent().Parent().Remove()
-								*/
 								jTarget = jTarget.Filter(fmt.Sprintf("[value='%s']", Value))
 								jTarget.SetAttr("checked", "checked")
-							/*
-								text := strings.TrimSpace(jTarget.Next().Find(".item-title").Text())
-								jItemInner := jTarget.Parent().Parent().Parent().Parent()
-								jItemInner.Empty()
-								jItemInner.AppendHtml(strings.Join(strings.Split(text, "\n"), "<br>"))
-							*/
 							case "textarea":
 								jTarget.AppendHtml(Value)
 							default:
@@ -281,76 +271,6 @@ func route_api_subjects(g *echo.Group) {
 					htmlBuffer.WriteString(ret)
 				}
 			}
-
-			/*
-				jRoot := htmlwriter.CreateHtmlNode("div").Class("form-grp")
-				jRoot.Attr("formid", form.Id)
-				jRoot.Attr("position", position)
-				jRoot.Attr("rowindex", convert.String(rowindex))
-				err = form.GenerateHTML(position, jRoot)
-				if err != nil {
-					return http.StatusInternalServerError, err
-				}
-
-				var buffer bytes.Buffer
-				jRoot.WriteWith(&buffer, "\t")
-
-				html := buffer.String()
-				if true {
-					doc, err := goquery.NewDocumentFromReader(&buffer)
-					if err != nil {
-						return http.StatusInternalServerError, err
-					}
-
-					//apply data to html
-					jFormGrp := doc.Find(".form-grp")
-					for _, data := range dataList {
-						if len(data.Value) > 0 || len(data.CodeId) > 0 {
-							item, has := itemHash[data.ItemId]
-							if !has {
-								return http.StatusInternalServerError, fmt.Errorf("no item : %v", data.ItemId)
-							}
-
-							formKey := data.ItemId
-							jTarget := jFormGrp.Find(fmt.Sprintf("[name='%s']", formKey))
-							if jTarget.Length() == 0 {
-								return http.StatusInternalServerError, fmt.Errorf("target length is zero")
-							}
-
-							var Value string
-							switch item.Type {
-							case "checkbox":
-								fallthrough
-							case "radio":
-								Value = data.CodeId
-							default:
-								Value = data.Value
-							}
-
-							switch item.Type {
-							case "checkbox":
-								fallthrough
-							case "radio":
-								jTarget.Filter(fmt.Sprintf("[value='%s']", Value)).SetAttr("checked", "true")
-							case "textarea":
-								jTarget.AppendHtml(Value)
-							default:
-								jTarget.SetAttr("value", Value)
-							}
-						}
-					}
-
-					firstDate := convert.Time(subject.FirstDate)
-					doc.Find("[name='i-1']").SetAttr("value", convert.String(firstDate.Add(time.Hour * time.Duration(24*(convert.Int(position)-1))))[:10])
-
-					ret, err := doc.Html()
-					if err != nil {
-						return http.StatusInternalServerError, err
-					}
-
-					html = ret
-				}
-			*/
 
 			return http.StatusOK, template.HTML(htmlBuffer.String())
 		})()
