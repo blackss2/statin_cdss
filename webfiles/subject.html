@@ -42,16 +42,24 @@
 					},
 					watch: {
 						"constants.subject.scrno": function() {
-							this.constants.subject_of_list.scrno = this.constants.subject.scrno;
+							if(this.constants.subject_of_list != null) {
+								this.constants.subject_of_list.scrno = this.constants.subject.scrno;
+							}
 						},
 						"constants.subject.first_date": function() {
-							this.constants.subject_of_list.first_date = this.constants.subject.first_date;
+							if(this.constants.subject_of_list != null) {
+								this.constants.subject_of_list.first_date = this.constants.subject.first_date;
+							}
 						},
 						"constants.subject.age": function() {
-							this.constants.subject_of_list.age = this.constants.subject.age;
+							if(this.constants.subject_of_list != null) {
+								this.constants.subject_of_list.age = this.constants.subject.age;
+							}
 						},
 						"constants.subject.sex": function() {
-							this.constants.subject_of_list.sex = this.constants.subject.sex;
+							if(this.constants.subject_of_list != null) {
+								this.constants.subject_of_list.sex = this.constants.subject.sex;
+							}
 						}
 					},
 					methods: {
@@ -59,6 +67,7 @@
 							this.constants.subject_of_list = item;
 							if(item == null) {
 								this.constants.subject = null;
+								Callback.call("load-subject", this.constants.subject);
 							} else {
 								this.$http.get("/api/subjects/" + item.id).then(function(res) {
 									if(res.body.error != null) {
@@ -89,17 +98,17 @@
 								<div class="content">
 									<ul class="daily-list" v-if="constants.subject != null">
 										<li class="daily" v-for="position in positions">
-											<span>{{position}}일차</span>
+											<span v-on:click="selectPosition(position)">{{position}}일차</span>
 											<ul class="daily-sub-menu" v-bind:class="{hidden:selected.position != position}">
-												<li class="sub-item" v-bind:class="{active:selected.group == 'g-2'}" v-on:click="selectForm('f-1', 'g-2')">국소반응</li>
-												<li class="sub-item" v-bind:class="{active:selected.group == 'g-3'}" v-on:click="selectForm('f-1', 'g-3')">전신반응</li>
-												<li class="sub-item" v-bind:class="{active:selected.group == 'g-7'}" v-on:click="selectForm('f-1', 'g-8')">생체생활정보</li>
-												<li class="sub-item" v-bind:class="{active:selected.group == 'g-7'}" v-on:click="selectForm('f-2', 'g-4')">기타 이상 반응</li>
+												<li class="sub-item" v-bind:class="{active:selected.groupid == 'g-2'}" v-on:click="selectForm('f-1', 'g-2')">국소반응</li>
+												<li class="sub-item" v-bind:class="{active:selected.groupid == 'g-3'}" v-on:click="selectForm('f-1', 'g-3')">전신반응</li>
+												<li class="sub-item" v-bind:class="{active:selected.groupid == 'g-7'}" v-on:click="selectForm('f-1', 'g-7')">생체생활정보</li>
+												<li class="sub-item" v-bind:class="{active:selected.groupid == 'g-4'}" v-on:click="selectForm('f-2', 'g-4')">기타 이상 반응</li>
 											</ul>
 										</li>
-										<li class="etc"  v-on:click="selectForm('f-3', 'g-5')">기타 이상 반응</li>
-										<li class="etc drug"  v-on:click="selectForm('f-4', 'g-6')">병용 약물 관리</li>
-										<li class="etc diary"  v-on:click="selectForm('f-5', 'g-7')">다이어리 평가</li>
+										<li class="etc"  v-on:click="selectStaticForm('f-3', 'g-5')">기타 이상 반응</li>
+										<li class="etc drug"  v-on:click="selectStaticForm('f-4', 'g-6')">병용 약물 관리</li>
+										<li class="etc diary"  v-on:click="selectSpecialForm('diary')">다이어리 평가</li>
 									</ul>
 									<div v-else>
 									대상자를 선택해주세요.
@@ -113,8 +122,9 @@
 										subject: null
 									},
 									selected: {
-										position: 1,
-										group: ""
+										position: 0,
+										formid: "",
+										groupid: ""
 									}
 								};
 								Callback.add("load-subject", this.loadSubject);
@@ -133,39 +143,215 @@
 							},
 							methods: {
 								loadSubject: function(item) {
+									var dataList = [];
+									for(var i=0; i<7 ;i++) {
+										if(item != null) {
+											var value = item.compliance[i+1];
+											if(value == null) {
+												value = 0;
+											}
+											dataList[i] = value;
+										} else {
+											dataList[i] = 0;
+										}
+									}
+									new Chart($("#bar-chart").get(0).getContext("2d"), {
+										type: 'horizontalBar',
+										data: {
+											labels: ["1일", "2일", "3일 ", "4일", "5일", "6일", "7일"],
+											datasets: [
+												{
+													backgroundColor: [
+														window.chartColors.red,
+														window.chartColors.yellow,
+														window.chartColors.blue,
+														window.chartColors.green,
+														window.chartColors.purple,
+														window.chartColors.orange,
+														window.chartColors.red
+													],
+													borderColor: [
+														window.chartColors.red,
+														window.chartColors.yellow,
+														window.chartColors.blue,
+														window.chartColors.green,
+														window.chartColors.purple,
+														window.chartColors.orange,
+														window.chartColors.red
+													],
+												borderWidth: 1,
+													data: dataList,
+												}
+											]
+										},
+										options: {
+											responsive: true,
+											legend: {
+												display : false
+											},
+											animation: {
+												animateScale: true,
+												animateRotate: true
+											},
+										}
+									});
+
 									this.constants.subject = item;
+									if(this.positions.length > 0) {
+										this.selectPosition(1);
+										this.selectForm("f-1", "g-2");
+									} else {
+										Callback.call("load-form", "", "");
+									}
+								},
+								selectStaticForm: function(formid, groupid) {
+										this.selected.position = 1;
+										this.selectForm(formid, groupid);
+								},
+								selectPosition: function(position) {
+									if(this.selected.position != position) {
+										this.selected.position = position;
+										this.selectForm(this.selected.formid, this.selected.groupid);
+									}
 								},
 								selectForm: function(formid, groupid) {
-									console.log(formid, groupid);
-								}
+									this.selected.formid = formid;
+									this.selected.groupid = groupid;
+									this.$http.get("/api/subjects/" + this.constants.subject.id + "/forms/" + formid + "/groups/" + groupid + "?position=" + this.selected.position).then(function(res) {
+										if(res.body.error != null) {
+											alert(res.body.error);
+										} else {
+											Callback.call("load-form", groupid, res.body.result);
+										}
+									}, function(err) {
+										console.error(err.body);
+										Callback.call("load-form", "", "");
+									});
+							}
 							}
 							</script>
 						</diary>
 					</div>
 					<div class="col-xs-9">
-						<section class="box box-height-md">
-							<h3 class="title">국소반응</h3>
-							<div class="content clearfix">
-								<div class="content scroll-content">
-									<h4 class="content-header">통증</h4>
-									<p class="ques">Q. 주사부위에서 통증이 느껴집니까?</p>
-									<ul class="answer-list">
-										<li class="answer"><button type="button" class="answer-num">0. </button>없음</li>
-										<li class="answer"><button type="button" class="answer-num">1. </button>활동에 지장 없음</li>
-										<li class="answer"><button type="button" class="answer-num">2. </button>24시간을 초과한 비마약성 진통제의 반복사용 또는 일상 활동을 일부 방해 </li>
-										<li class="answer"><button type="button" class="answer-num">3. </button>마약성 진통제를 사용하거나 일상활동을 심각하게 방해</li>
-									</ul>
-									<div class="right">
-										<strong> 점수 </strong>
-										<input type="text" value="0" class="input-sm center" readonly="readonly" />
+						<form-data>
+							<div id="form-html">
+								<section class="box box-height-md">
+									<div class="form-target content scroll-content" v-html="constants.html" style="height:450px;">
 									</div>
-								</div>
-								<div class="btn-grp center">
-									<button class="btn btn-sm btn-dark" type="button">수정</button>
-									<button class="btn btn-sm btn-gray" type="button">취소</button>
-								</div>
+									<div class="btn-grp center">
+										<button class="btn btn-sm btn-dark" type="button" v-if="constants.has_data">저장</button>
+									</div>
+								</section>
 							</div>
-						</section>
+							<script type="vue">
+							data: function() {
+								var obj = {
+									constants: {
+										html: "",
+										groupid: "",
+										has_data: false
+									}
+								};
+								Callback.add("load-form", this.loadForm);
+								return obj;
+							},
+							methods: {
+								loadForm: function(groupid, html) {
+									this.constants.groupid = groupid;
+									this.constants.html = html;
+									
+									this.constants.has_data = false;
+									if(groupid.length > 0) {
+										if(html.length > 0) {
+											this.constants.has_data = true;
+
+											var _this = this;
+											$("#form-html").hide();
+											setTimeout(function() {
+												var jFormHtml = $("#form-html");
+												jFormHtml.find(".guide").detach();
+												jFormHtml.find("[groupid]").addClass("group-mask");
+												jFormHtml.find("[groupid='" + groupid + "']").removeClass("group-mask");
+												jFormHtml.find(".group-mask").detach();
+												jFormHtml.find("li").css("list-style", "none");
+												jFormHtml.find(".item-inner").css("display", "inline-block");
+												jFormHtml.find(".content-block-title").addClass("title");
+												jFormHtml.find(".group-normal > .content-block-inner").hide();
+												jFormHtml.find(".item-block > .content-block-inner").addClass("ques").css("margin-left", "-20px");
+												jFormHtml.find(".item-title").css("font-weight", "normal");
+												var valueHash = {};
+												jFormHtml.find("input[type='radio']").each(function() {
+													$(this).hide();
+													if($(this).prop("checked")) {
+														var name = $(this).attr("name");
+														valueHash[name] = $(this).val();
+														$(this).next().css("color", "blue");
+													}
+													$(this).change(function() {
+														if($(this).prop("checked")) {
+															var name = $(this).attr("name");
+															var value = $(this).val();
+															var jRadioGroup = $("#form-html [name='" + name + "']");
+															jRadioGroup.each(function() {
+																if($(this).val() == value) {
+																	if(valueHash[name] == $(this).val()) {
+																		$(this).removeClass("change-value");
+																		$(this).next().css("color", "blue");
+																	} else {
+																		$(this).addClass("change-value");
+																		$(this).next().css("color", "red");
+																	}
+																} else {
+																	$(this).removeClass("change-value");
+																	$(this).next().css("color", "");
+																}
+															});
+														}
+													});
+												});
+												if(jFormHtml.find(".group-list").length > 0) {
+													jFormHtml.find(".group-list").each(function(idx) {
+														$(this).prepend('<div class="content-block-title title">No. ' + (idx+1) + '</div>');
+													});
+												}
+												/*
+												if(jFormHtml.find(".group-list").length > 0) {
+													var jClone = $("#list-template").clone().removeClass("hidden");
+													var names = [];
+													jFormHtml.find(".group-list").eq(0).find("td").each(function() {
+														names.push($(this).text());
+													});
+													var jTrHead = jClone.find("thead tr");
+													jTrHead.empty();
+													for(var i=0; i<names.length; i++) {
+														jTrHead.append($("<th>" + names[i] + "</th>"));
+													}
+													var jTbody = jClone.find("tbody");
+													var jTr = jTbody.find("tr").detach();
+													jFormHtml.find(".group-list").each(function() {
+														var jTrClone = jTr.clone();
+														jTbody.append(jTrClone);
+														jTrClone.empty();
+														//$(this).find(".item-content").each(function() {
+														$(this).find(".form-item").each(function() {
+															//jTrClone.append($("<td/>").append($(this).detach()));
+															jTrClone.append($("<td style='word-break:break-all;'/>").text($(this).val()));
+														});
+													});
+													jFormHtml.find(".form-target").empty().append(jClone);
+												}
+												*/
+
+												jFormHtml.show()
+											}, 0);
+										} else {
+											this.constants.html = "입력된 내용이 없습니다.";
+										}
+									}
+								}
+							}
+							</script>
+						</form-data>
 						<section class="box box-height-md subject_life hidden">
 							<h3 class="title">생체 생활 정보</h3>
 							<div class="content clearfix">
@@ -219,7 +405,7 @@
 									</div>
 								</div>
 								<div class="btn-grp center">
-									<button class="btn btn-sm btn-dark" type="button">수정</button>
+									<button class="btn btn-sm btn-dark" type="button">저장</button>
 									<button class="btn btn-sm btn-gray" type="button">취소</button>
 								</div>
 							</div>
@@ -934,21 +1120,21 @@
 		methods: {
 			loadSubject: function(item) {
 				this.constants.subject = item;
-				this.input.name = item.name;
-				this.input.scrno_1 = item.scrno.split("-")[0];
-				this.input.scrno_2 = item.scrno.split("-")[1];
-				this.input.scrno_3 = item.scrno.split("-")[2];
-				this.input.sex = item.sex;
-				console.log(item);
-				this.input.birth_year = item.birth_date.split("-")[0];
-				this.input.birth_month = item.birth_date.split("-")[1];
-				this.doUpdateBirthDay();
-				this.input.birth_day = item.birth_date.split("-")[2];
-				this.input.first_year = item.first_date.split("-")[0];
-				this.input.first_month = item.first_date.split("-")[1];
-				this.doUpdateFirstDay();
-				this.input.first_day = item.first_date.split("-")[2];
-				console.log(this.input);
+				if(item != null) {
+					this.input.name = item.name;
+					this.input.scrno_1 = item.scrno.split("-")[0];
+					this.input.scrno_2 = item.scrno.split("-")[1];
+					this.input.scrno_3 = item.scrno.split("-")[2];
+					this.input.sex = item.sex;
+					this.input.birth_year = item.birth_date.split("-")[0];
+					this.input.birth_month = item.birth_date.split("-")[1];
+					this.doUpdateBirthDay();
+					this.input.birth_day = item.birth_date.split("-")[2];
+					this.input.first_year = item.first_date.split("-")[0];
+					this.input.first_month = item.first_date.split("-")[1];
+					this.doUpdateFirstDay();
+					this.input.first_day = item.first_date.split("-")[2];
+				}
 			},
 			doUpdateBirthDay: function() {
 				var year = parseInt(this.input.birth_year);
@@ -1036,11 +1222,13 @@
 						alert(res.body.error);
 					} else {
 						$("#edit-subject").modal("hide");
-						this.constants.subject.name = this.input.name;
-						this.constants.subject.scrno = scrno;
-						this.constants.subject.sex = this.input.sex;
-						this.constants.subject.birth_date = birth_date;
-						this.constants.subject.first_date = first_date;
+						var item = res.body.result;
+						this.constants.subject.name = item.name;
+						this.constants.subject.scrno = item.scrno;
+						this.constants.subject.sex = item.sex;
+						this.constants.subject.age = item.age;
+						this.constants.subject.birth_date = item.birth_date;
+						this.constants.subject.first_date = item.first_date;
 					}
 				}, function(err) {
 					console.error(err.body);
@@ -1049,50 +1237,6 @@
 		}
 		</script>
 	</edit-subject>
-</div>
-<div class="modal fade" id="add-schedule">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content box">
-			<div class="modal-header">
-				<h5 class="modal-title title">방문 예약 일정 추가</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<div class="modal-body">
-				<table>
-					<colgroup>
-						<col width="35%"/>
-						<col width="65%"/>
-					</colgroup>
-					<tr>
-						<th>예약시간</th>
-						<td>
-							<div class="col-xs-3">
-								<input type="text" class="col-xs-12" maxlength="2" />
-							</div>
-							<span class="col-xs-1">:</span>
-							<div class="col-xs-3">
-								<input type="text" class="col-xs-12" maxlength="3" />
-							</div>
-						</td>
-					</tr>
-					<tr>
-						<th>예약자명</th>
-						<td>
-							<div class="col-xs-12">
-								<input type="text" class="col-xs-12" />
-							</div>
-						</td>
-					</tr>
-				</table>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-aqua btn-sm" v-on:click="doNew">승인</button>
-				<button type="button" class="btn btn-grey btn-sm" data-dismiss="modal">취소</button>
-			</div>
-		</div>
-	</div>
 </div>
 <script type="text/javascript">
 $(function(){
@@ -1115,121 +1259,79 @@ $(function(){
 	$(".daily-list").find("li")
 });
 var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        var config = {
-            type: 'line',
-            data: {
-                labels: ["January", "February", "March", "April", "May", "June", "July"],
-                datasets: [{
-                    label: "My First dataset",
-                    backgroundColor: window.chartColors.yellow,
-                    borderColor: window.chartColors.yellow,
-                    data: [
-                        randomScalingFactor(), 
-                        randomScalingFactor(), 
-                        randomScalingFactor(), 
-                        randomScalingFactor(), 
-                        randomScalingFactor(), 
-                        randomScalingFactor(), 
-                        randomScalingFactor()
-                    ],
-                    fill: false,
-                }, {
-                    label: "My Second dataset",
-                    fill: false,
-                    backgroundColor: window.chartColors.blue,
-                    borderColor: window.chartColors.blue,
-                    data: [
-                        randomScalingFactor(), 
-                        randomScalingFactor(), 
-                        randomScalingFactor(), 
-                        randomScalingFactor(), 
-                        randomScalingFactor(), 
-                        randomScalingFactor(), 
-                        randomScalingFactor()
-                    ],
-                }]
-            },
-            options: {
-                responsive: true,
-                title:{
-                    display:false,
-                    text:'Chart.js Line Chart'
-                },
-                legend : {
-                	position : 'bottom'
-                },
-                tooltips: {
-                    mode: 'index',
-                    intersect: false,
-                },
-                hover: {
-                    mode: 'nearest',
-                    intersect: true
-                },
-                scales: {
-                    xAxes: [{
-                        display: true,
-                        scaleLabel: {
-                            display: true,
-                            labelString: 'Month'
-                        }
-                    }],
-                    yAxes: [{
-                        display: true,
-                        scaleLabel: {
-                            display: true,
-                            labelString: 'Value'
-                        }
-                    }]
-                }
-            }
-        };
-var config3 = {
-    type: 'horizontalBar',
-    data: {
-		    labels: ["1일", "2일", "3일 ", "4일", "5일", "6일", "7일"],
-		    datasets: [
-		        {
-		            backgroundColor: [
-                		window.chartColors.red,
-		                window.chartColors.yellow,
-                		window.chartColors.blue,
-                		window.chartColors.green,
-                		window.chartColors.purple,
-                		window.chartColors.orange,
-                		window.chartColors.red
-		            ],
-		            borderColor: [
-                		window.chartColors.red,
-		                window.chartColors.yellow,
-                		window.chartColors.blue,
-                		window.chartColors.green,
-                		window.chartColors.purple,
-                		window.chartColors.orange,
-                		window.chartColors.red
-		            ],
-                borderWidth: 1,
-		            data: [65, 59, 80, 81, 56, 63, 70],
-		        }
-		    ]
+var config = {
+	type: 'line',
+	data: {
+		labels: ["January", "February", "March", "April", "May", "June", "July"],
+		datasets: [{
+			label: "My First dataset",
+			backgroundColor: window.chartColors.yellow,
+			borderColor: window.chartColors.yellow,
+			data: [
+				randomScalingFactor(), 
+				randomScalingFactor(), 
+				randomScalingFactor(), 
+				randomScalingFactor(), 
+				randomScalingFactor(), 
+				randomScalingFactor(), 
+				randomScalingFactor()
+			],
+			fill: false,
+		}, {
+			label: "My Second dataset",
+			fill: false,
+			backgroundColor: window.chartColors.blue,
+			borderColor: window.chartColors.blue,
+			data: [
+				randomScalingFactor(), 
+				randomScalingFactor(), 
+				randomScalingFactor(), 
+				randomScalingFactor(), 
+				randomScalingFactor(), 
+				randomScalingFactor(), 
+				randomScalingFactor()
+			],
+		}]
+	},
+	options: {
+		responsive: true,
+		title:{
+			display:false,
+			text:'Chart.js Line Chart'
 		},
-    options: {
-        responsive: true,
-        legend: {
-            display : false
-        },
-        animation: {
-            animateScale: true,
-            animateRotate: true
-        },
-    }
+		legend : {
+			position : 'bottom'
+		},
+		tooltips: {
+			mode: 'index',
+			intersect: false,
+		},
+		hover: {
+			mode: 'nearest',
+			intersect: true
+		},
+		scales: {
+			xAxes: [{
+				display: true,
+				scaleLabel: {
+					display: true,
+					labelString: 'Month'
+				}
+			}],
+			yAxes: [{
+				display: true,
+				scaleLabel: {
+					display: true,
+					labelString: 'Value'
+				}
+			}]
+		}
+	}
 };
-window.onload = function() {
-    var ctx = document.getElementById("line-chart").getContext("2d");
-    var ctx3 = document.getElementById("bar-chart").getContext("2d");
-    window.myDoughnut = new Chart(ctx, config);
-    window.myDoughnut = new Chart(ctx3, config3);
-};
+$(function() {
+    var ctx = $("#line-chart").get(0).getContext("2d");
+    //new Chart(ctx, config);
+});
 </script>
 
 <% template "bottom.html" . %>

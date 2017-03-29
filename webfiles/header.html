@@ -1,5 +1,10 @@
 <header id="header">
-	<div class="menu-wrapper col-xs-12 center">
+	<% if .has_sidebar %>
+	<div class="menu-wrapper col-xs-12 center" style="margin-left: -250px;">
+	<% else %>
+	<div class="logo-wrapper" style="position: absolute;" onclick="location.href='/'">1차 임상시험 마스터</div>
+	<div class="menu-wrapper col-xs-12 center" style="margin-left: 0px;">
+	<% end %>
 		<a href="/">
 			<img src="../public/img/icon_menu1.png" alt="메인 아이콘"/>
 			<span>메인</span>

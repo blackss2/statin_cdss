@@ -50,7 +50,6 @@ body.breakpoint{
 	z-index:10;
 	.menu-wrapper{
 		text-align:center;
-		margin-left:-150px;
 		a{
 			display:inline-block;
 			margin-right:35px;
@@ -91,6 +90,18 @@ body.breakpoint{
 	}
 }
 
+.logo-wrapper{
+	width:$sidebar-width; 
+	height:50px;
+	line-height:50px;
+	font-size:1.1em;
+	text-align:center;
+	cursor:pointer;
+	background:#2980b9;
+	font-weight:600;
+	display: inline-block;
+}
+
 #sidebar{
 	width:$sidebar-width; 
 	height:100%;
@@ -99,15 +110,6 @@ body.breakpoint{
 	background:$sidebar-bg-color;
 	position:Fixed;
 	z-index:100;
-	.logo-wrapper{
-		height:50px;
-		line-height:50px;
-		font-size:1.1em;
-		text-align:center;
-		cursor:pointer;
-		background:#2980b9;
-		font-weight:600;
-	}
 	.search-box{
 		padding:20px;
 		border-bottom:1px solid #e1e1e1;
@@ -437,8 +439,10 @@ body.breakpoint{
 			font-size:16px;
 			font-weight:700;
 			color:$color-dark;
-			cursor:pointer;
 			padding: 3px 25px;
+			> span, .sub-item {
+				cursor:pointer;
+			}
 			&:before{
 				content:'';
 				background: url("../../public/img/toggle_up.png") 14px 14px;

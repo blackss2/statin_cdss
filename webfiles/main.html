@@ -6,7 +6,7 @@
 		<div class="content clearfix">
 			<div class="col-sm-4">
 				<section class="box">
-					<h3 class="title">전체 이상반응</h3>
+					<h3 class="title">전체 이상반응2</h3>
 					<div class="content">
 						<canvas id="chart-area" height="150"/>
 					</div>
@@ -21,54 +21,43 @@
 				</section>
 			</div>
 			<div class="col-sm-4">
-				<section class="box">
-					<h3 class="title">의무기록 전체 순응도</h3>
-					<div class="content">
-						<table class="table-default table-pagination">
-							<thead>
-								<th>일</th>
-								<th>국소</th>
-								<th>전신</th>
-								<th>생체</th>
-								<th>순응도</th>
-							</thead>
-							<tbody>
-								<tr>
-									<td>1일</td>
-									<td>85%</td>
-									<td>85%</td>
-									<td>85%</td>
-									<td>85%</td>
-								</tr>
-								<tr>
-									<td>2일</td>
-									<td>85%</td>
-									<td>85%</td>
-									<td>85%</td>
-									<td>85%</td>
-								</tr>
-								<tr>
-									<td>3일</td>
-									<td>85%</td>
-									<td>85%</td>
-									<td>85%</td>
-									<td>85%</td>
-								</tr>
-							</tbody>
-							<tfoot>
-								<tr>
-									<td colspan='5'>
-										<div class="pagination">
-											<button type="button" class="btn btn-sm btn-prev" v-on:click="loadPage(start_page-1)">&lt;</button>
-											<button type="button" class="btn btn-sm" v-for="page in pages" v-bind:class="{active: (page==current_page)}" v-on:click="loadPage(page)">{{page}}</button>
-											<button type="button" class="btn btn-sm btn-next" v-on:click="loadPage(end_page+1)">&gt;</button>
-										</div>
-									</td>
-								</tr>
-							</tfoot>
-						</table>
-					</div>
-				</section>
+				<compliance>
+					<section class="box">
+						<h3 class="title">의무기록 전체 순응도</h3>
+						<div class="content">
+							<table class="table-default table-pagination">
+								<thead>
+									<th>일</th>
+									<th>국소</th>
+									<th>전신</th>
+									<th>생체</th>
+									<th>순응도</th>
+								</thead>
+								<tbody>
+									<tr v-for="item in constants.compliances">
+										<td>{{item.day}}일</td>
+										<td>{{item.local}}%</td>
+										<td>{{item.sysmetic}}%</td>
+										<td>{{item.vital}}%</td>
+										<td>{{item.total}}%</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</section>
+					<script type="vue">
+					data: function() {
+						var obj = {
+							constants: {
+								compliances: Store.get("page-initial").compliances,
+							}
+						};
+						return obj;
+					},
+					methods: {
+					}
+					</script>
+				</compliance>
 			</div>
 		</div>
 		<div class="content clearfix">
@@ -289,10 +278,11 @@ var randomScalingFactor = function() {
     var config = {
         type: 'doughnut',
         data: {
+			labels: ["정상", "이상반응"],
             datasets: [{
                 data: [
-                    randomScalingFactor(),
-                    randomScalingFactor(),
+                    Store.get("page-initial").total_ae["정상"],
+                    Store.get("page-initial").total_ae["이상반응"]
                 ],
                 backgroundColor: [
                     window.chartColors.yellow,
@@ -308,7 +298,7 @@ var randomScalingFactor = function() {
             },
             title: {
                 display: false,
-                text: 'Chart.js Doughnut Chart'
+                text: ''
             },
             animation: {
                 animateScale: true,
@@ -320,14 +310,17 @@ var randomScalingFactor = function() {
     var config2 = {
         type: 'doughnut',
         data: {
+			labels: ["실험군", "대조군", "위약군"],
             datasets: [{
                 data: [
-                    randomScalingFactor(),
-                    randomScalingFactor(),
+                    Store.get("page-initial").arm_ae["실험군"],
+                    Store.get("page-initial").arm_ae["대조군"],
+					Store.get("page-initial").arm_ae["위약군"],
                 ],
                 backgroundColor: [
                     window.chartColors.yellow,
                     window.chartColors.blue,
+					window.chartColors.green,
                 ],
                 label: 'Dataset 1'
             }],
@@ -339,7 +332,7 @@ var randomScalingFactor = function() {
             },
             title: {
                 display: false,
-                text: 'Chart.js Doughnut Chart'
+                text: ''
             },
             animation: {
                 animateScale: true,

@@ -380,7 +380,9 @@ func main_mobile(wg sync.WaitGroup) {
 
 		stack, err := gAPI.StackTable.Stack(subject.Id, form.Id)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, &Result{Error: err})
+			if err != ErrNotExist {
+				return c.JSON(http.StatusInternalServerError, &Result{Error: err})
+			}
 		}
 		if stack == nil {
 			s, err := gAPI.StackTable.Insert(subject.Id, form.Id, TNow, ActorId)
@@ -392,7 +394,9 @@ func main_mobile(wg sync.WaitGroup) {
 
 		visit, err := gAPI.VisitTable.Visit(stack.Id, position)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, &Result{Error: err})
+			if err != ErrNotExist {
+				return c.JSON(http.StatusInternalServerError, &Result{Error: err})
+			}
 		}
 		if visit == nil {
 			v, err := gAPI.VisitTable.Insert(stack.Id, position, TNow, ActorId)

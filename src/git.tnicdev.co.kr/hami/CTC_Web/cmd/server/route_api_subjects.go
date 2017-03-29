@@ -2,7 +2,10 @@ package main
 
 import (
 	"bytes"
+	"fmt"
+	"html/template"
 	"net/http"
+	"sort"
 	"strings"
 	"time"
 
@@ -17,21 +20,17 @@ import (
 func route_api_subjects(g *echo.Group) {
 	g.GET("/subjects", func(c echo.Context) error {
 		retCode, retValue := (func() (int, interface{}) {
-			name, err := util.ParamToString(c, "name", false)
-			if err != nil {
-				return http.StatusBadRequest, err
-			}
 			scrno, err := util.ParamToString(c, "scrno", false)
 			if err != nil {
 				return http.StatusBadRequest, err
 			}
-			arm_id, err := util.ParamToString(c, "arm_id", false)
+			arm, err := util.ParamToString(c, "arm", false)
 			if err != nil {
 				return http.StatusBadRequest, err
 			}
 			//////////////////////////////////////////////////
 
-			subjects, err := Search_Subjects(name, scrno, arm_id)
+			subjects, err := Search_Subjects(scrno, arm)
 			if err != nil {
 				return http.StatusInternalServerError, err
 			}
@@ -52,11 +51,19 @@ func route_api_subjects(g *echo.Group) {
 			}
 			//////////////////////////////////////////////////
 
-			subject, err := Select_Subjects(subjectid)
+			subject, err := gAPI.SubjectTable.Subject(subjectid)
 			if err != nil {
 				return http.StatusInternalServerError, err
 			}
-			return http.StatusOK, subject
+			if subject.StudyId != gConfig.StudyId {
+				return http.StatusBadRequest, ErrNotMatchedStudyId
+			}
+
+			dao, err := Select_Subject(subject)
+			if err != nil {
+				return http.StatusInternalServerError, err
+			}
+			return http.StatusOK, dao
 		})()
 
 		if err, is := retValue.(error); is {
@@ -85,10 +92,6 @@ func route_api_subjects(g *echo.Group) {
 			if err != nil {
 				return http.StatusBadRequest, err
 			}
-			rowindex, err := util.ParamToInt(c, "rowindex", true)
-			if err != nil {
-				return http.StatusBadRequest, err
-			}
 			//////////////////////////////////////////////////
 
 			subject, err := gAPI.SubjectTable.Subject(subjectid)
@@ -96,7 +99,7 @@ func route_api_subjects(g *echo.Group) {
 				return http.StatusInternalServerError, err
 			}
 			if subject.StudyId != gConfig.StudyId {
-				return http.StatusInternalServerError, ErrNotMatchedStudyId
+				return http.StatusBadRequest, ErrNotMatchedStudyId
 			}
 
 			forms, err := FormWithCache(gAPI.FormTable, gConfig.StudyId)
@@ -119,7 +122,9 @@ func route_api_subjects(g *echo.Group) {
 
 			stack, err := gAPI.StackTable.Stack(subject.Id, form.Id)
 			if err != nil {
-				return http.StatusInternalServerError, err
+				if err != ErrNotExist {
+					return http.StatusInternalServerError, err
+				}
 			}
 			if stack == nil {
 				s, err := gAPI.StackTable.Insert(subject.Id, form.Id, TNow, Uid)
@@ -131,7 +136,9 @@ func route_api_subjects(g *echo.Group) {
 
 			visit, err := gAPI.VisitTable.Visit(stack.Id, position)
 			if err != nil {
-				return http.StatusInternalServerError, err
+				if err != ErrNotExist {
+					return http.StatusInternalServerError, err
+				}
 			}
 			if visit == nil {
 				v, err := gAPI.VisitTable.Insert(stack.Id, position, TNow, Uid)
@@ -141,7 +148,7 @@ func route_api_subjects(g *echo.Group) {
 				visit = v
 			}
 
-			dataList, err := gAPI.DataTable.ListByRowindex(visit.Id, rowindex)
+			dataList, err := gAPI.DataTable.List(visit.Id)
 			if err != nil {
 				return http.StatusInternalServerError, err
 			}
@@ -152,11 +159,49 @@ func route_api_subjects(g *echo.Group) {
 				addFormMeta(form, groupHash, itemHash)
 			}
 
+			var group *Group
+			for _, g := range form.Groups {
+				if g.Id == groupid {
+					group = g
+					break
+				}
+			}
+
+			if group == nil {
+				return http.StatusInternalServerError, ErrNotExistGroup
+			}
+
+			var dataRowindexList [][]*Data
+			if len(dataList) > 0 {
+				maxRowindex := int64(0)
+				dataHash := make(map[int64][]*Data)
+				for _, data := range dataList {
+					if item, has := itemHash[data.ItemId]; has {
+						if item.GroupId == group.Id {
+							if maxRowindex < data.Rowindex {
+								maxRowindex = data.Rowindex
+							}
+							list, has := dataHash[data.Rowindex]
+							if !has {
+								list = make([]*Data, 0)
+							}
+							dataHash[data.Rowindex] = append(list, data)
+						}
+					}
+				}
+				dataRowindexList = make([][]*Data, maxRowindex+1)
+				for rowindex, list := range dataHash {
+					dataRowindexList[rowindex] = list
+				}
+			} /* else if group.Type != "list" {
+				dataRowindexList = [][]*Data{[]*Data{}}
+			}
+			*/
+
 			jRoot := htmlwriter.CreateHtmlNode("div").Class("form-grp")
 			jRoot.Attr("formid", form.Id)
 			jRoot.Attr("position", position)
-			jRoot.Attr("rowindex", convert.String(rowindex))
-			err = form.GenerateHTML(position, jRoot)
+			err = group.GenerateHTML(position, jRoot, false)
 			if err != nil {
 				return http.StatusInternalServerError, err
 			}
@@ -164,64 +209,150 @@ func route_api_subjects(g *echo.Group) {
 			var buffer bytes.Buffer
 			jRoot.WriteWith(&buffer, "\t")
 
-			html := buffer.String()
+			var htmlBuffer bytes.Buffer
 			if true {
-				doc, err := goquery.NewDocumentFromReader(&buffer)
+				docOrg, err := goquery.NewDocumentFromReader(&buffer)
 				if err != nil {
 					return http.StatusInternalServerError, err
 				}
 
-				//apply data to html
-				jFormGrp := doc.Find(".form-grp")
-				for _, data := range dataList {
-					if len(data.Value) > 0 || len(data.CodeId) > 0 {
-						item, has := itemHash[data.ItemId]
-						if !has {
-							return http.StatusInternalServerError, fmt.Errorf("no item : %v", data.ItemId)
-						}
+				for r, list := range dataRowindexList {
+					if list == nil {
+						continue
+					}
 
-						formKey := data.ItemId
-						jTarget := jFormGrp.Find(fmt.Sprintf("[name='%s']", formKey))
-						if jTarget.Length() == 0 {
-							return c.JSON(http.StatusInternalServerError, &Result{Error: fmt.Errorf("target length is zero")})
-						}
+					//apply data to html
+					doc := docOrg.Clone()
+					jFormGrp := doc.Find(".form-grp")
 
-						var Value string
-						switch item.Type {
-						case "checkbox":
-							fallthrough
-						case "radio":
-							Value = data.CodeId
-						default:
-							Value = data.Value
-						}
+					jFormGrp.SetAttr("rowindex", convert.String(r))
+					//TODO : rowindex based iteration
+					for _, data := range list {
+						if len(data.Value) > 0 || len(data.CodeId) > 0 {
+							item, has := itemHash[data.ItemId]
+							if !has {
+								return http.StatusInternalServerError, fmt.Errorf("no item : %v", data.ItemId)
+							}
 
-						switch item.Type {
-						case "checkbox":
-							fallthrough
-						case "radio":
-							jTarget.Filter(fmt.Sprintf("[value='%s']", Value)).SetAttr("checked", "true")
-						case "textarea":
-							jTarget.AppendHtml(Value)
-						default:
-							jTarget.SetAttr("value", Value)
+							formKey := data.ItemId
+							jTarget := jFormGrp.Find(fmt.Sprintf("[name='%s']", formKey))
+							if jTarget.Length() == 0 {
+								return http.StatusInternalServerError, fmt.Errorf("target length is zero")
+							}
+
+							var Value string
+							switch item.Type {
+							case "checkbox":
+								fallthrough
+							case "radio":
+								Value = data.CodeId
+							default:
+								Value = data.Value
+							}
+
+							switch item.Type {
+							case "checkbox":
+								fallthrough
+							case "radio":
+								/*
+									jTarget.Filter(fmt.Sprintf(":not([value='%s'])", Value)).Parent().Parent().Remove()
+								*/
+								jTarget = jTarget.Filter(fmt.Sprintf("[value='%s']", Value))
+								jTarget.SetAttr("checked", "checked")
+							/*
+								text := strings.TrimSpace(jTarget.Next().Find(".item-title").Text())
+								jItemInner := jTarget.Parent().Parent().Parent().Parent()
+								jItemInner.Empty()
+								jItemInner.AppendHtml(strings.Join(strings.Split(text, "\n"), "<br>"))
+							*/
+							case "textarea":
+								jTarget.AppendHtml(Value)
+							default:
+								jTarget.SetAttr("value", Value)
+							}
 						}
 					}
+
+					ret, err := doc.Html()
+					if err != nil {
+						return http.StatusInternalServerError, err
+					}
+
+					htmlBuffer.WriteString(ret)
 				}
+			}
 
-				firstDate := convert.Time(subject.FirstDate)
-				doc.Find("[name='i-1']").SetAttr("value", convert.String(firstDate.Add(time.Hour * time.Duration(24*(convert.Int(position)-1))))[:10])
-
-				ret, err := doc.Html()
+			/*
+				jRoot := htmlwriter.CreateHtmlNode("div").Class("form-grp")
+				jRoot.Attr("formid", form.Id)
+				jRoot.Attr("position", position)
+				jRoot.Attr("rowindex", convert.String(rowindex))
+				err = form.GenerateHTML(position, jRoot)
 				if err != nil {
 					return http.StatusInternalServerError, err
 				}
 
-				html = ret
-			}
+				var buffer bytes.Buffer
+				jRoot.WriteWith(&buffer, "\t")
 
-			args["FormHtml"] = template.HTML(html)
-			return http.StatusOK, subject
+				html := buffer.String()
+				if true {
+					doc, err := goquery.NewDocumentFromReader(&buffer)
+					if err != nil {
+						return http.StatusInternalServerError, err
+					}
+
+					//apply data to html
+					jFormGrp := doc.Find(".form-grp")
+					for _, data := range dataList {
+						if len(data.Value) > 0 || len(data.CodeId) > 0 {
+							item, has := itemHash[data.ItemId]
+							if !has {
+								return http.StatusInternalServerError, fmt.Errorf("no item : %v", data.ItemId)
+							}
+
+							formKey := data.ItemId
+							jTarget := jFormGrp.Find(fmt.Sprintf("[name='%s']", formKey))
+							if jTarget.Length() == 0 {
+								return http.StatusInternalServerError, fmt.Errorf("target length is zero")
+							}
+
+							var Value string
+							switch item.Type {
+							case "checkbox":
+								fallthrough
+							case "radio":
+								Value = data.CodeId
+							default:
+								Value = data.Value
+							}
+
+							switch item.Type {
+							case "checkbox":
+								fallthrough
+							case "radio":
+								jTarget.Filter(fmt.Sprintf("[value='%s']", Value)).SetAttr("checked", "true")
+							case "textarea":
+								jTarget.AppendHtml(Value)
+							default:
+								jTarget.SetAttr("value", Value)
+							}
+						}
+					}
+
+					firstDate := convert.Time(subject.FirstDate)
+					doc.Find("[name='i-1']").SetAttr("value", convert.String(firstDate.Add(time.Hour * time.Duration(24*(convert.Int(position)-1))))[:10])
+
+					ret, err := doc.Html()
+					if err != nil {
+						return http.StatusInternalServerError, err
+					}
+
+					html = ret
+				}
+			*/
+
+			return http.StatusOK, template.HTML(htmlBuffer.String())
 		})()
 
 		if err, is := retValue.(error); is {
@@ -230,7 +361,6 @@ func route_api_subjects(g *echo.Group) {
 			return c.JSON(retCode, &Result{Result: retValue})
 		}
 	})
-
 	g.POST("/subjects", func(c echo.Context) error {
 		Uid := c.Get(UID_KEY).(string)
 
@@ -240,7 +370,7 @@ func route_api_subjects(g *echo.Group) {
 				ScrNo     string `json:"scrno"`
 				Sex       string `json:"sex"`
 				BirthDate string `json:"birth_date"`
-				ArmId     string `json:"arm_id"`
+				Arm       string `json:"arm"`
 				FirstDate string `json:"first_date"`
 			}
 			err := util.BodyToStruct(c.Request().Body, &item)
@@ -249,11 +379,65 @@ func route_api_subjects(g *echo.Group) {
 			}
 			//////////////////////////////////////////////////
 
-			_, err = gAPI.SubjectTable.Insert(gConfig.StudyId, item.Name, item.ScrNo, item.Sex, item.BirthDate, item.ArmId, item.FirstDate, time.Now(), Uid)
+			_, err = gAPI.SubjectTable.Insert(gConfig.StudyId, item.Name, item.ScrNo, item.Sex, item.BirthDate, item.Arm, item.FirstDate, time.Now(), Uid)
 			if err != nil {
 				return http.StatusInternalServerError, err
 			}
 			return http.StatusOK, true
+		})()
+		if err, is := retValue.(error); is {
+			return c.JSON(retCode, &Result{Error: err})
+		} else {
+			return c.JSON(retCode, &Result{Result: retValue})
+		}
+	})
+	g.PUT("/subjects/:subjectid", func(c echo.Context) error {
+		retCode, retValue := (func() (int, interface{}) {
+			subjectid, err := util.PathToString(c, "subjectid")
+			if err != nil {
+				return http.StatusBadRequest, err
+			}
+
+			var item struct {
+				Name      string `json:"name"`
+				ScrNo     string `json:"scrno"`
+				Sex       string `json:"sex"`
+				BirthDate string `json:"birth_date"`
+				FirstDate string `json:"first_date"`
+			}
+			err = util.BodyToStruct(c.Request().Body, &item)
+			if err != nil {
+				return http.StatusBadRequest, err
+			}
+			//////////////////////////////////////////////////
+
+			IsAuth := false //TEMP
+
+			subject, err := gAPI.SubjectTable.Subject(subjectid)
+			if err != nil {
+				return http.StatusInternalServerError, err
+			}
+			if subject.StudyId != gConfig.StudyId {
+				return http.StatusBadRequest, ErrNotMatchedStudyId
+			}
+
+			if IsAuth {
+				subject.Name = item.Name
+			}
+			subject.ScrNo = item.ScrNo
+			subject.Sex = item.Sex
+			subject.BirthDate = item.BirthDate
+			subject.FirstDate = item.FirstDate
+
+			err = gAPI.SubjectTable.Update(subject.Id, subject)
+			if err != nil {
+				return http.StatusInternalServerError, err
+			}
+			dao, err := Select_Subject(subject)
+			if err != nil {
+				return http.StatusInternalServerError, err
+			}
+			return http.StatusOK, dao
 		})()
 		if err, is := retValue.(error); is {
 			return c.JSON(retCode, &Result{Error: err})
@@ -272,7 +456,7 @@ type DAO_Search_Subject struct {
 	TCreate  string `json:"t_create"`
 }
 
-func Search_Subjects(name string, scrno string, arm_id string) ([]*DAO_Search_Subject, error) {
+func Search_Subjects(scrno string, arm string) ([]*DAO_Search_Subject, error) {
 	list, err := gAPI.SubjectTable.List(gConfig.StudyId)
 	if err != nil {
 		return nil, err
@@ -280,18 +464,13 @@ func Search_Subjects(name string, scrno string, arm_id string) ([]*DAO_Search_Su
 
 	daos := make([]*DAO_Search_Subject, 0)
 	for _, v := range list {
-		if len(name) > 0 {
-			if !strings.Contains(v.Name, name) {
-				continue
-			}
-		}
 		if len(scrno) > 0 {
 			if !strings.Contains(v.ScrNo, scrno) {
 				continue
 			}
 		}
-		if len(arm_id) > 0 {
-			if !strings.Contains(v.ArmId, arm_id) {
+		if len(arm) > 0 {
+			if !strings.Contains(v.Arm, arm) {
 				continue
 			}
 		}
@@ -306,7 +485,22 @@ func Search_Subjects(name string, scrno string, arm_id string) ([]*DAO_Search_Su
 		}
 		daos = append(daos, dao)
 	}
+	sort.Sort(DAO_Search_Subject_Sort(daos))
 	return daos, nil
+}
+
+type DAO_Search_Subject_Sort []*DAO_Search_Subject
+
+func (s DAO_Search_Subject_Sort) Len() int {
+	return len(s)
+}
+
+func (s DAO_Search_Subject_Sort) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+func (s DAO_Search_Subject_Sort) Less(i, j int) bool {
+	return s[i].ScrNo < s[j].ScrNo
 }
 
 type DAO_Select_Subject struct {
@@ -323,19 +517,11 @@ type DAO_Select_Subject struct {
 	TCreate     string         `json:"t_create"`
 }
 
-func Select_Subjects(subjectid string) (*DAO_Select_Subject, error) {
-	subject, err := gAPI.SubjectTable.Subject(subjectid)
-	if err != nil {
-		return nil, err
-	}
-
-	if subject.StudyId != gConfig.StudyId {
-		return nil, ErrNotMatchedStudyId
-	}
-
+func Select_Subject(subject *Subject) (*DAO_Select_Subject, error) {
 	maxPosition := int64(0)
 
-	stack, err := gAPI.StackTable.Stack(subjectid, "f-1") //TEMP
+	stack, err := gAPI.StackTable.Stack(subject.Id, "f-1") //TEMP
+	countHash := make(map[string]int)
 	if err != nil {
 		if err != ErrNotExist {
 			return nil, err
@@ -346,12 +532,64 @@ func Select_Subjects(subjectid string) (*DAO_Select_Subject, error) {
 			return nil, err
 		}
 
+		Ids := make([]string, 0, len(visits))
+		visitHash := make(map[string]*Visit)
 		for _, v := range visits {
+			Ids = append(Ids, v.Id)
+			visitHash[v.Id] = v
 			p := convert.Int(v.Position)
 			if maxPosition < p {
 				maxPosition = p
 			}
 		}
+		if len(Ids) > 0 {
+			dataList, err := gAPI.DataTable.ListByVisitIds(Ids)
+			if err != nil {
+				return nil, err
+			}
+			smokerHash := make(map[string]bool)
+			alcoholHash := make(map[string]bool)
+			for _, d := range dataList {
+				if d.ItemId == "i-29" && d.Value != "" {
+					if visit, has := visitHash[d.VisitId]; has {
+						smokerHash[visit.Position] = true
+					}
+				}
+				if d.ItemId == "i-31" && d.Value != "" {
+					if visit, has := visitHash[d.VisitId]; has {
+						alcoholHash[visit.Position] = true
+					}
+				}
+			}
+			for _, d := range dataList {
+				if visit, has := visitHash[d.VisitId]; has {
+					countHash[visit.Position]++
+					if !smokerHash[visit.Position] && d.ItemId == "i-28" && d.CodeId == "c-45" {
+						countHash[visit.Position]++
+					}
+					if !alcoholHash[visit.Position] && d.ItemId == "i-30" && d.CodeId == "c-47" {
+						countHash[visit.Position]++
+					}
+				}
+			}
+		}
+	}
+
+	forms, err := FormWithCache(gAPI.FormTable, gConfig.StudyId)
+	if err != nil {
+		return nil, err
+	}
+	groupHash := make(map[string]*Group)
+	itemHash := make(map[string]*Item)
+	for _, form := range forms {
+		if form.Id == "f-1" {
+			addFormMeta(form, groupHash, itemHash)
+		}
+	}
+
+	compliance := make(map[string]int)
+	for k, v := range countHash {
+		compliance[k] = v * 100 / len(itemHash)
 	}
 
 	dao := &DAO_Select_Subject{
@@ -359,7 +597,7 @@ func Select_Subjects(subjectid string) (*DAO_Select_Subject, error) {
 		ScrNo:       subject.ScrNo,
 		Age:         getAgeFromDate(subject.BirthDate),
 		Sex:         subject.Sex,
-		Compliance:  make(map[string]int),
+		Compliance:  compliance,
 		BirthDate:   subject.BirthDate,
 		FirstDate:   subject.FirstDate,
 		MaxPosition: maxPosition,
@@ -369,7 +607,6 @@ func Select_Subjects(subjectid string) (*DAO_Select_Subject, error) {
 	if dao.IsAuth {
 		dao.Name = subject.Name
 	}
-	//TODO dao.Compliance
 	return dao, nil
 }
 

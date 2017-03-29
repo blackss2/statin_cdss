@@ -89,7 +89,7 @@ type Subject struct {
 	ScrNo     string    `json:"scrno" gorethink:"scrno"`
 	Sex       string    `json:"sex" gorethink:"sex"`
 	BirthDate string    `json:"birth_date" gorethink:"birth_date"`
-	ArmId     string    `json:"arm_id" gorethink:"arm_id"`
+	Arm       string    `json:"arm" gorethink:"arm"`
 	FirstDate string    `json:"first_date" gorethink:"first_date"`
 	IsDelete  bool      `json:"is_delete" gorethink:"is_delete"`
 	TCreate   time.Time `json:"t_create" gorethink:"t_create"`
@@ -118,7 +118,7 @@ func (st *SubjectTable) Insert(
 	ScrNo string,
 	Sex string,
 	BirthDate string,
-	ArmId string,
+	Arm string,
 	FirstDate string,
 	TCreate time.Time,
 	ActorId string,
@@ -128,7 +128,7 @@ func (st *SubjectTable) Insert(
 		ScrNo:     ScrNo,
 		Sex:       Sex,
 		BirthDate: BirthDate,
-		ArmId:     ArmId,
+		Arm:       Arm,
 		FirstDate: FirstDate,
 		IsDelete:  false,
 		TCreate:   TCreate,
@@ -207,6 +207,21 @@ func (st *SubjectTable) List(StudyId string) ([]*Subject, error) {
 	return list, nil
 }
 
+func (st *SubjectTable) Count(StudyId string) (int64, error) {
+	res, err := st.table.
+		GetAllByIndex("study_id", StudyId).
+		Count().
+		Run(st.session)
+	if err != nil {
+		return 0, err
+	}
+
+	var Count int64
+	res.One(&Count)
+
+	return Count, nil
+}
+
 type Stack struct {
 	Id        string    `json:"id,omitempty" gorethink:"id,omitempty"`
 	FormId    string    `json:"form_id" gorethink:"form_id"`
@@ -226,7 +241,7 @@ func NewStackTable(session *gorethink.Session, db gorethink.Term) *StackTable {
 			db:      db,
 		},
 	}
-	st.Init("stack", "subject_id")
+	st.Init("stack", "subject_id", "form_id")
 	return st
 }
 
@@ -280,6 +295,39 @@ func (st *StackTable) List(SubjectId string) ([]*Stack, error) {
 	return list, nil
 }
 
+func (st *StackTable) ListByFormId(FormId string) ([]*Stack, error) {
+	res, err := st.table.
+		GetAllByIndex("form_id", FormId).
+		Run(st.session)
+	if err != nil {
+		return nil, err
+	}
+
+	list := make([]*Stack, 0)
+	res.All(&list)
+
+	return list, nil
+}
+
+func (st *StackTable) ListByFormIds(FormIds []string) ([]*Stack, error) {
+	ids := make([]interface{}, 0, len(FormIds))
+	for _, v := range FormIds {
+		ids = append(ids, v)
+	}
+
+	res, err := st.table.
+		GetAllByIndex("form_id", ids...).
+		Run(st.session)
+	if err != nil {
+		return nil, err
+	}
+
+	list := make([]*Stack, 0)
+	res.All(&list)
+
+	return list, nil
+}
+
 type Visit struct {
 	Id       string    `json:"id,omitempty" gorethink:"id,omitempty"`
 	Position string    `json:"position" gorethink:"position"`
@@ -321,6 +369,25 @@ func (st *VisitTable) Insert(StackId string, Position string, TCreate time.Time,
 func (st *VisitTable) List(StackId string) ([]*Visit, error) {
 	res, err := st.table.
 		GetAllByIndex("stack_id", StackId).
+		Run(st.session)
+	if err != nil {
+		return nil, err
+	}
+
+	list := make([]*Visit, 0)
+	res.All(&list)
+
+	return list, nil
+}
+
+func (st *VisitTable) ListByStackIds(StackIds []string) ([]*Visit, error) {
+	ids := make([]interface{}, 0, len(StackIds))
+	for _, v := range StackIds {
+		ids = append(ids, v)
+	}
+
+	res, err := st.table.
+		GetAllByIndex("stack_id", ids...).
 		Run(st.session)
 	if err != nil {
 		return nil, err
@@ -403,6 +470,25 @@ func (st *DataTable) Insert(datas []*Data) error {
 func (st *DataTable) List(VisitId string) ([]*Data, error) {
 	res, err := st.table.
 		GetAllByIndex("visit_id", VisitId).
+		Run(st.session)
+	if err != nil {
+		return nil, err
+	}
+
+	list := make([]*Data, 0)
+	res.All(&list)
+
+	return list, nil
+}
+
+func (st *DataTable) ListByVisitIds(VisitIds []string) ([]*Data, error) {
+	ids := make([]interface{}, 0, len(VisitIds))
+	for _, v := range VisitIds {
+		ids = append(ids, v)
+	}
+
+	res, err := st.table.
+		GetAllByIndex("visit_id", ids...).
 		Run(st.session)
 	if err != nil {
 		return nil, err
