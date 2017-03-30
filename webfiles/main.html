@@ -70,38 +70,44 @@
 				</section>
 			</div>
 			<div class="col-sm-4">
-				<section class="box">
-					<h3 class="title">
-						예약
-						<span class="right update"> UPDATE : 2016.04.19 </span>
-					</h3>
-					<div class="content">
-						<table class="table-default table-height-full">
-							<thead>
-								<th>대상군</th>
-								<th>예약 인원</th>
-							</thead>
-							<tbody>
-								<tr>
-									<td>전체</td>
-									<td>12명</td>
-								</tr>
-								<tr>
-									<td>실험군</td>
-									<td>5명</td>
-								</tr>
-								<tr>
-									<td>대조군</td>
-									<td>4명</td>
-								</tr>
-								<tr>
-									<td>위약군</td>
-									<td>3명</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</section>
+				<reservation>
+					<section class="box">
+						<h3 class="title">
+							예약
+						</h3>
+						<div class="content">
+							<table class="table-default table-height-full">
+								<thead>
+									<th>대상군</th>
+									<th>예약 인원</th>
+								</thead>
+								<tbody>
+									<tr>
+										<td>전체</td>
+										<td>{{constants.reservations["total"]}}명</td>
+									</tr>
+									<tr v-for="arm in constants.arms">
+										<td>{{arm}}</td>
+										<td>{{constants.reservations[arm]}}명</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</section>
+					<script type="vue">
+					data: function() {
+						var obj = {
+							constants: {
+								arms: ["실험군", "대조군", "위약군"],
+								reservations: Store.get("page-initial").reservations
+							}
+						};
+						return obj;
+					},
+					methods: {
+					}
+					</script>
+				</reservation>
 			</div>
 		</div>
 		<div class="content clearfix">

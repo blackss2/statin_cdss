@@ -230,14 +230,16 @@
 													start: item.date
 												});
 												if(this.selected.date == item.date) {
-													event
+													event = item;
 												}
 											}
 											Callback.call("select-event", event);
 											$('#calendar').fullCalendar('removeEvents');
 											$('#calendar').fullCalendar('addEventSource', list);
 											$('#calendar').fullCalendar('rerenderEvents' );
-											lastDivRender();
+											if(lastDivRender != null) {
+												lastDivRender();
+											}
 										}
 									}, function(err) {
 										console.error(err);

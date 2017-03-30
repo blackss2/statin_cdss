@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync"
 
+	"git.tnicdev.co.kr/hami/CTC_Web/pkg/reservation"
 	"git.tnicdev.co.kr/hami/CTC_Web/pkg/user"
 	"git.tnicdev.co.kr/hami/CTC_Web/pkg/util"
 
@@ -73,18 +74,18 @@ func main_web(wg sync.WaitGroup) {
 		}
 
 		if args["IsLogin"] == true {
+			subjects, err := gAPI.SubjectTable.List(gConfig.StudyId)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, &Result{Error: err})
+			}
+			subjectHash := make(map[string]*Subject)
+			for _, v := range subjects {
+				subjectHash[v.Id] = v
+			}
+
 			total_ae := make(map[string]int)
 			arm_ae := make(map[string]int)
 			if true {
-				subjects, err := gAPI.SubjectTable.List(gConfig.StudyId)
-				if err != nil {
-					return c.JSON(http.StatusInternalServerError, &Result{Error: err})
-				}
-				subjectHash := make(map[string]*Subject)
-				for _, v := range subjects {
-					subjectHash[v.Id] = v
-				}
-
 				stacks, err := gAPI.StackTable.ListByFormIds([]string{"f-2", "f-3"}) //TEMP
 				if err != nil {
 					return c.JSON(http.StatusInternalServerError, &Result{Error: err})
@@ -270,8 +271,26 @@ func main_web(wg sync.WaitGroup) {
 			//TODO
 			enrollment := make(map[string]int)
 			//TODO
-			reservation := make(map[string]int)
-			//TODO
+			reservations := make(map[string]int)
+			if true {
+				var list []*reservation.Reservation
+				err := gAPI.ReservationStore.List(&list)
+				if err != nil {
+					return c.JSON(http.StatusInternalServerError, &Result{Error: err})
+				}
+
+				reservations["실험군"] = 0
+				reservations["대조군"] = 0
+				reservations["위약군"] = 0
+				for _, v := range list {
+					for _, s := range v.Subjects {
+						if subject, has := subjectHash[s.SubjectId]; has {
+							reservations[subject.Arm]++
+							reservations["total"]++
+						}
+					}
+				}
+			}
 
 			notices, notice_count, err := Search_Notices(0, 5)
 			if err != nil {
@@ -283,7 +302,7 @@ func main_web(wg sync.WaitGroup) {
 				"arm_ae":       arm_ae,
 				"compliances":  compliances,
 				"enrollment":   enrollment,
-				"reservation":  reservation,
+				"reservations": reservations,
 				"notices":      notices,
 				"notice_count": notice_count,
 			}
