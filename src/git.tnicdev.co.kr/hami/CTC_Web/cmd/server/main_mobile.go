@@ -142,13 +142,13 @@ func main_mobile(wg sync.WaitGroup) {
 	})
 	e.GET("/list", func(c echo.Context) error {
 		args := make(map[string]interface{})
-		user, err := InitMobileArgs(c, args)
+		_, err := InitMobileArgs(c, args)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, &Result{Error: err})
 		}
 
 		TNow := time.Now()
-		ActorId := user.Id
+		ActorId := "user"
 
 		subject, err := gAPI.SubjectTable.Subject("1d74db04-4021-4744-a537-a28e0fdcc0b4") //TEMP
 		if err != nil {
@@ -342,13 +342,13 @@ func main_mobile(wg sync.WaitGroup) {
 	})
 	e.GET("/form", func(c echo.Context) error {
 		args := make(map[string]interface{})
-		user, err := InitMobileArgs(c, args)
+		_, err := InitMobileArgs(c, args)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, &Result{Error: err})
 		}
 
 		TNow := time.Now()
-		ActorId := user.Id
+		ActorId := "user"
 
 		subject, err := gAPI.SubjectTable.Subject("1d74db04-4021-4744-a537-a28e0fdcc0b4") //TEMP
 		if err != nil {
@@ -497,13 +497,13 @@ func main_mobile(wg sync.WaitGroup) {
 	})
 	e.POST("/form", func(c echo.Context) error {
 		args := make(map[string]interface{})
-		user, err := InitMobileArgs(c, args)
+		_, err := InitMobileArgs(c, args)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, &Result{Error: err})
 		}
 
 		TNow := time.Now()
-		ActorId := user.Id
+		ActorId := "user"
 
 		subject, err := gAPI.SubjectTable.Subject("1d74db04-4021-4744-a537-a28e0fdcc0b4") //TEMP
 		if err != nil {
@@ -692,13 +692,13 @@ func main_mobile(wg sync.WaitGroup) {
 	})
 	e.DELETE("/form", func(c echo.Context) error {
 		args := make(map[string]interface{})
-		user, err := InitMobileArgs(c, args)
+		_, err := InitMobileArgs(c, args)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, &Result{Error: err})
 		}
 
 		TNow := time.Now()
-		ActorId := user.Id
+		ActorId := "user"
 
 		subject, err := gAPI.SubjectTable.Subject("1d74db04-4021-4744-a537-a28e0fdcc0b4") //TEMP
 		if err != nil {

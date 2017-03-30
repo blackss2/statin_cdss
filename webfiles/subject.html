@@ -278,35 +278,55 @@
 												jFormHtml.find(".content-block-title").addClass("title");
 												jFormHtml.find(".group-normal > .content-block-inner").hide();
 												jFormHtml.find(".item-block > .content-block-inner").addClass("ques").css("margin-left", "-20px");
+												jFormHtml.find(".ques td").css("font-size", "16px").css("padding-bottom", "12px");
+												jFormHtml.find(".ques td").each(function() {
+													$(this).text("Q. " + $(this).text());
+												});
+												jFormHtml.find(".item-block").css("margin-bottom", "40px");
+												jFormHtml.find(".item-inner .item-title").css("padding", "0");
 												jFormHtml.find(".item-title").css("font-weight", "normal");
-												var valueHash = {};
-												jFormHtml.find("input[type='radio']").each(function() {
-													$(this).hide();
-													if($(this).prop("checked")) {
-														var name = $(this).attr("name");
-														valueHash[name] = $(this).val();
-														$(this).next().css("color", "blue");
-													}
-													$(this).change(function() {
+												var rowindexValueHash = {};
+												jFormHtml.find("[rowindex]").each(function() {
+													var rowindex = $(this).attr("rowindex");
+													$(this).find("input[type='radio']").each(function() {
+														var valueHash = rowindexValueHash[rowindex];
+														if(valueHash == null) {
+															valueHash = {};
+															rowindexValueHash[rowindex] = valueHash;
+														}
+														$(this).hide();
 														if($(this).prop("checked")) {
 															var name = $(this).attr("name");
-															var value = $(this).val();
-															var jRadioGroup = $("#form-html [name='" + name + "']");
-															jRadioGroup.each(function() {
-																if($(this).val() == value) {
-																	if(valueHash[name] == $(this).val()) {
-																		$(this).removeClass("change-value");
-																		$(this).next().css("color", "blue");
-																	} else {
-																		$(this).addClass("change-value");
-																		$(this).next().css("color", "red");
-																	}
-																} else {
-																	$(this).removeClass("change-value");
-																	$(this).next().css("color", "");
-																}
-															});
+															valueHash[name] = $(this).val();
+															$(this).next().css("color", "blue");
 														}
+														$(this).attr("rowindex", rowindex);
+														$(this).change(function() {
+															if($(this).prop("checked")) {
+																var valueHash = rowindexValueHash[rowindex];
+																if(valueHash == null) {
+																	valueHash = {};
+																	rowindexValueHash[rowindex] = valueHash;
+																}
+																var name = $(this).attr("name");
+																var value = $(this).val();
+																var jRadioGroup = $(this).parent().parent().parent().find("[name='" + name + "']");
+																jRadioGroup.each(function() {
+																	if($(this).val() == value) {
+																		if(valueHash[name] == $(this).val()) {
+																			$(this).removeClass("change-value");
+																			$(this).next().css("color", "blue");
+																		} else {
+																			$(this).addClass("change-value");
+																			$(this).next().css("color", "red");
+																		}
+																	} else {
+																		$(this).removeClass("change-value");
+																		$(this).next().css("color", "");
+																	}
+																});
+															}
+														});
 													});
 												});
 												if(jFormHtml.find(".group-list").length > 0) {
@@ -314,34 +334,6 @@
 														$(this).prepend('<div class="content-block-title title">No. ' + (idx+1) + '</div>');
 													});
 												}
-												/*
-												if(jFormHtml.find(".group-list").length > 0) {
-													var jClone = $("#list-template").clone().removeClass("hidden");
-													var names = [];
-													jFormHtml.find(".group-list").eq(0).find("td").each(function() {
-														names.push($(this).text());
-													});
-													var jTrHead = jClone.find("thead tr");
-													jTrHead.empty();
-													for(var i=0; i<names.length; i++) {
-														jTrHead.append($("<th>" + names[i] + "</th>"));
-													}
-													var jTbody = jClone.find("tbody");
-													var jTr = jTbody.find("tr").detach();
-													jFormHtml.find(".group-list").each(function() {
-														var jTrClone = jTr.clone();
-														jTbody.append(jTrClone);
-														jTrClone.empty();
-														//$(this).find(".item-content").each(function() {
-														$(this).find(".form-item").each(function() {
-															//jTrClone.append($("<td/>").append($(this).detach()));
-															jTrClone.append($("<td style='word-break:break-all;'/>").text($(this).val()));
-														});
-													});
-													jFormHtml.find(".form-target").empty().append(jClone);
-												}
-												*/
-
 												jFormHtml.show()
 											}, 0);
 										} else {
