@@ -30,6 +30,7 @@ func main_web(wg sync.WaitGroup) {
 	})
 	route_api_subjects(g)
 	route_api_notices(g)
+	route_api_reservations(g)
 
 	//Web Pages
 	web := util.NewWebServer(e, "./webfiles")
@@ -313,7 +314,6 @@ func main_web(wg sync.WaitGroup) {
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, &Result{Error: err})
 		}
-
 		args["page_initial"] = map[string]interface{}{}
 		return c.Render(http.StatusOK, "schedule.html", args)
 	}, webChecker)

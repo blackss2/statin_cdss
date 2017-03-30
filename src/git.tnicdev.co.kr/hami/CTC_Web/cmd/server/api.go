@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"git.tnicdev.co.kr/hami/CTC_Web/pkg/notice"
+	"git.tnicdev.co.kr/hami/CTC_Web/pkg/reservation"
 	"git.tnicdev.co.kr/hami/CTC_Web/pkg/user"
 
 	"github.com/dancannon/gorethink"
@@ -15,14 +16,15 @@ import (
 )
 
 var gAPI = struct {
-	SubjectTable *SubjectTable
-	StackTable   *StackTable
-	VisitTable   *VisitTable
-	FormTable    *FormTable
-	DataTable    *DataTable
-	HistoryTable *HistoryTable
-	UserStore    *user.Store
-	NoticeStore  *notice.Store
+	SubjectTable     *SubjectTable
+	StackTable       *StackTable
+	VisitTable       *VisitTable
+	FormTable        *FormTable
+	DataTable        *DataTable
+	HistoryTable     *HistoryTable
+	UserStore        *user.Store
+	NoticeStore      *notice.Store
+	ReservationStore *reservation.Store
 }{}
 
 var gFormListCache []*Form
@@ -69,6 +71,10 @@ func init() {
 		log.Fatalln(err.Error())
 	}
 	gAPI.NoticeStore, err = notice.NewStore(u, "notice")
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	gAPI.ReservationStore, err = reservation.NewStore(u, "reservation")
 	if err != nil {
 		log.Fatalln(err.Error())
 	}

@@ -1,9 +1,11 @@
-package notice
+package reservation
 
 import (
 	"errors"
 )
 
 var (
-	ErrNotExistNotice = errors.New("not exist notice")
+	ErrNotExistReservation        = errors.New("not exist reservation")
+	ErrNotExistReservationSubject = errors.New("not exist reservation subject")
+	ErrExistReservationSubject    = errors.New("exist reservation subject")
 )
