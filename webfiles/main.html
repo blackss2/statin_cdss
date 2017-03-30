@@ -8,7 +8,7 @@
 				<section class="box">
 					<h3 class="title">전체 이상반응2</h3>
 					<div class="content">
-						<canvas id="chart-area" style="width:250px; height:100px;"/>
+						<canvas id="chart-area" style="width:100%; height:230px;"/>
 					</div>
 				</section>
 			</div>
@@ -16,7 +16,7 @@
 				<section class="box">
 					<h3 class="title">군별 이상반응</h3>
 					<div class="content">
-						<canvas id="chart-area2" style="width:250px; height:100px;"/>
+						<canvas id="chart-area2" style="width:100%; height:230px;"/>
 					</div>
 				</section>
 			</div>
@@ -65,7 +65,7 @@
 				<section class="box">
 					<h3 class="title">전체 피험자 Enroll 그래프</h3>
 					<div class="content">
-						<canvas id="bar-chart" style="width:500px; height:100px;"/>
+						<canvas id="bar-chart" style="width:100%; height:230px;"/>
 					</div>
 				</section>
 			</div>
@@ -299,6 +299,7 @@ var randomScalingFactor = function() {
         },
         options: {
             responsive: true,
+			maintainAspectRatio: false,
             legend: {
                 position: 'top',
             },
@@ -333,6 +334,7 @@ var randomScalingFactor = function() {
         },
         options: {
             responsive: true,
+			maintainAspectRatio: false,
             legend: {
                 position: 'top',
             },
@@ -350,39 +352,40 @@ var randomScalingFactor = function() {
     var config3 = {
         type: 'bar',
         data: {
-				    labels: ["전체", "이상반응", "이행률 저조", "관리필요", "오늘 예약", "중도 탈락"],
-				    datasets: [
-				        {
-				            backgroundColor: [
-				                'rgba(255, 99, 132, 0.2)',
-				                'rgba(54, 162, 235, 0.2)',
-				                'rgba(255, 206, 86, 0.2)',
-				                'rgba(75, 192, 192, 0.2)',
-				                'rgba(153, 102, 255, 0.2)',
-				                'rgba(255, 159, 64, 0.2)'
-				            ],
-				            borderColor: [
-				                'rgba(255,99,132,1)',
-				                'rgba(54, 162, 235, 1)',
-				                'rgba(255, 206, 86, 1)',
-				                'rgba(75, 192, 192, 1)',
-				                'rgba(153, 102, 255, 1)',
-				                'rgba(255, 159, 64, 1)'
-				            ],
-				            borderWidth: 1,
-				            data: [65, 59, 80, 81, 56, 55, 40],
-				        }
-				    ]
-				},
+			labels: ["전체", "이상반응", "이행률 저조", "관리필요", "오늘 예약", "중도 탈락"],
+			datasets: [
+				{
+					backgroundColor: [
+						'rgba(255, 99, 132, 0.2)',
+						'rgba(54, 162, 235, 0.2)',
+						'rgba(255, 206, 86, 0.2)',
+						'rgba(75, 192, 192, 0.2)',
+						'rgba(153, 102, 255, 0.2)',
+						'rgba(255, 159, 64, 0.2)'
+					],
+					borderColor: [
+						'rgba(255,99,132,1)',
+						'rgba(54, 162, 235, 1)',
+						'rgba(255, 206, 86, 1)',
+						'rgba(75, 192, 192, 1)',
+						'rgba(153, 102, 255, 1)',
+						'rgba(255, 159, 64, 1)'
+					],
+					borderWidth: 1,
+					data: [65, 59, 80, 81, 56, 55, 40],
+				}
+			]
+		},
         options: {
             responsive: true,
+			maintainAspectRatio: false,
             legend: {
                 display : false
             },
             animation: {
                 animateScale: true,
                 animateRotate: true
-            },
+            }
         }
     };
     window.onload = function() {
