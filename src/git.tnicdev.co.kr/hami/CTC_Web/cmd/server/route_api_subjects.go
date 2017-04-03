@@ -285,6 +285,192 @@ func route_api_subjects(g *echo.Group) {
 			return c.JSON(retCode, &Result{Result: retValue})
 		}
 	})
+	g.GET("/subjects/:subjectid/special/diary", func(c echo.Context) error {
+		retCode, retValue := (func() (int, interface{}) {
+			subjectid, err := util.PathToString(c, "subjectid")
+			if err != nil {
+				return http.StatusBadRequest, err
+			}
+			//////////////////////////////////////////////////
+
+			subject, err := gAPI.SubjectTable.Subject(subjectid)
+			if err != nil {
+				return http.StatusInternalServerError, err
+			}
+			if subject.StudyId != gConfig.StudyId {
+				return http.StatusBadRequest, ErrNotMatchedStudyId
+			}
+
+			//1
+			stacks, err := gAPI.StackTable.List(subjectid)
+			if err != nil {
+				if err != ErrNotExist {
+					return http.StatusInternalServerError, err
+				}
+			}
+
+			type DAO_Diary_Chart struct {
+				Factor1  map[string]int64 `json:"factor1"`
+				Factor2  map[string]int64 `json:"factor2"`
+				Factor3  map[string]int64 `json:"factor3"`
+				Factor4  map[string]int64 `json:"factor4"`
+				Factor5  map[string]int64 `json:"factor5"`
+				Factor6  map[string]int64 `json:"factor6"`
+				Factor7  map[string]int64 `json:"factor7"`
+				Factor8  map[string]int64 `json:"factor8"`
+				Factor9  map[string]int64 `json:"factor9"`
+				Factor10 map[string]int64 `json:"factor10"`
+			}
+
+			chart := &DAO_Diary_Chart{
+				Factor1:  make(map[string]int64),
+				Factor2:  make(map[string]int64),
+				Factor3:  make(map[string]int64),
+				Factor4:  make(map[string]int64),
+				Factor5:  make(map[string]int64),
+				Factor6:  make(map[string]int64),
+				Factor7:  make(map[string]int64),
+				Factor8:  make(map[string]int64),
+				Factor9:  make(map[string]int64),
+				Factor10: make(map[string]int64),
+			}
+
+			type DAO_Diary_AE struct {
+				Name      string `json:"name"`
+				Treatment string `json:"treatment"`
+				StartDate string `json:"start_date"`
+			}
+
+			dataHash := make(map[int64]*DAO_Diary_AE)
+			if len(stacks) > 0 {
+				StackIds := make([]string, 0, len(stacks))
+				for _, v := range stacks {
+					StackIds = append(StackIds, v.Id)
+				}
+
+				visits, err := gAPI.VisitTable.ListByStackIds(StackIds)
+				if err != nil {
+					return http.StatusInternalServerError, err
+				}
+				if len(visits) > 0 {
+					forms, err := FormWithCache(gAPI.FormTable, gConfig.StudyId)
+					if err != nil {
+						return http.StatusInternalServerError, err
+					}
+					groupHash := make(map[string]*Group)
+					itemHash := make(map[string]*Item)
+					for _, form := range forms {
+						addFormMeta(form, groupHash, itemHash)
+					}
+
+					Ids := make([]string, 0, len(visits))
+					visitHash := make(map[string]*Visit)
+					for _, v := range visits {
+						Ids = append(Ids, v.Id)
+						visitHash[v.Id] = v
+					}
+
+					dataList, err := gAPI.DataTable.ListByVisitIds(Ids)
+					if err != nil {
+						return http.StatusInternalServerError, err
+					}
+					for _, d := range dataList {
+						if visit, has := visitHash[d.VisitId]; has {
+							if item, has := itemHash[d.ItemId]; has {
+								dao, has := dataHash[d.Rowindex]
+								if !has {
+									dao = new(DAO_Diary_AE)
+									dataHash[d.Rowindex] = dao
+								}
+								switch item.Id {
+								case "i-2": //통증
+									for _, c := range item.Codes {
+										if d.CodeId == c.Id {
+											chart.Factor1[visit.Position] = convert.Int(c.Value)
+											break
+										}
+									}
+								case "i-3": //압통
+									for _, c := range item.Codes {
+										if d.CodeId == c.Id {
+											chart.Factor2[visit.Position] = convert.Int(c.Value)
+											break
+										}
+									}
+								case "i-6": //발열
+									for _, c := range item.Codes {
+										if d.CodeId == c.Id {
+											chart.Factor3[visit.Position] = convert.Int(c.Value)
+											break
+										}
+									}
+								case "i-7": //구토
+									for _, c := range item.Codes {
+										if d.CodeId == c.Id {
+											chart.Factor4[visit.Position] = convert.Int(c.Value)
+											break
+										}
+									}
+								case "i-8": //설사
+									for _, c := range item.Codes {
+										if d.CodeId == c.Id {
+											chart.Factor5[visit.Position] = convert.Int(c.Value)
+											break
+										}
+									}
+								case "i-4": //홍반/발적
+									for _, c := range item.Codes {
+										if d.CodeId == c.Id {
+											chart.Factor6[visit.Position] = convert.Int(c.Value)
+											break
+										}
+									}
+									//두통
+								case "i-5": //경결/부종
+									for _, c := range item.Codes {
+										if d.CodeId == c.Id {
+											chart.Factor8[visit.Position] = convert.Int(c.Value)
+											break
+										}
+									}
+									//근육통
+									//피로/권태
+								case "i-13":
+									dao.Name = d.Value
+								case "i-16":
+									dao.Treatment = d.Value
+								case "i-25":
+									dao.StartDate = d.Value
+								}
+							}
+						}
+					}
+				}
+			}
+
+			rows := make([]int, 0, len(dataHash))
+			for i, _ := range dataHash {
+				rows = append(rows, int(i))
+			}
+			sort.Ints(rows)
+			AEList := make([]*DAO_Diary_AE, 0, len(dataHash))
+			for _, r := range rows {
+				dao := dataHash[int64(r)]
+				AEList = append(AEList, dao)
+			}
+
+			return http.StatusOK, map[string]interface{}{
+				"chart": chart,
+				"ae":    AEList,
+			}
+		})()
+
+		if err, is := retValue.(error); is {
+			return c.JSON(retCode, &Result{Error: err})
+		} else {
+			return c.JSON(retCode, &Result{Result: retValue})
+		}
+	})
 	g.POST("/subjects", func(c echo.Context) error {
 		Uid := c.Get(UID_KEY).(string)
 

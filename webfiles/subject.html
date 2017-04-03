@@ -103,7 +103,6 @@
 												<li class="sub-item" v-bind:class="{active:selected.groupid == 'g-2'}" v-on:click="selectForm('f-1', 'g-2')">국소반응</li>
 												<li class="sub-item" v-bind:class="{active:selected.groupid == 'g-3'}" v-on:click="selectForm('f-1', 'g-3')">전신반응</li>
 												<li class="sub-item" v-bind:class="{active:selected.groupid == 'g-7'}" v-on:click="selectForm('f-1', 'g-7')">생체생활정보</li>
-												<li class="sub-item" v-bind:class="{active:selected.groupid == 'g-4'}" v-on:click="selectForm('f-2', 'g-4')">기타 이상 반응</li>
 											</ul>
 										</li>
 										<li class="etc"  v-on:click="selectStaticForm('f-3', 'g-5')">기타 이상 반응</li>
@@ -186,6 +185,7 @@
 										},
 										options: {
 											responsive: true,
+											maintainAspectRatio: false,
 											legend: {
 												display : false
 											},
@@ -227,21 +227,73 @@
 										console.error(err.body);
 										Callback.call("load-form", "", "");
 									});
-							}
+								},
+								selectSpecialForm: function(name) {
+									this.$http.get("/api/subjects/" + this.constants.subject.id + "/special/" + name).then(function(res) {
+										if(res.body.error != null) {
+											alert(res.body.error);
+										} else {
+											Callback.call("load-special-form", name, res.body.result);
+										}
+									}, function(err) {
+										console.error(err.body);
+										Callback.call("load-form", "", "");
+									});
+								},
 							}
 							</script>
 						</diary>
 					</div>
 					<div class="col-xs-9">
 						<form-data>
-							<div id="form-html">
-								<section class="box box-height-md">
-									<div class="form-target content scroll-content" v-html="constants.html" style="height:450px;">
-									</div>
-									<div class="btn-grp center">
-										<button class="btn btn-sm btn-dark" type="button" v-if="constants.has_data">저장</button>
-									</div>
-								</section>
+							<div>
+								<div id="form-html">
+									<section class="box box-height-md">
+										<div class="form-target content scroll-content" v-html="constants.html" style="height:450px;">
+										</div>
+										<div class="btn-grp center">
+											<button class="btn btn-sm btn-dark" type="button" v-if="constants.has_data">저장</button>
+										</div>
+									</section>
+								</div>
+								<div id="special-form-html" style="display:none;">
+									<section class="box box-height-md subject_diary">
+										<h3 class="title">다이어리 평가</h3>
+										<div class="content clearfix">
+											<div class="row">
+												<div class="col-xs-12 content" style="height:180px;">
+													<canvas id="line-chart"></canvas>
+												</div>
+											</div>
+											<div class="row cleafix">
+												<div class="col-xs-12">
+												</div>
+											</div>
+											<div class="row">
+												<div class="col-xs-12">
+													<div class="scroll-tbody">
+														<table class="table-default table-left" id="table-diary">
+															<tr v-for="item in constants.diary.ae">
+																<th v-if="item.length == 0">증상시작일 : {{item}}</th>
+																<td v-else>
+																	<div class="col-xs-4">증상명 : {{item.name}}</div>
+																	<div class="col-xs-8">치료방법 : {{item.treatment}}</div>
+																</td>
+															</tr>
+														</table>
+													</div>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col-xs-12">
+													<div class="right">
+														<button class="btn btn-sm btn-aqua" type="button">완료</button>
+													</div>
+												</div>
+											</div>
+										</div>
+									</section>
+								</div>
 							</div>
 							<script type="vue">
 							data: function() {
@@ -249,13 +301,116 @@
 									constants: {
 										html: "",
 										groupid: "",
-										has_data: false
+										has_data: false,
+										diary: {
+											ae: []
+										}
 									}
 								};
 								Callback.add("load-form", this.loadForm);
+								Callback.add("load-special-form", this.loadSpecialForm);
 								return obj;
 							},
 							methods: {
+								loadSpecialForm: function(name, result) {
+									$("#form-html").hide();
+									$("#special-form-html").show();
+
+									switch(name) {
+									case "diary":
+										if(result != null) {
+											var hash = {};
+											for(var i=0; i<result.ae.length; i++) {
+												var item = result.ae[i];
+												var list = hash[item.start_date];
+												if(list == null) {
+													list = [];
+													hash[item.start_date] = list;
+												}
+												list.push(item);
+											}
+											var list = [];
+											for(var start_date in hash) {
+												list.push(start_date);
+												for(var i=0; i<hash[start_date].length; i++) {
+													list.push(hash[start_date][i]);
+												}
+											}
+											this.constants.diary.ae = list;
+
+											var datasets = [];
+											var AELabels = ["통증", "압통", "발열", "구토", "설사", "홍반/발적", "두통", "경결/부종", "근육통", "피로/권태"];
+											var Colors = [window.chartColors.blue, window.chartColors.green, window.chartColors.grey, window.chartColors.orange, window.chartColors.purple, window.chartColors.red, window.chartColors.yellow, "", "#000000", "#ef12ae"];
+											for(var i=0; i<AELabels.length; i++) {
+												datasets.push({
+													label: AELabels[i],
+													backgroundColor: Colors[i],
+													borderColor: Colors[i],
+													data: [0, 0, 0, 0, 0, 0, 0],
+													fill: false,
+												})
+											}
+											for(var i=0; i<7; i++) {
+												datasets[0].data[i]  = result.chart.factor1[i+1];
+												datasets[1].data[i]  = result.chart.factor2[i+1];
+												datasets[2].data[i]  = result.chart.factor3[i+1];
+												datasets[3].data[i]  = result.chart.factor4[i+1];
+												datasets[4].data[i]  = result.chart.factor5[i+1];
+												datasets[5].data[i]  = result.chart.factor6[i+1];
+												datasets[6].data[i]  = result.chart.factor7[i+1];
+												datasets[7].data[i]  = result.chart.factor8[i+1];
+												datasets[8].data[i]  = result.chart.factor9[i+1];
+												datasets[9].data[i]  = result.chart.factor10[i+1];
+											}
+
+											var config = {
+												type: 'line',
+												data: {
+													labels: ["1일", "2일", "3일", "4일", "5일", "6일", "7일"],
+													datasets: datasets
+												},
+												options: {
+													responsive: true,
+													maintainAspectRatio: false,
+													title:{
+														display:false,
+														text:''
+													},
+													legend : {
+														position : 'bottom'
+													},
+													tooltips: {
+														mode: 'index',
+														intersect: false,
+													},
+													hover: {
+														mode: 'nearest',
+														intersect: true
+													},
+													scales: {
+														xAxes: [{
+															display: true,
+															scaleLabel: {
+																display: true,
+																labelString: 'Month'
+															}
+														}],
+														yAxes: [{
+															display: true,
+															scaleLabel: {
+																display: true,
+																labelString: 'Value'
+															}
+														}]
+													}
+												}
+											};
+											var ctx = $("#line-chart").get(0).getContext("2d");
+											new Chart(ctx, config);
+										}
+										break;
+									}
+								},
 								loadForm: function(groupid, html) {
 									this.constants.groupid = groupid;
 									this.constants.html = html;
@@ -335,6 +490,7 @@
 													});
 												}
 												jFormHtml.show()
+												$("#special-form-html").hide();
 											}, 0);
 										} else {
 											this.constants.html = "입력된 내용이 없습니다.";
@@ -790,97 +946,6 @@
 								</div>
 							</div>
 						</section>
-						<section class="box box-height-xlg subject_diary hidden">
-							<h3 class="title">다이어리 평가</h3>
-							<div class="content clearfix">
-								<div class="row">
-									<div class="col-xs-12 content">
-										<canvas id="line-chart"></canvas>
-									</div>
-								</div>
-								<div class="row cleafix">
-									<div class="col-xs-12">
-										
-									</div>
-								</div>
-								<div class="row">
-									<div class="col-xs-12">
-										<div class="scroll-tbody">
-											<table class="table-default table-left" id="table-diary">
-												<tr>
-													<th>2016.04.16</th>
-												</tr>
-												<tr>
-													<td>
-														<div class="col-xs-4">증상명 : 식욕부진 </div>
-														<div class="col-xs-8">치료방법 : 약물복용</div>
-													</td>
-												</tr>
-												<tr>
-													<td>
-														<div class="col-xs-4">증상명 : 식욕부진 </div>
-														<div class="col-xs-8">치료방법 : 약물복용</div>
-													</td>
-												</tr>
-												<tr>
-													<th>2016.04.16</th>
-												</tr>
-												<tr>
-													<td>
-														<div class="col-xs-4">증상명 : 식욕부진 </div>
-														<div class="col-xs-8">치료방법 : 약물복용</div>
-													</td>
-												</tr>
-												<tr>
-													<td>
-														<div class="col-xs-4">증상명 : 식욕부진 </div>
-														<div class="col-xs-8">치료방법 : 약물복용</div>
-													</td>
-												</tr>
-
-												<tr>
-													<th>2016.04.16</th>
-												</tr>
-												<tr>
-													<td>
-														<div class="col-xs-4">증상명 : 식욕부진 </div>
-														<div class="col-xs-8">치료방법 : 약물복용</div>
-													</td>
-												</tr>
-												<tr>
-													<td>
-														<div class="col-xs-4">증상명 : 식욕부진 </div>
-														<div class="col-xs-8">치료방법 : 약물복용</div>
-													</td>
-												</tr>
-												<tr>
-													<th>2016.04.16</th>
-												</tr>
-												<tr>
-													<td>
-														<div class="col-xs-4">증상명 : 식욕부진 </div>
-														<div class="col-xs-8">치료방법 : 약물복용</div>
-													</td>
-												</tr>
-												<tr>
-													<td>
-														<div class="col-xs-4">증상명 : 식욕부진 </div>
-														<div class="col-xs-8">치료방법 : 약물복용</div>
-													</td>
-												</tr>
-											</table>
-										</div>
-									</div>
-								</div>
-								<div class="row">
-									<div class="col-xs-12">
-										<div class="right">
-											<button class="btn btn-sm btn-aqua" type="button">완료</button>
-										</div>
-									</div>
-								</div>
-							</div>
-						</section>
 					</div>
 				</div>
 			</div>
@@ -1249,80 +1314,6 @@ $(function(){
 	});
 
 	$(".daily-list").find("li")
-});
-var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-var config = {
-	type: 'line',
-	data: {
-		labels: ["January", "February", "March", "April", "May", "June", "July"],
-		datasets: [{
-			label: "My First dataset",
-			backgroundColor: window.chartColors.yellow,
-			borderColor: window.chartColors.yellow,
-			data: [
-				randomScalingFactor(), 
-				randomScalingFactor(), 
-				randomScalingFactor(), 
-				randomScalingFactor(), 
-				randomScalingFactor(), 
-				randomScalingFactor(), 
-				randomScalingFactor()
-			],
-			fill: false,
-		}, {
-			label: "My Second dataset",
-			fill: false,
-			backgroundColor: window.chartColors.blue,
-			borderColor: window.chartColors.blue,
-			data: [
-				randomScalingFactor(), 
-				randomScalingFactor(), 
-				randomScalingFactor(), 
-				randomScalingFactor(), 
-				randomScalingFactor(), 
-				randomScalingFactor(), 
-				randomScalingFactor()
-			],
-		}]
-	},
-	options: {
-		responsive: true,
-		title:{
-			display:false,
-			text:'Chart.js Line Chart'
-		},
-		legend : {
-			position : 'bottom'
-		},
-		tooltips: {
-			mode: 'index',
-			intersect: false,
-		},
-		hover: {
-			mode: 'nearest',
-			intersect: true
-		},
-		scales: {
-			xAxes: [{
-				display: true,
-				scaleLabel: {
-					display: true,
-					labelString: 'Month'
-				}
-			}],
-			yAxes: [{
-				display: true,
-				scaleLabel: {
-					display: true,
-					labelString: 'Value'
-				}
-			}]
-		}
-	}
-};
-$(function() {
-    var ctx = $("#line-chart").get(0).getContext("2d");
-    //new Chart(ctx, config);
 });
 </script>
 
