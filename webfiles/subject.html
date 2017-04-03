@@ -409,6 +409,8 @@
 											new Chart(ctx, config);
 										}
 										break;
+									case "ae":
+										break;
 									}
 								},
 								loadForm: function(groupid, html) {
@@ -434,9 +436,12 @@
 												jFormHtml.find(".group-normal > .content-block-inner").hide();
 												jFormHtml.find(".item-block > .content-block-inner").addClass("ques").css("margin-left", "-20px");
 												jFormHtml.find(".ques td").css("font-size", "16px").css("padding-bottom", "12px");
-												jFormHtml.find(".ques td").each(function() {
-													$(this).text("Q. " + $(this).text());
-												});
+												var isListGroup = (jFormHtml.find(".group-list").length > 0);
+												if(!isListGroup) {
+													jFormHtml.find(".ques td").each(function() {
+														$(this).text("Q. " + $(this).text());
+													});
+												}
 												jFormHtml.find(".item-block").css("margin-bottom", "40px");
 												jFormHtml.find(".item-inner .item-title").css("padding", "0");
 												jFormHtml.find(".item-title").css("font-weight", "normal");
@@ -477,17 +482,53 @@
 																		}
 																	} else {
 																		$(this).removeClass("change-value");
-																		$(this).next().css("color", "");
+																		$(this).next().css("color", "black");
 																	}
 																});
+															} else {
+																$(this).next().css("color", "black");
 															}
 														});
 													});
 												});
-												if(jFormHtml.find(".group-list").length > 0) {
+												if(isListGroup) {
+													var jRows = jFormHtml.find(".content").children().detach();
+													var jClone = $(".subject_etc").clone().removeClass("hidden");
+													jFormHtml.find(".content").append(jClone);
+													var bSetupHeader = false;
+													jRows.each(function() {
+														if(!bSetupHeader) {
+															$(this).find(".item-block .ques td").each(function() {
+																jClone.find("thead tr").append($("<th/>").text($(this).text().trim()));
+															});
+															jClone.find("thead tr").append($("<th/>").text("삭제/복구"));
+															bSetupHeader = true;
+														}
+														var jTr = $("<tr/>");
+														jClone.find("tbody").append(jTr);
+														$(this).find(".item-block").each(function() {
+															var jInput = $(this).find(".item-content").detach();
+															jTr.append($("<td/>").append(jInput));
+															if(jInput.find("input[value='c-48']").length > 0) {
+																jInput.find("input[value='c-48']").parent().find(".item-inner").addClass("btn").addClass("btn-default").css("padding", "5px");
+																jInput.find("input[value='c-48']").trigger("change");
+															}
+															if(jInput.find("input[value='c-49']").length > 0) {
+																jInput.find("input[value='c-49']").parent().find(".item-inner").addClass("btn").addClass("btn-default").css("padding", "5px");
+																jInput.find("input[value='c-49']").trigger("change");
+															}
+														});
+														var jDeleteBtn = $('<button class="btn btn-sm btn-danger" type="button">삭제</button>');
+														jTr.append($("<td/>").append(jDeleteBtn));
+														jDeleteBtn.click(function() {
+															//
+														});
+													});
+													/*
 													jFormHtml.find(".group-list").each(function(idx) {
 														$(this).prepend('<div class="content-block-title title">No. ' + (idx+1) + '</div>');
 													});
+													*/
 												}
 												jFormHtml.show()
 												$("#special-form-html").hide();
@@ -500,364 +541,17 @@
 							}
 							</script>
 						</form-data>
-						<section class="box box-height-md subject_life hidden">
-							<h3 class="title">생체 생활 정보</h3>
-							<div class="content clearfix">
-								<div class="content scroll-content">
-									<div class="content">
-										<h4 class="content-header">심박수</h4>
-										<input type="text" class="input-sm center"/>
-										<span class="unit">bpm</span>
-									</div>
-									<div class="content">
-										<h4 class="content-header">혈압</h4>
-										<p>
-											<label class="input-label" for="min">최저 혈압 : </label>
-											<input type="text" name="min" class="input-sm center"/>
-											<span class="unit">mmHg</span>
-										</p>
-										<p>
-											<label class="input-label" for="max">최고 혈압 : </label>
-											<input type="text" name="max" class="input-sm center"/>
-											<span class="unit">mmHg</span>
-										</p>
-									</div>
-									<div class="content">
-										<h4 class="content-header">음주</h4>
-										<label class="input-radio">마심
-											<input type="radio" name="drink" class="radio-btn"/>
-											<span class="fake-btn"></span>
-										</label>
-										<label class="input-radio">안마심
-											<input type="radio" name="drink" class="radio-btn"/>
-											<span class="fake-btn"></span>
-										</label>
-									</div>
-									<div class="content">
-										<h4 class="content-header">흡연량</h4>
-										<p>
-											<label class="input-radio">폈음
-												<input type="radio" name="drink" class="radio-btn"/>
-												<span class="fake-btn"></span>
-											</label>
-											<label class="input-radio">피지않음
-												<input type="radio" name="drink" class="radio-btn"/>
-												<span class="fake-btn"></span>
-											</label>
-										</p>
-										<p>
-											<label class="input-label" for="min">하루</label>
-											<input type="text" name="min" class="input-sm center"/>
-											<span class="unit">개피</span>
-										</p>
-									</div>
-								</div>
-								<div class="btn-grp center">
-									<button class="btn btn-sm btn-dark" type="button">저장</button>
-									<button class="btn btn-sm btn-gray" type="button">취소</button>
-								</div>
-							</div>
-						</section>
-						<section class="box box-height-md subject_etc hidden">
+						<section class="subject_etc hidden">
 							<h3 class="title">기타 이상 반응</h3>
 							<div class="content clearfix">
-								<div class="row">
-									<div class="col-xs-12">
-										<label class="input-label" for="select-orderby">정렬 : </label>
-										<select name="select-orderby" class="select-orderby">
-											<option> 시작일</option>
-											<option> 종료일</option>
-											<option> 증상명</option>
-											<option> 치료방법</option>
-											<option> 이상증상유무</option>
-										</select>
-									</div>
-								</div>
 								<div class="row cleafix">
 									<div class="col-xs-12 content">
 										<div class="scroll-tbody clearfix">
 											<table class="table-default clearfix" id="table-etc">
 												<thead>
-													<tr>
-														<th>
-															<label class="input-check no-label">
-																<input type="checkbox" name="test" class="check-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</th>
-														<th>시작일</th>
-														<th>종료일</th>
-														<th>증상명</th>
-														<th>치료방법</th>
-														<th>이상증상유무</th>
-													</tr>
+													<tr></tr>
 												</thead>
 												<tbody>
-													<tr>
-														<td>
-															<label class="input-check no-label">
-																<input type="checkbox" name="test" class="check-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-														<td>2016/04/16</td>
-														<td>2016/04/17</td>
-														<td>식욕부진</td>
-														<td>약물복용</td>
-														<td>
-															<label class="input-radio">인가
-																<input type="radio" name="test" class="radio-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-															<label class="input-radio">비인가
-																<input type="radio" name="test" class="radio-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-													</tr>
-													<tr>
-														<td>
-															<label class="input-check no-label">
-																<input type="checkbox" name="test" class="check-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-														<td>2016/04/16</td>
-														<td>2016/04/17</td>
-														<td>식욕부진</td>
-														<td>약물복용</td>
-														<td>
-															<label class="input-radio">인가
-																<input type="radio" name="test" class="radio-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-															<label class="input-radio">비인가
-																<input type="radio" name="test" class="radio-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-													</tr>
-													<tr>
-														<td>
-															<label class="input-check no-label">
-																<input type="checkbox" name="test" class="check-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-														<td>2016/04/16</td>
-														<td>2016/04/17</td>
-														<td>식욕부진</td>
-														<td>약물복용</td>
-														<td>
-															<label class="input-radio">인가
-																<input type="radio" name="test" class="radio-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-															<label class="input-radio">비인가
-																<input type="radio" name="test" class="radio-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-													</tr>
-													<tr>
-														<td>
-															<label class="input-check no-label">
-																<input type="checkbox" name="test" class="check-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-														<td>2016/04/16</td>
-														<td>2016/04/17</td>
-														<td>식욕부진</td>
-														<td>약물복용</td>
-														<td>
-															<label class="input-radio">인가
-																<input type="radio" name="test" class="radio-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-															<label class="input-radio">비인가
-																<input type="radio" name="test" class="radio-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-													</tr>
-													<tr>
-														<td>
-															<label class="input-check no-label">
-																<input type="checkbox" name="test" class="check-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-														<td>2016/04/16</td>
-														<td>2016/04/17</td>
-														<td>식욕부진</td>
-														<td>약물복용</td>
-														<td>
-															<label class="input-radio">인가
-																<input type="radio" name="test" class="radio-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-															<label class="input-radio">비인가
-																<input type="radio" name="test" class="radio-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-													</tr>
-													<tr>
-														<td>
-															<label class="input-check no-label">
-																<input type="checkbox" name="test" class="check-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-														<td>2016/04/16</td>
-														<td>2016/04/17</td>
-														<td>식욕부진</td>
-														<td>약물복용</td>
-														<td>
-															<label class="input-radio">인가
-																<input type="radio" name="test" class="radio-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-															<label class="input-radio">비인가
-																<input type="radio" name="test" class="radio-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-													</tr>
-													<tr>
-														<td>
-															<label class="input-check no-label">
-																<input type="checkbox" name="test" class="check-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-														<td>2016/04/16</td>
-														<td>2016/04/17</td>
-														<td>식욕부진</td>
-														<td>약물복용</td>
-														<td>
-															<label class="input-radio">인가
-																<input type="radio" name="test" class="radio-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-															<label class="input-radio">비인가
-																<input type="radio" name="test" class="radio-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-													</tr>
-													<tr>
-														<td>
-															<label class="input-check no-label">
-																<input type="checkbox" name="test" class="check-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-														<td>2016/04/16</td>
-														<td>2016/04/17</td>
-														<td>식욕부진</td>
-														<td>약물복용</td>
-														<td>
-															<label class="input-radio">인가
-																<input type="radio" name="test" class="radio-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-															<label class="input-radio">비인가
-																<input type="radio" name="test" class="radio-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-													</tr>
-													<tr>
-														<td>
-															<label class="input-check no-label">
-																<input type="checkbox" name="test" class="check-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-														<td>2016/04/16</td>
-														<td>2016/04/17</td>
-														<td>식욕부진</td>
-														<td>약물복용</td>
-														<td>
-															<label class="input-radio">인가
-																<input type="radio" name="test" class="radio-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-															<label class="input-radio">비인가
-																<input type="radio" name="test" class="radio-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-													</tr>
-													<tr>
-														<td>
-															<label class="input-check no-label">
-																<input type="checkbox" name="test" class="check-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-														<td>2016/04/16</td>
-														<td>2016/04/17</td>
-														<td>식욕부진</td>
-														<td>약물복용</td>
-														<td>
-															<label class="input-radio">인가
-																<input type="radio" name="test" class="radio-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-															<label class="input-radio">비인가
-																<input type="radio" name="test" class="radio-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-													</tr>
-													<tr>
-														<td>
-															<label class="input-check no-label">
-																<input type="checkbox" name="test" class="check-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-														<td>2016/04/16</td>
-														<td>2016/04/17</td>
-														<td>식욕부진</td>
-														<td>약물복용</td>
-														<td>
-															<label class="input-radio">인가
-																<input type="radio" name="test" class="radio-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-															<label class="input-radio">비인가
-																<input type="radio" name="test" class="radio-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-													</tr>
-													<tr>
-														<td>
-															<label class="input-check no-label">
-																<input type="checkbox" name="test" class="check-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-														<td>2016/04/16</td>
-														<td>2016/04/17</td>
-														<td>식욕부진</td>
-														<td>약물복용</td>
-														<td>
-															<label class="input-radio">인가
-																<input type="radio" name="test" class="radio-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-															<label class="input-radio">비인가
-																<input type="radio" name="test" class="radio-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-													</tr>
-
 												</tbody>
 											</table>
 										</div>

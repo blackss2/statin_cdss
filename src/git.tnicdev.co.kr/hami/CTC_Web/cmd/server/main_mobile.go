@@ -59,7 +59,7 @@ func main_mobile(wg sync.WaitGroup) {
 			return next(c)
 		}
 	}
-	route_login(e, webChecker)
+	route_mobile_login(e, webChecker)
 
 	e.GET("/", func(c echo.Context) error {
 		args := make(map[string]interface{})
@@ -68,12 +68,14 @@ func main_mobile(wg sync.WaitGroup) {
 	e.GET("/main", func(c echo.Context) error {
 		TNow := time.Now()
 
+		Sid := c.Get(SID_KEY).(string)
+
 		args := make(map[string]interface{})
 		_, err := InitMobileArgs(c, args)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, &Result{Error: err})
 		}
-		subject, err := gAPI.SubjectTable.Subject("1d74db04-4021-4744-a537-a28e0fdcc0b4") //TEMP
+		subject, err := gAPI.SubjectTable.Subject(Sid) //TEMP
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, &Result{Error: err})
 		}
@@ -150,7 +152,9 @@ func main_mobile(wg sync.WaitGroup) {
 		TNow := time.Now()
 		ActorId := "user"
 
-		subject, err := gAPI.SubjectTable.Subject("1d74db04-4021-4744-a537-a28e0fdcc0b4") //TEMP
+		Sid := c.Get(SID_KEY).(string)
+
+		subject, err := gAPI.SubjectTable.Subject(Sid) //TEMP
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, &Result{Error: err})
 		}
@@ -350,7 +354,9 @@ func main_mobile(wg sync.WaitGroup) {
 		TNow := time.Now()
 		ActorId := "user"
 
-		subject, err := gAPI.SubjectTable.Subject("1d74db04-4021-4744-a537-a28e0fdcc0b4") //TEMP
+		Sid := c.Get(SID_KEY).(string)
+
+		subject, err := gAPI.SubjectTable.Subject(Sid) //TEMP
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, &Result{Error: err})
 		}
@@ -404,6 +410,9 @@ func main_mobile(wg sync.WaitGroup) {
 				return c.JSON(http.StatusInternalServerError, &Result{Error: err})
 			}
 			visit = v
+
+			Update_AECount(subject.Id)
+			Update_Compliance(subject.Id)
 		}
 
 		dataList, err := gAPI.DataTable.ListByRowindex(visit.Id, rowindex)
@@ -441,6 +450,8 @@ func main_mobile(wg sync.WaitGroup) {
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, &Result{Error: err})
 			}
+
+			doc.Find(".item-i-32").Parent().Parent().Remove()
 
 			//apply data to html
 			jFormGrp := doc.Find(".form-grp")
@@ -505,7 +516,9 @@ func main_mobile(wg sync.WaitGroup) {
 		TNow := time.Now()
 		ActorId := "user"
 
-		subject, err := gAPI.SubjectTable.Subject("1d74db04-4021-4744-a537-a28e0fdcc0b4") //TEMP
+		Sid := c.Get(SID_KEY).(string)
+
+		subject, err := gAPI.SubjectTable.Subject(Sid) //TEMP
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, &Result{Error: err})
 		}
@@ -688,6 +701,10 @@ func main_mobile(wg sync.WaitGroup) {
 				return c.JSON(http.StatusInternalServerError, &Result{Error: err})
 			}
 		}
+
+		Update_AECount(subject.Id)
+		Update_Compliance(subject.Id)
+
 		return c.NoContent(http.StatusOK)
 	})
 	e.DELETE("/form", func(c echo.Context) error {
@@ -700,7 +717,9 @@ func main_mobile(wg sync.WaitGroup) {
 		TNow := time.Now()
 		ActorId := "user"
 
-		subject, err := gAPI.SubjectTable.Subject("1d74db04-4021-4744-a537-a28e0fdcc0b4") //TEMP
+		Sid := c.Get(SID_KEY).(string)
+
+		subject, err := gAPI.SubjectTable.Subject(Sid) //TEMP
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, &Result{Error: err})
 		}

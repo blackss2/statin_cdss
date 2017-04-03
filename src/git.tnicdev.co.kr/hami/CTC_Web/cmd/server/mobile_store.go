@@ -91,6 +91,7 @@ type Subject struct {
 	BirthDate string    `json:"birth_date" gorethink:"birth_date"`
 	Arm       string    `json:"arm" gorethink:"arm"`
 	FirstDate string    `json:"first_date" gorethink:"first_date"`
+	Password  string    `json:"password" gorethink:"password"`
 	IsDelete  bool      `json:"is_delete" gorethink:"is_delete"`
 	TCreate   time.Time `json:"t_create" gorethink:"t_create"`
 	ActorId   string    `json:"actor_id" gorethink:"actor_id"`
@@ -115,6 +116,7 @@ func NewSubjectTable(session *gorethink.Session, db gorethink.Term) *SubjectTabl
 func (st *SubjectTable) Insert(
 	StudyId string,
 	Name string,
+	Password string,
 	ScrNo string,
 	Sex string,
 	BirthDate string,
@@ -125,6 +127,7 @@ func (st *SubjectTable) Insert(
 ) (*Subject, error) {
 	subject := &Subject{
 		Name:      Name,
+		Password:  Password,
 		ScrNo:     ScrNo,
 		Sex:       Sex,
 		BirthDate: BirthDate,

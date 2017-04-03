@@ -77,10 +77,14 @@
 							단일 기관, 무작위배정, 이중 눈가림,<br> 
 							활성 대조, 1상 임상시험
 							</div>
+							<div class="guide">
+								<input type="text" id="scrno" placeholder="대상자번호" style="width:200px; height:30px;" />
+								<input type="password" id="password" placeholder="비밀번호" style="width:200px; height:30px;" />
+							</div>
 						</div>
 						<div class="toolbar toolbar-bottom">
 							<div class="toolbar-inner">
-								<a class="button button-fill" style="text-align: center; width:100%; font-weight:bold;" href="javascript:to_main();">Main Page</a>
+								<a class="button button-fill" style="text-align: center; width:100%; font-weight:bold;" href="javascript:doLogin();">Login</a>
 							</div>
 						</div>
 					</div>
@@ -88,9 +92,33 @@
 			</div>
 		</div>
 		<script src="public/js/framework7.min.js"></script>
+		<script src="public/js/jquery/jquery-3.1.1.min.js"></script>
 		<script>
-		function to_main() {
-			location.href = "/main";
+		function doLogin() {
+			var scrno = $("#scrno").val();
+			var password = $("#password").val();
+			if(scrno.length == 0) {
+				alert("대상자번호를 입력해주십시오.");
+				return;
+			}
+			if(password.length == 0) {
+				alert("비밀번호를 입력해주십시오.");
+				return;
+			}
+			$.ajax({
+				url: "/login",
+				type: "POST",
+				data: {
+					scrno: scrno,
+					password: password
+				},
+				success: function() {
+					location.href = "/main";
+				},
+				error: function(err) {
+					alert(err);
+				}
+			});
 		}
 		// Determine theme depending on device
 		// Set Template7 global devices flags

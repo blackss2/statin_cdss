@@ -159,6 +159,14 @@
 							</td>
 						</tr>
 						<tr>
+							<th>비밀번호</th>
+							<td>
+								<div class="col-xs-7">
+									<input type="text" class="col-xs-12" v-model="input.password" />
+								</div>
+							</td>
+						</tr>
+						<tr>
 							<th>대상자번호</th>
 							<td>
 								<div class="col-xs-3">
@@ -280,6 +288,7 @@
 				},
 				input: {
 					name: "",
+					password: "",
 					scrno_1: "",
 					scrno_2: "",
 					scrno_3: "",
@@ -357,6 +366,10 @@
 					alert("이름을 입력하셔야 합니다.");
 					return;
 				}
+				if(this.input.password.length == 0) {
+					alert("비밀번호를 입력하셔야 합니다.");
+					return;
+				}
 				if(this.input.scrno_1.length != 2 || this.input.scrno_2.length != 3 || this.input.scrno_3.length != 3) {
 					alert("대상자번호(OO-OOO-OOO)를 올바르게 입력하셔야 합니다.");
 					return;
@@ -383,6 +396,7 @@
 
 				this.$http.post("/api/subjects", {
 					name: this.input.name,
+					password: this.input.password,
 					scrno: scrno,
 					sex: this.input.sex,
 					birth_date: birth_date,
@@ -396,7 +410,7 @@
 						Callback.call("do-search");
 					}
 				}, function(err) {
-					console.error(err.body);
+					alert(JSON.parse(err.responseText).error);
 				});
 			}
 		}

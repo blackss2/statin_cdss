@@ -477,6 +477,7 @@ func route_api_subjects(g *echo.Group) {
 		retCode, retValue := (func() (int, interface{}) {
 			var item struct {
 				Name      string `json:"name"`
+				Password  string `json:"password"`
 				ScrNo     string `json:"scrno"`
 				Sex       string `json:"sex"`
 				BirthDate string `json:"birth_date"`
@@ -489,7 +490,7 @@ func route_api_subjects(g *echo.Group) {
 			}
 			//////////////////////////////////////////////////
 
-			_, err = gAPI.SubjectTable.Insert(gConfig.StudyId, item.Name, item.ScrNo, item.Sex, item.BirthDate, item.Arm, item.FirstDate, time.Now(), Uid)
+			_, err = gAPI.SubjectTable.Insert(gConfig.StudyId, item.Name, item.Password, item.ScrNo, item.Sex, item.BirthDate, item.Arm, item.FirstDate, time.Now(), Uid)
 			if err != nil {
 				return http.StatusInternalServerError, err
 			}
