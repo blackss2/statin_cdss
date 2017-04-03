@@ -98,7 +98,7 @@ func main_web(wg sync.WaitGroup) {
 				arm_ae["대조군"] = armAEHash["대조군"]
 				arm_ae["위약군"] = armAEHash["위약군"]
 			}
-			//TODO
+
 			compliances := make([]*DAO_Compliance, 0)
 
 			DAY_COUNT := 7

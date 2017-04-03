@@ -35,7 +35,8 @@
 								</thead>
 								<tbody>
 									<tr v-for="item in constants.compliances">
-										<td>{{item.day}}일</td>
+										<td v-if="item.day == '1'">접종일</td>
+										<td v-else>접종후 {{parseInt(item.day-1)}}일</td>
 										<td>{{item.local}}%</td>
 										<td>{{item.sysmetic}}%</td>
 										<td>{{item.vital}}%</td>

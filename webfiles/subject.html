@@ -123,7 +123,8 @@
 									selected: {
 										position: 0,
 										formid: "",
-										groupid: ""
+										groupid: "",
+										special: ""
 									}
 								};
 								Callback.add("load-subject", this.loadSubject);
@@ -197,11 +198,15 @@
 									});
 
 									this.constants.subject = item;
-									if(this.positions.length > 0) {
-										this.selectPosition(1);
-										this.selectForm("f-1", "g-2");
+									if(this.selected.special.length > 0) {
+										this.selectSpecialForm(this.selected.special);
 									} else {
-										Callback.call("load-form", "", "");
+										if(this.positions.length > 0) {
+											this.selectPosition(1);
+											this.selectForm("f-1", "g-2");
+										} else {
+											Callback.call("load-form", "", "");
+										}
 									}
 								},
 								selectStaticForm: function(formid, groupid) {
@@ -217,6 +222,7 @@
 								selectForm: function(formid, groupid) {
 									this.selected.formid = formid;
 									this.selected.groupid = groupid;
+									this.selected.special = "";
 									this.$http.get("/api/subjects/" + this.constants.subject.id + "/forms/" + formid + "/groups/" + groupid + "?position=" + this.selected.position).then(function(res) {
 										if(res.body.error != null) {
 											alert(res.body.error);
@@ -229,6 +235,7 @@
 									});
 								},
 								selectSpecialForm: function(name) {
+									this.selected.special = name;
 									this.$http.get("/api/subjects/" + this.constants.subject.id + "/special/" + name).then(function(res) {
 										if(res.body.error != null) {
 											alert(res.body.error);
@@ -274,7 +281,7 @@
 													<div class="scroll-tbody">
 														<table class="table-default table-left" id="table-diary">
 															<tr v-for="item in constants.diary.ae">
-																<th v-if="item.length == 0">증상시작일 : {{item}}</th>
+																<th v-if="item.substr != null">증상시작일 : {{item}}</th>
 																<td v-else>
 																	<div class="col-xs-4">증상명 : {{item.name}}</div>
 																	<div class="col-xs-8">치료방법 : {{item.treatment}}</div>
@@ -331,6 +338,7 @@
 											}
 											var list = [];
 											for(var start_date in hash) {
+												console.log(start_date, hash[start_date]);
 												list.push(start_date);
 												for(var i=0; i<hash[start_date].length; i++) {
 													list.push(hash[start_date][i]);
@@ -419,6 +427,7 @@
 									
 									this.constants.has_data = false;
 									if(groupid.length > 0) {
+										$("#special-form-html").hide();
 										if(html.length > 0) {
 											this.constants.has_data = true;
 
@@ -531,7 +540,6 @@
 													*/
 												}
 												jFormHtml.show()
-												$("#special-form-html").hide();
 											}, 0);
 										} else {
 											this.constants.html = "입력된 내용이 없습니다.";
