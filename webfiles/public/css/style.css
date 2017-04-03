@@ -3,6 +3,7 @@ $yellow: #f4d033;
 $red : #fd7a76;
 $aqua : #3bc0c3;
 $gray: #e3e8ed;
+$orange: #ffa500;
 $skyblue : #6dcff6;
 $lightgreen: #a2d425;
 $color-dark: #313541;
@@ -175,6 +176,7 @@ body.breakpoint{
 			border-bottom:1px solid #e1e1e1;
 			border-left-width:10px;
 			border-left-style:solid;
+			border-left-color: #eeeeee;
 			cursor:pointer;
 			[class^='col-xs']{
 				padding:0 5px;
@@ -197,6 +199,9 @@ body.breakpoint{
 			}
 			&.red{
 				border-left-color:$red;
+			}
+			&.orange{
+				border-left-color:$orange;
 			}
 			&.yellow{
 				border-left-color:$yellow;

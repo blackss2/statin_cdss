@@ -28,9 +28,13 @@ func route_api_subjects(g *echo.Group) {
 			if err != nil {
 				return http.StatusBadRequest, err
 			}
+			Type, err := util.ParamToString(c, "type", false)
+			if err != nil {
+				return http.StatusBadRequest, err
+			}
 			//////////////////////////////////////////////////
 
-			subjects, err := Search_Subjects(scrno, arm)
+			subjects, err := Search_Subjects(scrno, arm, Type)
 			if err != nil {
 				return http.StatusInternalServerError, err
 			}
@@ -368,19 +372,23 @@ func route_api_subjects(g *echo.Group) {
 }
 
 type DAO_Search_Subject struct {
-	Id       string `json:"id,omitempty"`
-	ScrNo    string `json:"scrno"`
-	Age      string `json:"age"`
-	Sex      string `json:"sex"`
-	Progress string `json:"progress"`
-	TCreate  string `json:"t_create"`
+	Id         string `json:"id,omitempty"`
+	ScrNo      string `json:"scrno"`
+	Age        string `json:"age"`
+	Sex        string `json:"sex"`
+	Tag        string `json:"tag"`
+	Compliance int    `json:"compliance"`
+	Progress   string `json:"progress"`
+	TCreate    string `json:"t_create"`
 }
 
-func Search_Subjects(scrno string, arm string) ([]*DAO_Search_Subject, error) {
+func Search_Subjects(scrno string, arm string, Type string) ([]*DAO_Search_Subject, error) {
 	list, err := gAPI.SubjectTable.List(gConfig.StudyId)
 	if err != nil {
 		return nil, err
 	}
+
+	//Type
 
 	daos := make([]*DAO_Search_Subject, 0)
 	for _, v := range list {
@@ -395,13 +403,78 @@ func Search_Subjects(scrno string, arm string) ([]*DAO_Search_Subject, error) {
 			}
 		}
 
+		hasAE := false
+		if true {
+			count, err := Subject_AECount(v.Id)
+			if err != nil {
+				return nil, err
+			}
+
+			if count > 0 {
+				hasAE = true
+			}
+		}
+		hasLow := false
+		compliance := 0
+		maxPosition := int64(0)
+		if true {
+			cps, err := Subject_Compliance(v.Id)
+			if err != nil {
+				return nil, err
+			}
+
+			totalCount := 0
+			totalItemCount := 0
+			for _, v := range cps {
+				if v.HasVisit {
+					totalCount += v.TotalCount
+					totalItemCount += v.TotalItemCount
+
+					p := convert.Int(v.Day)
+					if maxPosition < p {
+						maxPosition = p
+					}
+				}
+			}
+
+			if totalItemCount > 0 {
+				LOW_CUTOFF := 70
+
+				compliance = totalCount * 100 / totalItemCount
+				if compliance < LOW_CUTOFF {
+					hasLow = true
+				}
+			}
+		}
+		if len(Type) > 0 {
+			switch Type {
+			case "ae":
+				if !hasAE {
+					continue
+				}
+			case "low":
+				if !hasLow {
+					continue
+				}
+			}
+		}
+
+		tag := ""
+		if hasAE {
+			tag = "ae"
+		} else if hasLow {
+			tag = "low"
+		}
+
 		dao := &DAO_Search_Subject{
-			Id:       v.Id,
-			ScrNo:    v.ScrNo,
-			Age:      getAgeFromDate(v.BirthDate),
-			Sex:      v.Sex,
-			Progress: "X일차YY3%", //TEMP
-			TCreate:  convert.String(v.TCreate)[:10],
+			Id:         v.Id,
+			ScrNo:      v.ScrNo,
+			Age:        getAgeFromDate(v.BirthDate),
+			Sex:        v.Sex,
+			Tag:        tag,
+			Compliance: compliance,
+			Progress:   fmt.Sprintf("%d일차 %d%%", maxPosition, compliance), //TEMP
+			TCreate:    convert.String(v.TCreate)[:10],
 		}
 		daos = append(daos, dao)
 	}
@@ -438,78 +511,23 @@ type DAO_Select_Subject struct {
 }
 
 func Select_Subject(subject *Subject) (*DAO_Select_Subject, error) {
-	maxPosition := int64(0)
-
-	stack, err := gAPI.StackTable.Stack(subject.Id, "f-1") //TEMP
-	countHash := make(map[string]int)
+	cps, err := Subject_Compliance(subject.Id)
 	if err != nil {
-		if err != ErrNotExist {
-			return nil, err
-		}
-	} else {
-		visits, err := gAPI.VisitTable.List(stack.Id)
-		if err != nil {
-			return nil, err
-		}
+		return nil, err
+	}
 
-		Ids := make([]string, 0, len(visits))
-		visitHash := make(map[string]*Visit)
-		for _, v := range visits {
-			Ids = append(Ids, v.Id)
-			visitHash[v.Id] = v
-			p := convert.Int(v.Position)
+	compliance := make(map[string]int)
+	maxPosition := int64(0)
+	for _, v := range cps {
+		if v.TotalItemCount > 0 {
+			compliance[v.Day] = v.TotalCount * 100 / v.TotalItemCount
+		}
+		if v.HasVisit {
+			p := convert.Int(v.Day)
 			if maxPosition < p {
 				maxPosition = p
 			}
 		}
-		if len(Ids) > 0 {
-			dataList, err := gAPI.DataTable.ListByVisitIds(Ids)
-			if err != nil {
-				return nil, err
-			}
-			smokerHash := make(map[string]bool)
-			alcoholHash := make(map[string]bool)
-			for _, d := range dataList {
-				if d.ItemId == "i-29" && d.Value != "" {
-					if visit, has := visitHash[d.VisitId]; has {
-						smokerHash[visit.Position] = true
-					}
-				}
-				if d.ItemId == "i-31" && d.Value != "" {
-					if visit, has := visitHash[d.VisitId]; has {
-						alcoholHash[visit.Position] = true
-					}
-				}
-			}
-			for _, d := range dataList {
-				if visit, has := visitHash[d.VisitId]; has {
-					countHash[visit.Position]++
-					if !smokerHash[visit.Position] && d.ItemId == "i-28" && d.CodeId == "c-45" {
-						countHash[visit.Position]++
-					}
-					if !alcoholHash[visit.Position] && d.ItemId == "i-30" && d.CodeId == "c-47" {
-						countHash[visit.Position]++
-					}
-				}
-			}
-		}
-	}
-
-	forms, err := FormWithCache(gAPI.FormTable, gConfig.StudyId)
-	if err != nil {
-		return nil, err
-	}
-	groupHash := make(map[string]*Group)
-	itemHash := make(map[string]*Item)
-	for _, form := range forms {
-		if form.Id == "f-1" {
-			addFormMeta(form, groupHash, itemHash)
-		}
-	}
-
-	compliance := make(map[string]int)
-	for k, v := range countHash {
-		compliance[k] = v * 100 / len(itemHash)
 	}
 
 	dao := &DAO_Select_Subject{

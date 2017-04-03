@@ -21,7 +21,6 @@
 					<option value="">전체</option>
 					<option value="ae">진행 중 이상반응</option>
 					<option value="low">순응도 저조</option>
-					<option value="warn">관리 필요</option>
 				</select>
 			</p>
 		</section>
@@ -67,7 +66,7 @@
 			aqua
 			sky-blue
 			-->
-			<li class="clearfix" v-bind:class="{'active':(selected.id==item.id), 'red':getColor(item, 'red'), 'yellow':getColor(item, 'yellow'), 'aqua':getColor(item, 'aqua'), 'sky-blue':getColor(item, 'sky-blue')}" v-for="item in constants.subjects" v-on:click="selectSubject(item)">
+			<li class="clearfix" v-bind:class="{'active':(selected.id==item.id), 'red':getColor(item, 'red'), 'orange':getColor(item, 'orange'), 'yellow':getColor(item, 'yellow'), 'sky-blue':getColor(item, 'sky-blue')}" v-for="item in constants.subjects" v-on:click="selectSubject(item)">
 				<div class="col-xs-12 info">
 					<span class="col-xs-6 name">{{item.scrno}}</span>
 					<span class="col-xs-6">{{item.t_create}}</span>
@@ -92,8 +91,18 @@
 		},
 		methods: {
 			getColor: function(item, color) {
-				//TODO
-				return true;
+				switch(color) {
+				case "red":
+					return (item.tag == "low" && item.compliance < 50);
+				case "orange":
+					return (item.tag == "low" && item.compliance >= 50 &&  item.compliance < 60);
+				case "yellow":
+					return (item.tag == "low" && item.compliance >= 60);
+				case "sky-blue":
+					return (item.tag == "ae");
+				default:
+					return false;
+				}
 			},
 			selectSubject: function(item) {
 				this.selected.id = item.id;
