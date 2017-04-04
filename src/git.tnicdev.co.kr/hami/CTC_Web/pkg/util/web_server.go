@@ -93,11 +93,21 @@ func (web *WebServer) UpdateRender() error {
 		},
 	})
 	if web.hasWatch {
-		ntp, err := tp.ParseGlob(web.path + "/*.html")
-		if err != nil {
-			return err
-		}
-		tp = ntp
+		filepath.Walk(web.path, func(path string, fi os.FileInfo, err error) error {
+			if strings.HasPrefix(filepath.Ext(path), ".htm") {
+				rel, err := filepath.Rel(web.path, path)
+				if err != nil {
+					return err
+				}
+				data, err := ioutil.ReadFile(path)
+				if err != nil {
+					return err
+				}
+				rel = filepath.ToSlash(rel)
+				template.Must(tp.New(rel).Parse(string(data)))
+			}
+			return nil
+		})
 	} else {
 		for path, v := range staticFiles {
 			if strings.HasPrefix(filepath.Ext(path), ".htm") {
