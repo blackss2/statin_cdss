@@ -98,7 +98,8 @@
 								<div class="content">
 									<ul class="daily-list" v-if="constants.subject != null">
 										<li class="daily" v-for="position in positions">
-											<span v-on:click="selectPosition(position)">{{position}}일차</span>
+											<span v-on:click="selectPosition(position)" v-if="position == 1">접종일</span>
+											<span v-on:click="selectPosition(position)" v-else>접종후 {{parseInt(position)-1}}일</span>
 											<ul class="daily-sub-menu" v-bind:class="{hidden:selected.position != position}">
 												<li class="sub-item" v-bind:class="{active:selected.groupid == 'g-2'}" v-on:click="selectForm('f-1', 'g-2')">국소반응</li>
 												<li class="sub-item" v-bind:class="{active:selected.groupid == 'g-3'}" v-on:click="selectForm('f-1', 'g-3')">전신반응</li>
@@ -161,7 +162,7 @@
 									window.CompChart = new Chart($("#bar-chart").get(0).getContext("2d"), {
 										type: 'horizontalBar',
 										data: {
-											labels: ["1일", "2일", "3일 ", "4일", "5일", "6일", "7일"],
+											labels: ["접종일", "접종후 1일", "접종후 2일", "접종후 3일 ", "접종후 4일", "접종후 5일", "접종후 6일"],
 											datasets: [
 												{
 													backgroundColor: [
