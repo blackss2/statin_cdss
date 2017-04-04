@@ -521,6 +521,14 @@
 													var jRows = jFormHtml.find(".content").children().detach();
 													var jClone = $(".subject_etc").clone().removeClass("hidden");
 													jFormHtml.find(".content").append(jClone);
+													switch(_this.constants.groupid) {
+													case "g-5":
+														jClone.find(".title").text("기타 이상 증상");
+														break;
+													case "g-6":
+														jClone.find(".title").text("병용 약물 관리");
+														break;
+													}
 													var bSetupHeader = false;
 													jRows.each(function() {
 														if(!bSetupHeader) {
@@ -567,7 +575,7 @@
 							</script>
 						</form-data>
 						<section class="subject_etc hidden">
-							<h3 class="title">기타 이상 증상</h3>
+							<h3 class="title"></h3>
 							<div class="content clearfix">
 								<div class="row cleafix">
 									<div class="col-xs-12 content">
@@ -577,79 +585,6 @@
 													<tr></tr>
 												</thead>
 												<tbody>
-												</tbody>
-											</table>
-										</div>
-									</div>
-								</div>
-								<div class="row">
-									<div class="col-xs-12 btn-grp">
-										<button class="btn btn-sm btn-aqua" type="button">추가</button>
-										<div class="right">
-											<button class="btn btn-sm btn-dark" type="button">수정</button>
-											<button class="btn btn-sm btn-gray" type="button">삭제</button>
-										</div>
-								</div>
-							</div>
-						</section>
-						<section class="box box-height-md subject_drug hidden">
-							<h3 class="title">병용 약물 관리</h3>
-							<div class="content clearfix">
-								<div class="row">
-									<div class="col-xs-12">
-										<label class="input-label" for="select-orderby">정렬 : </label>
-										<select name="select-orderby" class="select-orderby">
-											<option> 시작일</option>
-											<option> 종료일</option>
-											<option> 증상명</option>
-											<option> 치료방법</option>
-											<option> 이상증상유무</option>
-										</select>
-									</div>
-								</div>
-								<div class="row cleafix">
-									<div class="col-xs-12 content">
-										<div class="scroll-tbody clearfix">
-											<table class="table-default clearfix" id="table-drug">
-												<thead>
-													<tr>
-														<th>
-															<label class="input-check no-label">
-																<input type="checkbox" name="test" class="check-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</th>
-														<th>시작일</th>
-														<th>종료일</th>
-														<th>증상명</th>
-														<th>약물정보(이름, 용량&단위, 횟수, 사유, 비고)</th>
-													</tr>
-												</thead>
-												<tbody>
-													<tr>
-														<td>
-															<label class="input-check no-label">
-																<input type="checkbox" name="test" class="check-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-														<td>2016/04/16</td>
-														<td>201604/17</td>
-														<td>식욕부진</td>
-														<td>(훼스탈,2정,2회,속메스꺼움)</td>
-													</tr>
-													<tr>
-														<td>
-															<label class="input-check no-label">
-																<input type="checkbox" name="test" class="check-btn"/>
-																<span class="fake-btn"></span>
-															</label>
-														</td>
-														<td>2016/04/16</td>
-														<td>201604/17</td>
-														<td>식욕부진</td>
-														<td>(훼스탈,2정,2회,속메스꺼움)</td>
-													</tr>
 												</tbody>
 											</table>
 										</div>

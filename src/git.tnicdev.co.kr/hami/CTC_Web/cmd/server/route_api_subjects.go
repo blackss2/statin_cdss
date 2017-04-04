@@ -377,11 +377,6 @@ func route_api_subjects(g *echo.Group) {
 					for _, d := range dataList {
 						if visit, has := visitHash[d.VisitId]; has {
 							if item, has := itemHash[d.ItemId]; has {
-								dao, has := dataHash[d.Rowindex]
-								if !has {
-									dao = new(DAO_Diary_AE)
-									dataHash[d.Rowindex] = dao
-								}
 								switch item.Id {
 								case "i-2": //통증
 									for _, c := range item.Codes {
@@ -436,10 +431,25 @@ func route_api_subjects(g *echo.Group) {
 									//근육통
 									//피로/권태
 								case "i-13":
+									dao, has := dataHash[d.Rowindex]
+									if !has {
+										dao = new(DAO_Diary_AE)
+										dataHash[d.Rowindex] = dao
+									}
 									dao.Name = d.Value
 								case "i-16":
+									dao, has := dataHash[d.Rowindex]
+									if !has {
+										dao = new(DAO_Diary_AE)
+										dataHash[d.Rowindex] = dao
+									}
 									dao.Treatment = d.Value
 								case "i-25":
+									dao, has := dataHash[d.Rowindex]
+									if !has {
+										dao = new(DAO_Diary_AE)
+										dataHash[d.Rowindex] = dao
+									}
 									dao.StartDate = d.Value
 								}
 							}
