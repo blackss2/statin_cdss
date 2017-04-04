@@ -116,7 +116,7 @@
 					location.href = "/main";
 				},
 				error: function(err) {
-					alert(err);
+					alert(JSON.parse(err.responseText).error);
 				}
 			});
 		}
