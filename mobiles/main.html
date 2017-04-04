@@ -510,7 +510,7 @@
 					
 					if(!ignoreMove && !isListForm) {
 						var pageTop = $$(".page-content-form").scrollTop();
-						var itemBlocks = $$(".page-content-form .form-grp .item-block");
+						var itemBlocks = $$(".page-content-form .form-grp > :not([groupid='g-7']) .item-block");
 						var findBlock = null;
 						itemBlocks.each(function(idx) {
 							if(findBlock == null && $$(this).find(".label-radio").length > 0) {

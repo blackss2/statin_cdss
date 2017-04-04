@@ -85,34 +85,16 @@ func Update_Compliance(SubjectId string) ([]*Compliance, error) {
 			if err != nil {
 				return nil, err
 			}
-			smokerHash := make(map[string]bool)
-			alcoholHash := make(map[string]bool)
-			for _, d := range dataList {
-				if d.ItemId == "i-29" && d.Value != "" {
-					if visit, has := visitHash[d.VisitId]; has {
-						smokerHash[visit.Position] = true
-					}
-				}
-				if d.ItemId == "i-31" && d.Value != "" {
-					if visit, has := visitHash[d.VisitId]; has {
-						alcoholHash[visit.Position] = true
-					}
-				}
-			}
 			for _, d := range dataList {
 				if item, has := itemHash[d.ItemId]; has {
-					if visit, has := visitHash[d.VisitId]; has {
-						hash, has := countHash[item.GroupId]
-						if !has {
-							hash = make(map[string]int)
-							countHash[item.GroupId] = hash
-						}
-						hash[visit.Position]++
-						if !smokerHash[visit.Position] && d.ItemId == "i-28" && d.CodeId == "c-45" {
-							hash[visit.Position]++
-						}
-						if !alcoholHash[visit.Position] && d.ItemId == "i-30" && d.CodeId == "c-47" {
-							hash[visit.Position]++
+					if item.Type == "radio" {
+						if visit, has := visitHash[d.VisitId]; has {
+							hash, has := countHash[visit.Position]
+							if !has {
+								hash = make(map[string]int)
+								countHash[visit.Position] = hash
+							}
+							hash[item.GroupId]++
 						}
 					}
 				}
@@ -124,20 +106,22 @@ func Update_Compliance(SubjectId string) ([]*Compliance, error) {
 	sumHash := make(map[string]int, DAY_COUNT)
 	for i := 0; i < DAY_COUNT; i++ {
 		p := fmt.Sprintf("%d", i+1)
-		baseHash[p] += len(itemHash)
 		for _, v := range itemHash {
-			switch v.GroupId {
-			case "g-2":
-				cpHash[p].LocalItemCount++
-			case "g-3":
-				cpHash[p].SysmeticItemCount++
-			case "g-7":
-				cpHash[p].VitalItemCount++
+			if v.Type == "radio" {
+				switch v.GroupId {
+				case "g-2":
+					cpHash[p].LocalItemCount++
+				case "g-3":
+					cpHash[p].SysmeticItemCount++
+				case "g-7":
+					cpHash[p].VitalItemCount++
+				}
 			}
 		}
+		baseHash[p] = cpHash[p].LocalItemCount + cpHash[p].SysmeticItemCount + cpHash[p].VitalItemCount
 	}
-	for groupid, hash := range countHash {
-		for p, v := range hash {
+	for p, hash := range countHash {
+		for groupid, v := range hash {
 			switch groupid {
 			case "g-2":
 				cpHash[p].LocalCount = v
@@ -146,8 +130,8 @@ func Update_Compliance(SubjectId string) ([]*Compliance, error) {
 			case "g-7":
 				cpHash[p].VitalCount = v
 			}
-			sumHash[p] += v
 		}
+		sumHash[p] = cpHash[p].LocalCount + cpHash[p].SysmeticCount + cpHash[p].VitalCount
 	}
 	for i := 0; i < DAY_COUNT; i++ {
 		p := fmt.Sprintf("%d", i+1)
