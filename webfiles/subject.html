@@ -155,7 +155,10 @@
 											dataList[i] = 0;
 										}
 									}
-									new Chart($("#bar-chart").get(0).getContext("2d"), {
+									if(window.CompChart != null) {
+										window.CompChart.destroy();
+									}
+									window.CompChart = new Chart($("#bar-chart").get(0).getContext("2d"), {
 										type: 'horizontalBar',
 										data: {
 											labels: ["1일", "2일", "3일 ", "4일", "5일", "6일", "7일"],
@@ -179,8 +182,8 @@
 														window.chartColors.orange,
 														window.chartColors.red
 													],
-												borderWidth: 1,
-													data: dataList,
+													borderWidth: 1,
+													data: dataList
 												}
 											]
 										},
@@ -194,6 +197,15 @@
 												animateScale: true,
 												animateRotate: true
 											},
+											scales: {
+												xAxes: [{
+													ticks: {
+														beginAtZero: true,
+														max: 100,
+														min: 0
+													}
+												}]
+											}
 										}
 									});
 
@@ -396,25 +408,27 @@
 														intersect: true
 													},
 													scales: {
-														xAxes: [{
-															display: true,
-															scaleLabel: {
-																display: true,
-																labelString: 'Month'
-															}
-														}],
 														yAxes: [{
 															display: true,
 															scaleLabel: {
 																display: true,
-																labelString: 'Value'
+																labelString: '점수'
+															},
+															ticks: {
+																beginAtZero: true,
+																max: 4,
+																min: 0,
+																stepSize: 1
 															}
 														}]
 													}
 												}
 											};
 											var ctx = $("#line-chart").get(0).getContext("2d");
-											new Chart(ctx, config);
+											if(window.DiaryChart != null) {
+												window.DiaryChart.destroy();
+											}
+											window.DiaryChart = new Chart(ctx, config);
 										}
 										break;
 									case "ae":
