@@ -1,8 +1,10 @@
 package main
 
 import (
+	"errors"
 	"net/http"
 	"strings"
+	"time"
 
 	"git.tnicdev.co.kr/research/statin_cdss/pkg/user"
 
@@ -27,32 +29,13 @@ func route_login(e *echo.Echo, webChecker echo.MiddlewareFunc) {
 				Uid := session.Values[UID_KEY]
 				if Uid != nil {
 					c.Set(UID_KEY, Uid)
-				}
-				UserId := session.Values[USERID_KEY]
-				if UserId != nil {
-					c.Set(USERID_KEY, UserId)
-				}
-				Role := session.Values[ROLE_KEY]
-				if Role != nil {
-					c.Set(ROLE_KEY, Role)
-				}
-			}
-
-			ret := next(c)
-			return ret
-		}
-	})
-	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) (err error) {
-			return next(c) //TEMP
-
-			path := c.Request().URL.Path
-			if c.Get(UID_KEY) == nil {
-				if !strings.HasPrefix(path, "/public") && path != "/favicon.ico" {
+					c.Set(USERID_KEY, session.Values[USERID_KEY])
+				} else {
 					hash := map[string]bool{
 						"/":       true,
 						"/login":  true,
 						"/logout": true,
+						"/join":   true,
 					}
 					list := []string{
 					//"/api/external/",
@@ -98,7 +81,7 @@ func route_login(e *echo.Echo, webChecker echo.MiddlewareFunc) {
 				return http.StatusInternalServerError, err
 			}
 
-			u, err := gAPI.UserStore.GetByUserId(userid, true)
+			u, err := gAPI.UserStore.GetByUserId(userid)
 			if err != nil {
 				return http.StatusInternalServerError, err
 			}
@@ -109,7 +92,6 @@ func route_login(e *echo.Echo, webChecker echo.MiddlewareFunc) {
 
 			session.Values[UID_KEY] = u.Id
 			session.Values[USERID_KEY] = u.UserId
-			session.Values[ROLE_KEY] = u.Role
 
 			err = saveSession(c, session)
 			if err != nil {
@@ -145,6 +127,39 @@ func route_login(e *echo.Echo, webChecker echo.MiddlewareFunc) {
 			return c.Redirect(http.StatusFound, "/")
 		}
 	}, webChecker)
+	e.POST("/join", func(c echo.Context) error {
+		retCode, retValue := (func() (int, interface{}) {
+			userid := c.FormValue("userid")
+			if len(userid) == 0 {
+				return http.StatusOK, errors.New("require parameter missing : userid")
+			}
+			password := c.FormValue("password")
+			if len(password) == 0 {
+				return http.StatusOK, errors.New("require parameter missing : password")
+			}
+			password_confirm := c.FormValue("password_confirm")
+			if len(password_confirm) == 0 {
+				return http.StatusOK, errors.New("require parameter missing : password_confirm")
+			}
+			if password != password_confirm {
+				return http.StatusOK, errors.New("parameter validation violation : password != password_confirm")
+			}
+			//////////////////////////////////////////////////
+
+			t_create := time.Now()
+			_, err := gAPI.UserStore.Insert(userid, password, t_create)
+			if err != nil {
+				return http.StatusInternalServerError, err
+			}
+
+			return http.StatusOK, true
+		})()
+		if err, is := retValue.(error); is {
+			return c.JSON(retCode, &Result{Error: err})
+		} else {
+			return c.JSON(retCode, &Result{Result: retValue})
+		}
+	})
 }
 
 func getSession(c echo.Context, session_store *sessions.CookieStore, SessionKey string) (*sessions.Session, error) {

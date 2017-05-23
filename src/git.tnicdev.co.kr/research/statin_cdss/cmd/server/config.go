@@ -3,12 +3,9 @@ package main
 import ()
 
 const (
-	SECRET_KEYWORD        = "CTC"
-	MOBILE_SECRET_KEYWORD = "CTC_MOBILE"
-	UID_KEY               = "UID_KEY"
-	USERID_KEY            = "USERID_KEY"
-	ROLE_KEY              = "ROLE_KEY"
-	SID_KEY               = "SID_KEY"
+	SECRET_KEYWORD = "STATIN_CDSS"
+	UID_KEY        = "UID_KEY"
+	USERID_KEY     = "USERID_KEY"
 )
 
 var gConfig struct {

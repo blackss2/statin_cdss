@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"strings"
 
-	"git.tnicdev.co.kr/research/statin_cdss/pkg/reservation"
 	"git.tnicdev.co.kr/research/statin_cdss/pkg/user"
 	"git.tnicdev.co.kr/research/statin_cdss/pkg/util"
 
@@ -26,8 +25,6 @@ func main() {
 		}
 	})
 	route_api_subjects(g)
-	route_api_notices(g)
-	route_api_reservations(g)
 
 	//Web Pages
 	web := util.NewWebServer(e, "./webfiles")
@@ -62,66 +59,7 @@ func main() {
 		}
 
 		if args["IsLogin"] == true {
-			subjects, err := gAPI.SubjectTable.List(gConfig.StudyId)
-			if err != nil {
-				return c.JSON(http.StatusInternalServerError, &Result{Error: err})
-			}
-			subjectHash := make(map[string]*Subject)
-			for _, v := range subjects {
-				subjectHash[v.Id] = v
-			}
-
-			total_ae := make(map[string]int)
-			arm_ae := make(map[string]int)
-			if true {
-				subjectAEHash := make(map[string]bool)
-				armAEHash := make(map[string]int)
-
-				total_ae["정상"] = len(subjects) - len(subjectAEHash)
-				total_ae["이상반응"] = len(subjectAEHash)
-
-				arm_ae["실험군"] = armAEHash["실험군"]
-				arm_ae["대조군"] = armAEHash["대조군"]
-				arm_ae["위약군"] = armAEHash["위약군"]
-			}
-
-			//TODO
-			enrollment := make(map[string]int)
-			//TODO
-			reservations := make(map[string]int)
-			if true {
-				var list []*reservation.Reservation
-				err := gAPI.ReservationStore.List(&list)
-				if err != nil {
-					return c.JSON(http.StatusInternalServerError, &Result{Error: err})
-				}
-
-				reservations["실험군"] = 0
-				reservations["대조군"] = 0
-				reservations["위약군"] = 0
-				for _, v := range list {
-					for _, s := range v.Subjects {
-						if subject, has := subjectHash[s.SubjectId]; has {
-							reservations[subject.Arm]++
-							reservations["total"]++
-						}
-					}
-				}
-			}
-
-			notices, notice_count, err := Search_Notices(0, 5)
-			if err != nil {
-				return c.JSON(http.StatusInternalServerError, &Result{Error: err})
-			}
-
-			args["page_initial"] = map[string]interface{}{
-				"total_ae":     total_ae,
-				"arm_ae":       arm_ae,
-				"enrollment":   enrollment,
-				"reservations": reservations,
-				"notices":      notices,
-				"notice_count": notice_count,
-			}
+			args["page_initial"] = map[string]interface{}{}
 			return c.Render(http.StatusOK, "main.html", args)
 		} else {
 			args["page_initial"] = map[string]interface{}{}
@@ -141,27 +79,6 @@ func main() {
 		InitSidebarArgs(c, user, args)
 		args["has_sidebar"] = true
 		return c.Render(http.StatusOK, "subject.html", args)
-	}, webChecker)
-
-	e.GET("/schedule", func(c echo.Context) error {
-		args := make(map[string]interface{})
-		_, err := InitUserArgs(c, args)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, &Result{Error: err})
-		}
-		args["page_initial"] = map[string]interface{}{}
-		return c.Render(http.StatusOK, "schedule.html", args)
-	}, webChecker)
-
-	e.GET("/export", func(c echo.Context) error {
-		args := make(map[string]interface{})
-		_, err := InitUserArgs(c, args)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, &Result{Error: err})
-		}
-
-		args["page_initial"] = map[string]interface{}{}
-		return c.Render(http.StatusOK, "export.html", args)
 	}, webChecker)
 
 	e.GET("/:filename", func(c echo.Context) error {
@@ -209,13 +126,7 @@ func main() {
 }
 
 type DAO_Common_UserInfo struct {
-	UserId       string `json:"userid"`
-	Name         string `json:"name"`
-	Birth        string `json:"birth"`
-	Mobile       string `json:"mobile"`
-	Organization string `json:"organization"`
-	Position     string `json:"position"`
-	Role         string `json:"role"`
+	UserId string `json:"userid"`
 }
 
 func InitUserArgs(c echo.Context, args map[string]interface{}) (*user.User, error) {
@@ -228,16 +139,9 @@ func InitUserArgs(c echo.Context, args map[string]interface{}) (*user.User, erro
 			return nil, err
 		}
 		args["uid"] = user.Id
-		args["role"] = user.Role
 
 		var dao = &DAO_Common_UserInfo{
-			UserId:       user.UserId,
-			Name:         user.Name,
-			Birth:        user.Birth,
-			Mobile:       user.Mobile,
-			Organization: user.Organization,
-			Position:     user.Position,
-			Role:         user.Role,
+			UserId: user.UserId,
 		}
 		args["user"] = dao
 
@@ -248,7 +152,7 @@ func InitUserArgs(c echo.Context, args map[string]interface{}) (*user.User, erro
 
 // 반드시 page-initial 초기화 한 후에 실행되어야 함
 func InitSidebarArgs(c echo.Context, user *user.User, args map[string]interface{}) error {
-	subjects, err := Search_Subjects("", "", "")
+	subjects, err := Search_Subjects(user.Id, "", "", "", "")
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, &Result{Error: err})
 	}
@@ -264,17 +168,4 @@ func InitSidebarArgs(c echo.Context, user *user.User, args map[string]interface{
 		}
 	}
 	return nil
-}
-
-func IsAdmin(c echo.Context) (bool, error) {
-	return HasRole(c, "admin")
-}
-
-func HasRole(c echo.Context, Role string) (bool, error) {
-	RoleName := c.Get(ROLE_KEY)
-	if RoleName != nil {
-		return (RoleName == Role), nil
-	} else {
-		return false, nil
-	}
 }
