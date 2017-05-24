@@ -40,13 +40,15 @@ func init() {
 		log.Fatalln(err)
 	}
 
-	gAPI.UserStore, err = user.NewStore(u, "user")
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
-	gAPI.SubjectStore, err = subject.NewStore(u, "subject")
-	if err != nil {
-		log.Fatalln(err.Error())
+	if false {
+		gAPI.UserStore, err = user.NewStore(u, "user")
+		if err != nil {
+			log.Fatalln(err.Error())
+		}
+		gAPI.SubjectStore, err = subject.NewStore(u, "subject")
+		if err != nil {
+			log.Fatalln(err.Error())
+		}
 	}
 }
 
