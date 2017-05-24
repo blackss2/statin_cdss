@@ -24,6 +24,7 @@ func main() {
 			return next(c)
 		}
 	})
+	route_api_dupcheck(g)
 	route_api_subjects(g)
 
 	//Web Pages
