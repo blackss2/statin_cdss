@@ -1,16 +1,9 @@
 port:
   web: 80
-  mobile: 8080
-store_url: rethinkdb://tnicdev.co.kr:28015/trial_diary
-study_id: 825feec8-3cc3-43a1-9123-2d5f4cff2811
+store_url: rethinkdb://115.68.219.243:28015/statin_cdss
 ssl:
   enable: false
-  redirect_port: 8011
+  redirect_port: 80
   cert:
     public: ./startiot_publickey.cer
     private: ./startiot_privatekey.pem
-mail:
-  host: smtp.gmail.com
-  port: 587
-  userid: sender@dbusker.com
-  password: "*sender77"

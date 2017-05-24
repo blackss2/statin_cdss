@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"net/http"
 	"sort"
 	"strings"
@@ -59,11 +60,11 @@ func route_api_subjects(g *echo.Group) {
 			}
 			//////////////////////////////////////////////////
 
-			subject, err := gAPI.SubjectStore.GetBySubjectId(subjectid, Uid)
+			sbj, err := gAPI.SubjectStore.GetBySubjectId(subjectid, Uid)
 			if err != nil {
 				return http.StatusInternalServerError, err
 			}
-			dao, err := Select_Subject(subject)
+			dao, err := Select_Subject(sbj)
 			if err != nil {
 				return http.StatusInternalServerError, err
 			}
@@ -101,7 +102,7 @@ func route_api_subjects(g *echo.Group) {
 			return c.JSON(retCode, &Result{Result: retValue})
 		}
 	})
-	g.PUT("/subjects/:subjectid", func(c echo.Context) error {
+	g.POST("/subjects/:subjectid/initial", func(c echo.Context) error {
 		Uid := c.Get(UID_KEY).(string)
 
 		retCode, retValue := (func() (int, interface{}) {
@@ -111,7 +112,12 @@ func route_api_subjects(g *echo.Group) {
 			}
 
 			var item struct {
-				//TODO
+				Demography     subject.Demography     `json:"demography"`
+				BloodPressure  subject.BloodPressure  `json:"blood_pressure"`
+				StatinFirst    subject.StatinFirst    `json:"statin_first"`
+				StatinsLast    subject.StatinsLast    `json:"statin_last"`
+				BloodTest      subject.BloodTest      `json:"blood_test"`
+				MedicalHistory subject.MedicalHistory `json:"medical_history"`
 			}
 			err = util.BodyToStruct(c.Request().Body, &item)
 			if err != nil {
@@ -119,22 +125,124 @@ func route_api_subjects(g *echo.Group) {
 			}
 			//////////////////////////////////////////////////
 
-			subject, err := gAPI.SubjectStore.GetBySubjectId(subjectid, Uid)
+			sbj, err := gAPI.SubjectStore.GetBySubjectId(subjectid, Uid)
 			if err != nil {
 				return http.StatusInternalServerError, err
 			}
 
-			//TODO
+			if len(sbj.Datas) > 0 {
+				return http.StatusBadRequest, errors.New("exist initial data")
+			}
 
-			err = gAPI.SubjectStore.Update(subject.Id, subject.SubjectId) //TEMP
+			err = gAPI.SubjectStore.AppendData(sbj.Id, &subject.Data{
+				Demography:     item.Demography,
+				BloodPressure:  item.BloodPressure,
+				StatinFirst:    item.StatinFirst,
+				StatinsLast:    item.StatinsLast,
+				BloodTest:      item.BloodTest,
+				MedicalHistory: item.MedicalHistory,
+			})
 			if err != nil {
 				return http.StatusInternalServerError, err
 			}
-			dao, err := Select_Subject(subject)
+			return http.StatusOK, true
+		})()
+		if err, is := retValue.(error); is {
+			return c.JSON(retCode, &Result{Error: err})
+		} else {
+			return c.JSON(retCode, &Result{Result: retValue})
+		}
+	})
+	g.POST("/subjects/:subjectid/followup", func(c echo.Context) error {
+		Uid := c.Get(UID_KEY).(string)
+
+		retCode, retValue := (func() (int, interface{}) {
+			subjectid, err := util.PathToString(c, "subjectid")
+			if err != nil {
+				return http.StatusBadRequest, err
+			}
+
+			var item struct {
+				Demography     subject.Demography     `json:"demography"`
+				BloodPressure  subject.BloodPressure  `json:"blood_pressure"`
+				StatinFirst    subject.StatinFirst    `json:"statin_first"`
+				StatinsLast    subject.StatinsLast    `json:"statin_last"`
+				BloodTest      subject.BloodTest      `json:"blood_test"`
+				MedicalHistory subject.MedicalHistory `json:"medical_history"`
+			}
+			err = util.BodyToStruct(c.Request().Body, &item)
+			if err != nil {
+				return http.StatusBadRequest, err
+			}
+			//////////////////////////////////////////////////
+
+			sbj, err := gAPI.SubjectStore.GetBySubjectId(subjectid, Uid)
 			if err != nil {
 				return http.StatusInternalServerError, err
 			}
-			return http.StatusOK, dao
+
+			if len(sbj.Datas) == 0 {
+				return http.StatusBadRequest, errors.New("not exist initial data")
+			}
+
+			last := sbj.Datas[len(sbj.Datas)-1]
+			item.Demography.Age = last.Demography.Age
+			item.Demography.BirthDate = last.Demography.BirthDate
+			item.Demography.Height = last.Demography.Height
+			item.Demography.Sex = last.Demography.Sex
+			if item.Demography.Weight == 0 {
+				item.Demography.Weight = last.Demography.Weight
+			}
+			if len(item.BloodPressure.Date) == 0 || item.BloodPressure.Systolic == 0 || item.BloodPressure.Diastolic == 0 {
+				item.BloodPressure = last.BloodPressure
+			}
+			item.StatinFirst = last.StatinFirst
+			if len(item.StatinsLast.Dept) == 0 || len(item.StatinsLast.Code) == 0 || len(item.StatinsLast.Date) == 0 || item.StatinsLast.Period == 0 {
+				item.StatinsLast = last.StatinsLast
+			}
+			if len(item.BloodTest.Date) == 0 || item.BloodTest.HDL == 0 || item.BloodTest.TotalCholesterol == 0 || item.BloodTest.Glucose == 0 {
+				item.BloodTest = last.BloodTest
+			}
+			if last.MedicalHistory.TransientStroke {
+				item.MedicalHistory.TransientStroke = last.MedicalHistory.TransientStroke
+			}
+			if last.MedicalHistory.PeripheralVascular {
+				item.MedicalHistory.PeripheralVascular = last.MedicalHistory.PeripheralVascular
+			}
+			if last.MedicalHistory.Carotid {
+				item.MedicalHistory.Carotid = last.MedicalHistory.Carotid
+			}
+			if last.MedicalHistory.AbdominalAneurysm {
+				item.MedicalHistory.AbdominalAneurysm = last.MedicalHistory.AbdominalAneurysm
+			}
+			if last.MedicalHistory.Diabetes {
+				item.MedicalHistory.Diabetes = last.MedicalHistory.Diabetes
+			}
+			if last.MedicalHistory.CoronaryArtery {
+				item.MedicalHistory.CoronaryArtery = last.MedicalHistory.CoronaryArtery
+			}
+			if last.MedicalHistory.IschemicStroke {
+				item.MedicalHistory.IschemicStroke = last.MedicalHistory.IschemicStroke
+			}
+			if last.MedicalHistory.HighBloodPressure {
+				item.MedicalHistory.HighBloodPressure = last.MedicalHistory.HighBloodPressure
+			}
+			if last.MedicalHistory.Smoking {
+				item.MedicalHistory.Smoking = last.MedicalHistory.Smoking
+			}
+
+			err = gAPI.SubjectStore.AppendData(sbj.Id, &subject.Data{
+				Demography:     item.Demography,
+				BloodPressure:  item.BloodPressure,
+				StatinFirst:    item.StatinFirst,
+				StatinsLast:    item.StatinsLast,
+				BloodTest:      item.BloodTest,
+				MedicalHistory: item.MedicalHistory,
+			})
+			if err != nil {
+				return http.StatusInternalServerError, err
+			}
+			return http.StatusOK, true
 		})()
 		if err, is := retValue.(error); is {
 			return c.JSON(retCode, &Result{Error: err})
@@ -198,16 +306,18 @@ func (s DAO_Search_Subject_Sort) Less(i, j int) bool {
 }
 
 type DAO_Select_Subject struct {
-	Id string `json:"id,omitempty"`
-	//TODO
-	TCreate string `json:"t_create"`
+	Id      string        `json:"id,omitempty"`
+	Data    *subject.Data `json:"data"`
+	TCreate string        `json:"t_create"`
 }
 
 func Select_Subject(subject *subject.Subject) (*DAO_Select_Subject, error) {
 	dao := &DAO_Select_Subject{
-		Id: subject.Id,
-		//TODO
+		Id:      subject.Id,
 		TCreate: convert.String(subject.TCreate)[:10],
+	}
+	if len(subject.Datas) > 0 {
+		dao.Data = subject.Datas[len(subject.Datas)-1]
 	}
 	return dao, nil
 }

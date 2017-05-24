@@ -9,11 +9,67 @@ import (
 )
 
 type Subject struct {
-	Id        string `json:"id,omitempty" gorethink:"id,omitempty"`
-	SubjectId string `json:"subject_id" gorethink:"subject_id"`
-	//TODO
-	OwnerId string    `json:"owner_id" gorethink:"owner_id"`
-	TCreate time.Time `json:"t_create" gorethink:"t_create"`
+	Id        string    `json:"id,omitempty"`
+	SubjectId string    `json:"subject_id"`
+	Datas     []*Data   `json:"datas"`
+	OwnerId   string    `json:"owner_id"`
+	TCreate   time.Time `json:"t_create"`
+}
+
+type Data struct {
+	Demography     Demography     `json:"demography"`
+	BloodPressure  BloodPressure  `json:"blood_pressure"`
+	StatinFirst    StatinFirst    `json:"statin_first"`
+	StatinsLast    StatinsLast    `json:"statin_last"`
+	BloodTest      BloodTest      `json:"blood_test"`
+	MedicalHistory MedicalHistory `json:"medical_history"`
+}
+
+type Demography struct {
+	BirthDate string  `json:"birth_date"`
+	Age       string  `json:"age"`
+	Sex       string  `json:"sex"`
+	Height    float64 `json:"height"`
+	Weight    float64 `json:"weight"`
+}
+
+type BloodPressure struct {
+	Date      string `json:"date"`
+	Systolic  int64  `json:"systolic"`
+	Diastolic int64  `json:"diastolic"`
+}
+
+type StatinFirst struct {
+	Dept   string `json:"dept"`
+	Code   string `json:"code"`
+	Date   string `json:"date"`
+	Period int64  `json:"period"`
+}
+
+type StatinsLast struct {
+	Dept   string `json:"dept"`
+	Code   string `json:"code"`
+	Date   string `json:"date"`
+	Period int64  `json:"period"`
+}
+
+type BloodTest struct {
+	Date             string  `json:"date"`
+	HDL              float64 `json:"hdl"`
+	TotalCholesterol float64 `json:"total_cholesterol"`
+	Glucose          float64 `json:"glucose"`
+}
+
+type MedicalHistory struct {
+	TransientStroke    bool `json:"transient_stroke"`
+	PeripheralVascular bool `json:"peripheral_vascular"`
+	Carotid            bool `json:"carotid"`
+	AbdominalAneurysm  bool `json:"abdominal_aneurysm"`
+	Diabetes           bool `json:"diabetes"`
+	CoronaryArtery     bool `json:"coronary_artery"`
+	IschemicStroke     bool `json:"ischemic_stroke"`
+	HighBloodPressure  bool `json:"high_blood_pressure"`
+	Smoking            bool `json:"smoking"`
 }
 
 type Store struct {
@@ -94,6 +150,7 @@ func (st *Store) ListByOwnerId(OwnerId string) ([]*Subject, error) {
 func (st *Store) Insert(SubjectId string, OwnerId string, TCreate time.Time) (string, error) {
 	item := &Subject{
 		SubjectId: SubjectId,
+		Datas:     make([]*Data, 0),
 		OwnerId:   OwnerId,
 		TCreate:   TCreate,
 	}
@@ -110,24 +167,19 @@ func (st *Store) Insert(SubjectId string, OwnerId string, TCreate time.Time) (st
 	return id, nil
 }
 
-func (st *Store) Update(id string, SubjectId string) error {
+func (st *Store) Update() {
+	panic("not support update")
+}
+
+func (st *Store) AppendData(id string, Data *Data) error {
 	var item Subject
 	err := st.Get(id, &item)
 	if err != nil {
 		return err
 	}
 
-	isChanged := false
-	if len(SubjectId) > 0 && item.SubjectId != SubjectId {
-		item.SubjectId = SubjectId
-		isChanged = true
-	}
-
-	if isChanged {
-		return st.Store.Update(id, &item)
-	} else {
-		return nil
-	}
+	item.Datas = append(item.Datas, Data)
+	return st.Store.Update(id, &item)
 }
 
 func (st *Store) Delete(id string) error {
