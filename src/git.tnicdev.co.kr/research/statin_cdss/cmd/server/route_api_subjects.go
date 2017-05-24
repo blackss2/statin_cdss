@@ -118,6 +118,7 @@ func route_api_subjects(g *echo.Group) {
 				StatinsLast    subject.StatinsLast    `json:"statin_last"`
 				BloodTest      subject.BloodTest      `json:"blood_test"`
 				MedicalHistory subject.MedicalHistory `json:"medical_history"`
+				FamilyHistory  subject.FamilyHistory  `json:"family_history"`
 			}
 			err = util.BodyToStruct(c.Request().Body, &item)
 			if err != nil {
@@ -134,14 +135,19 @@ func route_api_subjects(g *echo.Group) {
 				return http.StatusBadRequest, errors.New("exist initial data")
 			}
 
-			err = gAPI.SubjectStore.AppendData(sbj.Id, &subject.Data{
+			data := &subject.Data{
 				Demography:     item.Demography,
 				BloodPressure:  item.BloodPressure,
 				StatinFirst:    item.StatinFirst,
 				StatinsLast:    item.StatinsLast,
 				BloodTest:      item.BloodTest,
 				MedicalHistory: item.MedicalHistory,
-			})
+				FamilyHistory:  item.FamilyHistory,
+			}
+			Estimation, err := CalculateEstimation(data)
+			data.Estimation = Estimation
+
+			err = gAPI.SubjectStore.AppendData(sbj.Id, data)
 			if err != nil {
 				return http.StatusInternalServerError, err
 			}
@@ -169,6 +175,7 @@ func route_api_subjects(g *echo.Group) {
 				StatinsLast    subject.StatinsLast    `json:"statin_last"`
 				BloodTest      subject.BloodTest      `json:"blood_test"`
 				MedicalHistory subject.MedicalHistory `json:"medical_history"`
+				FamilyHistory  subject.FamilyHistory  `json:"family_history"`
 			}
 			err = util.BodyToStruct(c.Request().Body, &item)
 			if err != nil {
@@ -230,15 +237,23 @@ func route_api_subjects(g *echo.Group) {
 			if last.MedicalHistory.Smoking {
 				item.MedicalHistory.Smoking = last.MedicalHistory.Smoking
 			}
+			if last.FamilyHistory.CoronaryArtery {
+				item.FamilyHistory.CoronaryArtery = last.FamilyHistory.CoronaryArtery
+			}
 
-			err = gAPI.SubjectStore.AppendData(sbj.Id, &subject.Data{
+			data := &subject.Data{
 				Demography:     item.Demography,
 				BloodPressure:  item.BloodPressure,
 				StatinFirst:    item.StatinFirst,
 				StatinsLast:    item.StatinsLast,
 				BloodTest:      item.BloodTest,
 				MedicalHistory: item.MedicalHistory,
-			})
+				FamilyHistory:  item.FamilyHistory,
+			}
+			Estimation, err := CalculateEstimation(data)
+			data.Estimation = Estimation
+
+			err = gAPI.SubjectStore.AppendData(sbj.Id, data)
 			if err != nil {
 				return http.StatusInternalServerError, err
 			}
@@ -334,4 +349,49 @@ func getAgeFromDate(date string) string {
 		Age = convert.String((now.Year() - t.Year()) + c)
 	}
 	return Age
+}
+
+func CalculateEstimation(data *subject.Data) (subject.Estimation, error) {
+	var Estimation subject.Estimation
+	if data.MedicalHistory.CoronaryArtery || data.MedicalHistory.IschemicStroke || data.MedicalHistory.TransientStroke || data.MedicalHistory.PeripheralVascular {
+		//초고위험군 (LDL-C target <70mg/dl) : 병력 中 [관상동맥질환, 허혈성 뇌졸증, 일과성 뇌허혈발작, 말초혈관질환]
+		Estimation.DangerousGroup = "high"
+		Estimation.TargetLDL = 70
+	} else if data.MedicalHistory.CoronaryArtery || data.MedicalHistory.AbdominalAneurysm || data.MedicalHistory.Diabetes {
+		//고위험군 (LDL-C target <100mg/dl) : 병력 中 [경동맥질환, 복부동맥류, 당뇨병]
+		Estimation.DangerousGroup = "middle-high"
+		Estimation.TargetLDL = 100
+	} else {
+		//위험인자 : 흡연, 고혈압(수축기>=140 OR 이완기>=90), HDL-C(<40mg/dL), HDL-C(>=60mg/dL), 연령(남>=45, 여>=55), 관상동맥질환 조기발병 가족력
+		count := 0
+		if data.MedicalHistory.Smoking {
+			count++
+		}
+		if data.BloodPressure.Systolic >= 140 || data.BloodPressure.Diastolic >= 90 {
+			count++
+		}
+		if data.BloodTest.HDL < 40 {
+			count++
+		}
+		if data.BloodTest.HDL >= 60 {
+			count++
+		}
+		if data.Demography.Sex == "M" && data.Demography.Age >= 45 {
+			count++
+		}
+		if data.FamilyHistory.CoronaryArtery {
+			count++
+		}
+		if count >= 2 {
+			//위험인자>=2 (LDL-C target <130mg/dl)
+			Estimation.DangerousGroup = "middle-low"
+			Estimation.TargetLDL = 130
+		} else {
+			//위험인자<=1 (LDL-C target <160mg/dl)
+			Estimation.DangerousGroup = "low"
+			Estimation.TargetLDL = 160
+		}
+	}
+
+	return Estimation, nil
 }

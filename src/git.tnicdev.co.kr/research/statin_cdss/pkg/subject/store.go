@@ -16,6 +16,11 @@ type Subject struct {
 	TCreate   time.Time `json:"t_create"`
 }
 
+type Estimation struct {
+	DangerousGroup string  `json:"dangerous_group"`
+	TargetLDL      float64 `json:"target_ldl"`
+}
+
 type Data struct {
 	Demography     Demography     `json:"demography"`
 	BloodPressure  BloodPressure  `json:"blood_pressure"`
@@ -23,11 +28,13 @@ type Data struct {
 	StatinsLast    StatinsLast    `json:"statin_last"`
 	BloodTest      BloodTest      `json:"blood_test"`
 	MedicalHistory MedicalHistory `json:"medical_history"`
+	FamilyHistory  FamilyHistory  `json:"family_history"`
+	Estimation     Estimation     `json:"estimation"`
 }
 
 type Demography struct {
 	BirthDate string  `json:"birth_date"`
-	Age       string  `json:"age"`
+	Age       int64   `json:"age"`
 	Sex       string  `json:"sex"`
 	Height    float64 `json:"height"`
 	Weight    float64 `json:"weight"`
@@ -70,6 +77,10 @@ type MedicalHistory struct {
 	IschemicStroke     bool `json:"ischemic_stroke"`
 	HighBloodPressure  bool `json:"high_blood_pressure"`
 	Smoking            bool `json:"smoking"`
+}
+
+type FamilyHistory struct {
+	CoronaryArtery bool `json:"coronary_artery"`
 }
 
 type Store struct {
