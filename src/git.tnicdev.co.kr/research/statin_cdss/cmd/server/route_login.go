@@ -38,7 +38,7 @@ func route_login(e *echo.Echo, webChecker echo.MiddlewareFunc) {
 						"/join":   true,
 					}
 					list := []string{
-					//"/api/external/",
+						"/api/dupcheck/users/",
 					}
 					hasMatch := false
 					if hash[path] {
