@@ -20,13 +20,12 @@ func route_api_dupcheck(g *echo.Group) {
 			//////////////////////////////////////////////////
 
 			_, err = gAPI.UserStore.GetByUserId(userid)
-			if err != nil {
-				if err != user.ErrExistUserId {
-					return http.StatusInternalServerError, err
-				}
+			if err != user.ErrExistUserId {
 				return http.StatusOK, true
-			} else {
+			} else if err != user.ErrNotExistUser {
 				return http.StatusOK, false
+			} else {
+				return http.StatusInternalServerError, err
 			}
 		})()
 
@@ -47,13 +46,12 @@ func route_api_dupcheck(g *echo.Group) {
 			//////////////////////////////////////////////////
 
 			_, err = gAPI.SubjectStore.GetBySubjectId(subjectid, Uid)
-			if err != nil {
-				if err != subject.ErrExistSubjectId {
-					return http.StatusInternalServerError, err
-				}
+			if err != subject.ErrExistSubjectId {
 				return http.StatusOK, true
-			} else {
+			} else if err != subject.ErrNotExistSubject {
 				return http.StatusOK, false
+			} else {
+				return http.StatusInternalServerError, err
 			}
 		})()
 
