@@ -25,7 +25,15 @@
 	}
 	
 }
-
+.util-menu{
+	color:#555;
+	text-align:right;
+	font-size:1.1em;
+	font-weight:600;
+	span:not(.seperator){
+		cursor:pointer;
+	}
+}
 .join-wrapper{
 	@extend .vertical-align;
 	width:600px;

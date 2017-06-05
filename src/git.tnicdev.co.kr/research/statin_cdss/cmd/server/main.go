@@ -54,13 +54,17 @@ func main() {
 
 	e.GET("/", func(c echo.Context) error {
 		args := make(map[string]interface{})
-		_, err := InitUserArgs(c, args)
+		user, err := InitUserArgs(c, args)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, &Result{Error: err})
 		}
 
 		if args["IsLogin"] == true {
 			args["page_initial"] = map[string]interface{}{}
+
+			InitSidebarArgs(c, user, args)
+			args["has_sidebar"] = true
+
 			return c.Render(http.StatusOK, "main.html", args)
 		} else {
 			args["page_initial"] = map[string]interface{}{}

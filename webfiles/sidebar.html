@@ -1,55 +1,63 @@
 <aside id="sidebar" class="clearfix" v-root-container>
-	<div class="logo-wrapper" onclick="location.href='/'">1차 임상시험 마스터</div>
+	<div class="logo-wrapper" onclick="location.href='/'">Logo + System Name</div>
 	<subject-search>
 		<section class="search-box">
 			<p class="clearfix">
-				<label class="col-xs-5">피험자 번호</label>
-				<input type="text" class="input-search col-xs-7" v-model="input.scrno" />
+				<label class="col-xs-5">PID</label>
+				<input type="text" class="input-search col-xs-7" v-model="input.subjectid" maxlength="9" />
 			</p>
 			<p class="clearfix">
-				<label class="col-xs-5">피험자 군</label>
-				<select class=" input-search col-xs-7"  v-model="input.arm">
+				<label class="col-xs-5">성별</label>
+				<select class="select-search col-xs-7" v-model="input.sex">
 					<option value="">전체</option>
-					<option v-for="arm in constants.arms" v-bind:value="arm">{{arm}}</option>
+					<option v-for="sex in constants.sex" v-bind:value="sex">{{sex == 'M' ? '남성' : '여성'}}</option>
 				</select>
 			</p>
 			<p class="clearfix">
+				<label class="col-xs-5">목표 ldl-C</label>
+				<select class="select-search col-xs-7" v-model="input.target_ldl">
+					<option value="">전체</option>
+					<option v-for="target_ldl in constants.target_ldl" v-bind:value="target_ldl">{{target_ldl}}</option>
+				</select>
+			</p>
+			<p class="clearfix" v-bind:id="constants.random_id">
 				<button class="btn-search" v-on:click="doSearch">검색</button>
-			</p>
-			<p class="clearfix">
-				<select class="select-search form-control" v-model="input.type">
-					<option value="">전체</option>
-					<option value="ae">진행 중 이상반응</option>
-					<option value="low">순응도 저조</option>
-				</select>
 			</p>
 		</section>
 		<script type="vue">
 		data: function() {
 			var obj = {
 				constants: {
-					arms: ["실험군", "대조군", "위약군"]
+					random_id :'_' + Math.random().toString().substr(2),
+					sex: ['M','F'],
+					target_ldl : [70,100,130,160],
 				},
 				input: {
-					scrno: "",
-					arm: "",
-					type: ""
+					subjectid: "",
+					sex:"",
+					target_ldl:"",
+					dangerous:""
 				}
 			};
 			Callback.add("do-search", this.doSearch);
 			return obj;
 		},
+		mounted : function(){
+			this.doSearch();
+		},
 		methods: {
 			doSearch: function() {
-				this.$http.get("/api/subjects?scrno=" + this.input.scrno +
-					"&arm=" + this.input.arm +
-					"&type=" + this.input.type
+				this.$http.get("/api/subjects?subjectid=" + this.input.subjectid +
+					"&sex=" + this.input.sex +
+					"&target_ldl=" + this.input.target_ldl +
+					"&dangerous_group" + this.input.dangerous
 				).then(function(res) {
 					if(res.body.error != null) {
 						alert(res.body.error);
 					} else {
+						console.log(res.body.result);
+						//TODO
 						Callback.call("update-subject-list", res.body.result);
-						Callback.call("select-subject", null);
 					}
 				}, function(err) {
 					console.error(err.body);
@@ -60,85 +68,335 @@
 	</subject-search>
 	<subject-list>
 		<ul class="subject-list">
-			<!--
-			red
-			yellow
-			aqua
-			sky-blue
-			-->
-			<li class="clearfix" v-bind:class="{'active':(selected.id==item.id), 'red':getColor(item, 'red'), 'orange':getColor(item, 'orange'), 'yellow':getColor(item, 'yellow'), 'sky-blue':getColor(item, 'sky-blue')}" v-for="item in constants.subjects" v-on:click="selectSubject(item)">
+			<li class="clearfix" v-bind:class="{active : (selected.id == subject.subject_id), red : subject.dangerous_group == 'extream', yellow : subject.dangerous_group == 'high', skyblue : subject.dangerous_group == 'danger2', aqua : subject.dangerous_group == 'danger1'}" v-for="subject in subjects" v-on:click="selectSubject(subject.subject_id)">
 				<div class="col-xs-12 info">
-					<span class="col-xs-6 name">{{item.scrno}}</span>
-					<span class="col-xs-6">{{item.t_create}}</span>
-					<span class="col-xs-6 age">{{item.age}}/{{(item.sex == "M" ? "남성" : "여성")}}</span>
-					<span class="col-xs-6">{{item.progress}}</span>
+					<span class="col-xs-6 pid">{{subject.subject_id}}</span>
+					<span class="col-xs-6" v-if="subject.sex.length > 0">{{constants.sex_hash[subject.sex]}}</span>
+					<span class="col-xs-6" v-else>&nbsp;</span>
+					<span class="col-xs-6 ldl-c" v-if="subject.target_ldl.length>0">{{subject.target_ldl}}mg/dL</span>
+					<span class="col-xs-6">{{constants.dangerous_hash[subject.dangerous_group]}}</span>
 				</div>
 			</li>
 		</ul>
 		<script type="vue">
-		data: function() {
-			var obj = {
-				constants: {
-					subjects: Store.get("page-initial").sidebar.subjects,
-					arms: []
+			data : function(){
+				var obj = {
+					constants: {
+						sex_hash: {
+							'M' : '남성',
+							'F' : '여성'
+						},
+						dangerous_hash : {
+							'extream' : '초고위험군',
+							'high' : '고위험군',
+							'danger2' : '위험인자2',
+							'danger1' : '위험인자1'
+						}
+					},
+					selected : {
+						id : ''
+					},
+					subjects : []
+				}
+				Callback.add("update-subject-list", this.updateSubjectList);
+				return obj;
+			},
+			methods : {
+				selectSubject : function(subjectid){
+					if(subjectid == null){
+						this.selected.id = '';
+        		Callback.call("update-subject-data", null);
+					}else{
+						this.selected.id = subjectid;
+						this.$http.get("/api/subjects/" + subjectid ).then(function(res) {
+							if(res.body.error != null) {
+								alert(res.body.error);
+							} else {
+								var labels = ["100-129", "130-159", "160-189", ">=190"];
+	        			var colorNames = Object.keys(window.chartColors);
+	        			Callback.call("update-subject-data", res.body.result);
+
+								if(window.myLine != null) {
+		        			window.myLine.destroy();
+		        		}
+		        		window.myLine = new Chart(document.getElementById("canvas").getContext("2d"), {
+			            type: 'line',
+			            data: {
+			                labels: labels,
+			                datasets: [{
+			                		label : 'atrovastatin',
+			                    backgroundColor: window.chartColors.red,
+			                    borderColor: window.chartColors.red,
+			                    data: [
+			                        randomScalingFactor(), 
+			                        randomScalingFactor(), 
+			                        randomScalingFactor(), 
+			                        randomScalingFactor()
+			                    ],
+			                    fill: false,
+			                }, {
+			                    label : 'Rosuvastatin',
+			                    backgroundColor: window.chartColors.blue,
+			                    borderColor: window.chartColors.blue,
+			                    data: [
+			                        randomScalingFactor(), 
+			                        randomScalingFactor(), 
+			                        randomScalingFactor(), 
+			                        randomScalingFactor()
+			                    ],
+			                    fill: false,
+			                }]
+			            },
+			            options: {
+			                responsive: true,
+			                hover: {
+			                    mode: 'nearest',
+			                    intersect: true
+			                },
+			                scales: {
+			                    xAxes: [{
+			                        display: true,
+			                        scaleLabel: {
+			                            display: true,
+			                            labelString: 'Baseline LDL- cholesterol(mg/dL)'
+			                        }
+			                    }],
+			                    yAxes: [{
+			                        display: true,
+			                        scaleLabel: {
+			                            display: true,
+			                            labelString: 'CEA-RR'
+			                        }
+			                    }]
+			                }
+			            }
+			        	});
+			        	window.myLine = new Chart(document.getElementById("canvas2").getContext("2d"), {
+			            type: 'line',
+			            data: {
+			                labels: labels,
+			                datasets: [{
+			                		label : 'atrovastatin',
+			                    backgroundColor: window.chartColors.red,
+			                    borderColor: window.chartColors.red,
+			                    data: [
+			                        randomScalingFactor(), 
+			                        randomScalingFactor(), 
+			                        randomScalingFactor(), 
+			                        randomScalingFactor()
+			                    ],
+			                    fill: false,
+			                }, {
+			                    label : 'Rosuvastatin',
+			                    backgroundColor: window.chartColors.blue,
+			                    borderColor: window.chartColors.blue,
+			                    data: [
+			                        randomScalingFactor(), 
+			                        randomScalingFactor(), 
+			                        randomScalingFactor(), 
+			                        randomScalingFactor()
+			                    ],
+			                    fill: false,
+			                }]
+			            },
+			            options: {
+			                responsive: true,
+			                hover: {
+			                    mode: 'nearest',
+			                    intersect: true
+			                },
+			                scales: {
+			                    xAxes: [{
+			                        display: true,
+			                        scaleLabel: {
+			                            display: true,
+			                            labelString: 'Baseline LDL- cholesterol(mg/dL)'
+			                        }
+			                    }],
+			                    yAxes: [{
+			                        display: true,
+			                        scaleLabel: {
+			                            display: true,
+			                            labelString: 'CEA-RR'
+			                        }
+			                    }]
+			                }
+			            }
+			        	});
+			        	window.myLine = new Chart(document.getElementById("canvas3").getContext("2d"), {
+			            type: 'line',
+			            data: {
+			                labels: labels,
+			                datasets: [{
+			                		label : 'atrovastatin',
+			                    backgroundColor: window.chartColors.red,
+			                    borderColor: window.chartColors.red,
+			                    data: [
+			                        randomScalingFactor(), 
+			                        randomScalingFactor(), 
+			                        randomScalingFactor(), 
+			                        randomScalingFactor()
+			                    ],
+			                    fill: false,
+			                }, {
+			                    label : 'Pitavastatin',
+			                    backgroundColor: window.chartColors.orange,
+			                    borderColor: window.chartColors.orange,
+			                    data: [
+			                        randomScalingFactor(), 
+			                        randomScalingFactor(), 
+			                        randomScalingFactor(), 
+			                        randomScalingFactor()
+			                    ],
+			                    fill: false,
+			                }, {
+			                    label : 'pravastatin',
+			                    backgroundColor: window.chartColors.green,
+			                    borderColor: window.chartColors.green,
+			                    data: [
+			                        randomScalingFactor(), 
+			                        randomScalingFactor(), 
+			                        randomScalingFactor(), 
+			                        randomScalingFactor()
+			                    ],
+			                    fill: false,
+			                }, {
+			                    label : 'Rosuvastatin',
+			                    backgroundColor: window.chartColors.blue,
+			                    borderColor: window.chartColors.blue,
+			                    data: [
+			                        randomScalingFactor(), 
+			                        randomScalingFactor(), 
+			                        randomScalingFactor(), 
+			                        randomScalingFactor()
+			                    ],
+			                    fill: false,
+			                }, {
+			                    label : 'simvastatin',
+			                    backgroundColor: window.chartColors.purple,
+			                    borderColor: window.chartColors.purple,
+			                    data: [
+			                        randomScalingFactor(), 
+			                        randomScalingFactor(), 
+			                        randomScalingFactor(), 
+			                        randomScalingFactor()
+			                    ],
+			                    fill: false,
+			                }]
+			            },
+			            options: {
+			                responsive: true,
+			                hover: {
+			                    mode: 'nearest',
+			                    intersect: true
+			                },
+			                scales: {
+			                    xAxes: [{
+			                        display: true,
+			                        scaleLabel: {
+			                            display: true,
+			                            labelString: 'Baseline LDL- cholesterol(mg/dL)'
+			                        }
+			                    }],
+			                    yAxes: [{
+			                        display: true,
+			                        scaleLabel: {
+			                            display: true,
+			                            labelString: 'CEA-RR'
+			                        }
+			                    }]
+			                }
+			            }
+			        	});
+			        	window.myLine = new Chart(document.getElementById("canvas4").getContext("2d"), {
+			            type: 'line',
+			            data: {
+			                labels: labels,
+			                datasets: [{
+			                		label : 'pravastatin',
+			                    backgroundColor: window.chartColors.green,
+			                    borderColor: window.chartColors.green,
+			                    data: [
+			                        randomScalingFactor(), 
+			                        randomScalingFactor(), 
+			                        randomScalingFactor(), 
+			                        randomScalingFactor()
+			                    ],
+			                    fill: false,
+			                }, {
+			                    label : 'pravastatin',
+			                    backgroundColor: window.chartColors.green,
+			                    borderColor: window.chartColors.green,
+			                    data: [
+			                        randomScalingFactor(), 
+			                        randomScalingFactor(), 
+			                        randomScalingFactor(), 
+			                        randomScalingFactor()
+			                    ],
+			                    fill: false,
+			                }]
+			            },
+			            options: {
+			                responsive: true,
+			                hover: {
+			                    mode: 'nearest',
+			                    intersect: true
+			                },
+			                scales: {
+			                    xAxes: [{
+			                        display: true,
+			                        scaleLabel: {
+			                            display: true,
+			                            labelString: 'Baseline LDL- cholesterol(mg/dL)'
+			                        }
+			                    }],
+			                    yAxes: [{
+			                        display: true,
+			                        scaleLabel: {
+			                            display: true,
+			                            labelString: 'CEA-RR'
+			                        }
+			                    }]
+			                }
+			            }
+			        	});
+		            
+							}
+						}, function(err) {
+							console.error(err.body);
+						});
+					}
 				},
-				selected: {
-					id: ""
+				updateSubjectList : function(list){
+					this.subjects = list;
+					if(list.length > 0){
+						this.selectSubject(list[0].subject_id)
+					}else{
+						this.selectSubject(null)
+					}
 				}
-			};
-			Callback.add("update-subject-list", this.updateSubjectList);
-			return obj;
-		},
-		methods: {
-			getColor: function(item, color) {
-				switch(color) {
-				case "red":
-					return (item.tag == "low" && item.compliance < 50);
-				case "orange":
-					return (item.tag == "low" && item.compliance >= 50 &&  item.compliance < 60);
-				case "yellow":
-					return (item.tag == "low" && item.compliance >= 60);
-				case "sky-blue":
-					return (item.tag == "ae");
-				default:
-					return false;
-				}
-			},
-			selectSubject: function(item) {
-				this.selected.id = item.id;
-				Callback.call("select-subject", item);
-			},
-			updateSubjectList: function(list) {
-				this.constants.subjects = list;
-				this.selected.id = "";
 			}
-		}
 		</script>
 	</subject-list>
-	<add-button>
-	<div class="add-subject-wrapper">
-		<button class="btn btn-add-subject" type="button" v-on:click="openModal">신규 피험자 등록</button>
-	</div>
-	<script type="vue">
-		data: function() {
-			var obj = {};
-			return obj;
-		},
-		methods: {
-			openModal: function() {
-				Callback.call("add-subject-reset");
-				$("#add-subject").modal("show");
+	<add-subject-btn>
+		<div class="add-subject-wrapper">
+			<button class="btn btn-add-subject" v-on:click="addSubject()">신규 대상자 등록</button>
+		</div>
+		<script type="vue">
+			methods : {
+				addSubject : function(){
+					$("#add-subject").modal('show');
+				}
 			}
-		}
-	</script>
-	</add-button>
+		</script>
+	</add-subject-btn>
 </aside>
 <div class="modal fade" id="add-subject" v-root-container>
 	<add-subject>
 		<div class="modal-dialog" role="document">
 			<div class="modal-content box">
 				<div class="modal-header">
-					<h5 class="modal-title title">신규 피험자 등록</h5>
+					<h5 class="modal-title title">신규 대상자 등록</h5>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
@@ -151,274 +409,107 @@
 							<col width="65%"/>
 						</colgroup>
 						<tr>
-							<th>이름</th>
+							<th>등록 번호</th>
 							<td>
-								<div class="col-xs-7">
-									<input type="text" class="col-xs-12" v-model="input.name" />
+								<div class="col-xs-12">
+									<input type="text" class="col-xs-12" maxlength="9" v-model="input.subjectid" v-on:keyup="doDupCheck()"/>
 								</div>
 							</td>
 						</tr>
 						<tr>
-							<th>비밀번호</th>
+							<th></th>
 							<td>
-								<div class="col-xs-7">
-									<input type="text" class="col-xs-12" v-model="input.password" />
-								</div>
-							</td>
-						</tr>
-						<tr>
-							<th>대상자번호</th>
-							<td>
-								<div class="col-xs-3">
-									<input type="text" class="col-xs-12" maxlength="2" v-model="input.scrno_1" />
-								</div>
-								<span class="col-xs-1">-</span>
-								<div class="col-xs-3">
-									<input type="text" class="col-xs-12" maxlength="3" v-model="input.scrno_2" />
-								</div>
-								<span class="col-xs-1">-</span>
-								<div class="col-xs-3">
-									<input type="text" class="col-xs-12" maxlength="3" v-model="input.scrno_3" />
-								</div>
-							</td>
-						</tr>
-						<tr>
-							<th>성별</th>
-							<td>
-								<label class="input-radio">남자
-									<input type="radio" name="sex" value="M" class="radio-btn" v-model="input.sex" />
-									<span class="fake-btn"></span>
-								</label>
-								<label class="input-radio">여자
-									<input type="radio" name="sex" value="F" class="radio-btn" v-model="input.sex" />
-									<span class="fake-btn"></span>
-								</label>
-							</td>
-						</tr>
-						<tr>
-							<th>생년월일</th>
-							<td class="birth">
-								<div class="col-xs-4">
-									<select v-on:change="doUpdateBirthDay" v-model="input.birth_year">
-										<option value="">[년]</option>
-										<option v-for="item in constants.birth.years" v-bind:value="item">{{item}}</option>
-									</select>
-								</div>
-								<div class="col-xs-4">
-									<select v-on:change="doUpdateBirthDay" v-model="input.birth_month">
-										<option value="">[월]</option>
-										<option v-for="item in constants.birth.months" v-bind:value="item">{{item}}</option>
-									</select>
-								</div>
-								<div class="col-xs-4">
-									<select v-model="input.birth_day">
-										<option value="">[일]</option>
-										<option v-for="item in constants.birth.days" v-bind:value="item">{{item}}</option>
-									</select>
-								</div>
-							</td>
-						</tr>
-						<tr>
-							<th>피험자군</th>
-							<td>
-								<div class="col-xs-7">
-									<select v-model="input.arm">
-										<option value="">-- 군을 선택해주세요 --</option>
-										<option v-for="arm in constants.arms" v-bind:value="arm">{{arm}}</option>
-									</select>
-								</div>
-							</td>
-						</tr>
-						<tr>
-							<th>접종일</th>
-							<td class="birth">
-								<div class="col-xs-4">
-									<select v-on:change="doUpdateFirstDay" v-model="input.first_year">
-										<option value="">[년]</option>
-										<option v-for="item in constants.first.years" v-bind:value="item">{{item}}</option>
-									</select>
-								</div>
-								<div class="col-xs-4">
-									<select v-on:change="doUpdateFirstDay" v-model="input.first_month">
-										<option value="">[월]</option>
-										<option v-for="item in constants.first.months" v-bind:value="item">{{item}}</option>
-									</select>
-								</div>
-								<div class="col-xs-4">
-									<select v-model="input.first_day">
-										<option value="">[일]</option>
-										<option v-for="item in constants.first.days" v-bind:value="item">{{item}}</option>
-									</select>
+								<div class="col-xs-12">
+									<p class="duplicate-message" v-bind:class="{success :message_hash.isSuccess}" v-if="message_hash.isSuccess == true">{{message_hash.success}}</p>
+									<p class="duplicate-message" v-bind:class="{error : message_hash.isError}" v-if="message_hash.isError == true">{{message_hash.error}}</p>
 								</div>
 							</td>
 						</tr>
 					</table>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-aqua btn-sm" v-on:click="doRegister">등록</button>
-					<button type="button" class="btn btn-grey btn-sm" data-dismiss="modal">취소</button>
+					<button type="button" class="btn btn-aqua btn-sm" v-on:click="doNew">완료</button>
+					<button type="button" class="btn btn-gray btn-sm" data-dismiss="modal">취소</button>
 				</div>
 			</div>
 		</div>
 		<script type="vue">
-		data: function() {
-			var nowYear = new Date().getFullYear();
-			var birth_years = [];
-			for(var i=1900; i<= nowYear; i++) {
-				birth_years.push(i);
-			}
-			var first_years = [];
-			for(var i=1900; i<= nowYear; i++) {
-				first_years.push(i);
-			}
-
-			var obj = {
-				constants: {
-					birth: {
-						years: birth_years,
-						months: ["01","02","03","04","05","06","07","08","09","10","11","12"],
-						days: []
-					},
-					first: {
-						years: first_years,
-						months: ["01","02","03","04","05","06","07","08","09","10","11","12"],
-						days: []
-					},
-					arms: ["실험군", "대조군", "위약군"]
+				data : function(){
+					var obj = {
+						message_hash : {
+							success : '사용 가능한 등록번호 입니다.',
+							error :  '사용 중인 등록번호 입니다.',
+							isSuccess : false,
+							isError : false
+						},
+						input : {
+							subjectid : ''
+						},
+						timeoutLock: false,
+						checkTimeOut : 0
+					}
+					return obj;
 				},
-				input: {
-					name: "",
-					password: "",
-					scrno_1: "",
-					scrno_2: "",
-					scrno_3: "",
-					sex: "",
-					birth_year: "",
-					birth_month: "",
-					birth_day: "",
-					arm: "",
-					first_year: "",
-					first_month: "",
-					first_day: ""
-				}
-			};
-			Callback.add("add-subject-reset", this.reset);
-			return obj;
-		},
-		methods: {
-			reset: function() {
-				for(var key in this.input) {
-					this.input[key] = "";
-				}
-			},
-			doUpdateBirthDay: function() {
-				var year = parseInt(this.input.birth_year);
-				var month = parseInt(this.input.birth_month);
-				if(!isNaN(year) && !isNaN(month)) {
-					var dt = new Date(year + "-01-01");
-					dt.setMonth(parseInt(month));
-					dt.setDate(0);
-					var maxDate = dt.getDate();
-					var days = [];
-					var hasSelectedDay = false;
-					for(var i=1; i<=maxDate; i++) {
-						days.push(i < 10 ? "0" + i : "" + i);
-						if(this.input.birth_day == i) {
-							hasSelectedDay = true;
+				methods : {
+					doDupCheck : function(){
+						this.checkTimeOut = 300;
+						this.checkLoop();
+					},
+					checkLoop : function(){
+						if(this.checkTimeOut > 0) {
+							if(!this.timeoutLock) {
+								var _this = this;
+								this.timeoutLock = true;
+								setTimeout(function(){
+									_this.checkTimeOut -= 50;
+									_this.timeoutLock = false;
+									_this.checkLoop();
+								}, 50);
+							}
+								}else{
+							this.checkTimeOut = 0;
+							this.$http.get("/api/dupcheck/subjects/" + this.input.subjectid ).then(function(res) {
+								if(res.body.error != null) {
+									alert(res.body.error);
+								} else {
+									console.log(res.body.result);
+								}
+							}, function(err) {
+								console.error(err.body);
+							});
+						}
+					},
+					doNew : function(){
+						if(this.input.subjectid.length == 0 ){
+							alert("등록번호를 입력해주세요");
+						}else{
+							this.$http.post("/api/subjects",{'subjectid' : this.input.subjectid}).then(function(res) {
+								if(res.body.error != null) {
+									alert(res.body.error);
+									if(res.body.error == "exist subject_id"){
+										this.message_hash.isError = true;
+									}
+								} else {
+									console.log(res.body.result);
+									Callback.call("do-search",)
+									$('[data-dismiss]').click();
+									//TODO
+								}
+							}, function(err) {
+								console.error(err.body);
+								this.message_hash.isError = true;
+							});
 						}
 					}
-					this.constants.birth.days = days;
-					if(!hasSelectedDay) {
-						this.input.birth_day = "";
-					}
-				} else {
-					this.constants.birth.days = [];
-					this.input.birth_Day = "";
 				}
-			},
-			doUpdateFirstDay: function() {
-				var year = parseInt(this.input.first_year);
-				var month = parseInt(this.input.first_month);
-				if(!isNaN(year) && !isNaN(month)) {
-					var dt = new Date(year + "-01-01");
-					dt.setMonth(parseInt(month));
-					dt.setDate(0);
-					var maxDate = dt.getDate();
-					var days = [];
-					var hasSelectedDay = false;
-					for(var i=1; i<=maxDate; i++) {
-						days.push(i < 10 ? "0" + i : "" + i);
-						if(this.input.first_day == i) {
-							hasSelectedDay = true;
-						}
-					}
-					this.constants.first.days = days;
-					if(!hasSelectedDay) {
-						this.input.first_day = "";
-					}
-				} else {
-					this.constants.first.days = [];
-					this.input.birth_Day = "";
-				}
-			},
-			doRegister: function() {
-				if(this.input.name.length == 0) {
-					alert("이름을 입력하셔야 합니다.");
-					return;
-				}
-				if(this.input.password.length == 0) {
-					alert("비밀번호를 입력하셔야 합니다.");
-					return;
-				}
-				if(this.input.scrno_1.length != 2 || this.input.scrno_2.length != 3 || this.input.scrno_3.length != 3) {
-					alert("대상자번호(OO-OOO-OOO)를 올바르게 입력하셔야 합니다.");
-					return;
-				}
-				if(this.input.sex.length == 0) {
-					alert("성별을 입력하셔야 합니다.");
-					return;
-				}
-				if(this.input.birth_year.length == 0 || this.input.birth_month.length == 0 || this.input.birth_day.length == 0) {
-					alert("생년월일을 입력하셔야 합니다.");
-					return;
-				}
-				if(this.input.arm.length == 0) {
-					alert("피험자군을 입력하셔야 합니다.");
-					return;
-				}
-				if(this.input.first_year.length == 0 || this.input.first_month.length == 0 || this.input.first_day.length == 0) {
-					alert("접종일을 입력하셔야 합니다.");
-					return;
-				}
-				var scrno = this.input.scrno_1 + "-" + this.input.scrno_2 + "-" + this.input.scrno_3;
-				var birth_date = this.input.birth_year + "-" + this.input.birth_month + "-" + this.input.birth_day;
-				var first_date = this.input.first_year + "-" + this.input.first_month + "-" + this.input.first_day;
-
-				this.$http.post("/api/subjects", {
-					name: this.input.name,
-					password: this.input.password,
-					scrno: scrno,
-					sex: this.input.sex,
-					birth_date: birth_date,
-					arm: this.input.arm,
-					first_date: first_date
-				}).then(function(res) {
-					if(res.body.error != null) {
-						alert(res.body.error);
-					} else {
-						$("#add-subject").modal("hide");
-						Callback.call("do-search");
-					}
-				}, function(err) {
-					alert(JSON.parse(err.responseText).error);
-				});
-			}
-		}
-		</script>
+			</script>
 	</add-subject>
 </div>
 <script type="text/javascript">
 	$(function(){
+		// var container_height = $("#container").height();
+		// $("#sidebar").css("height", container_height);
+
 		var ul_height = $(".add-subject-wrapper").offset().top - $('.subject-list').offset().top;
 		$(".subject-list").height(ul_height);
 
@@ -426,5 +517,6 @@
 			var ul_height = $(".add-subject-wrapper").offset().top - $('.subject-list').offset().top;
 			$(".subject-list").height(ul_height);
 		}).resize();
+
 	})
 </script>

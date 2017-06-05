@@ -82,7 +82,7 @@ func route_api_subjects(g *echo.Group) {
 
 		retCode, retValue := (func() (int, interface{}) {
 			var item struct {
-				SubjectId string `json:"subject_id"`
+				SubjectId string `json:"subjectid"`
 			}
 			err := util.BodyToStruct(c.Request().Body, &item)
 			if err != nil {
@@ -143,6 +143,7 @@ func route_api_subjects(g *echo.Group) {
 				BloodTest:      item.BloodTest,
 				MedicalHistory: item.MedicalHistory,
 				FamilyHistory:  item.FamilyHistory,
+				TCreate:        time.Now(),
 			}
 			Estimation, err := CalculateEstimation(data)
 			data.Estimation = Estimation
@@ -249,6 +250,7 @@ func route_api_subjects(g *echo.Group) {
 				BloodTest:      item.BloodTest,
 				MedicalHistory: item.MedicalHistory,
 				FamilyHistory:  item.FamilyHistory,
+				TCreate:        time.Now(),
 			}
 			Estimation, err := CalculateEstimation(data)
 			data.Estimation = Estimation
@@ -265,15 +267,80 @@ func route_api_subjects(g *echo.Group) {
 			return c.JSON(retCode, &Result{Result: retValue})
 		}
 	})
+
+	g.POST("/subjects/:subjectid/prescription", func(c echo.Context) error {
+		Uid := c.Get(UID_KEY).(string)
+
+		retCode, retValue := (func() (int, interface{}) {
+			subjectid, err := util.PathToString(c, "subjectid")
+			if err != nil {
+				return http.StatusBadRequest, err
+			}
+
+			var item struct {
+				Prescription subject.Prescription `json:"prescription"`
+			}
+			err = util.BodyToStruct(c.Request().Body, &item)
+			if err != nil {
+				return http.StatusBadRequest, err
+			}
+			//////////////////////////////////////////////////
+
+			sbj, err := gAPI.SubjectStore.GetBySubjectId(subjectid, Uid)
+			if err != nil {
+				return http.StatusInternalServerError, err
+			}
+
+			if len(sbj.Datas) == 0 {
+				return http.StatusBadRequest, errors.New("not exist initial data")
+			}
+
+			last := sbj.Datas[len(sbj.Datas)-1]
+
+			if len(last.Prescription.Statins) > 0 || len(last.Prescription.Levels) > 0 {
+				data := &subject.Data{
+					Demography:     last.Demography,
+					BloodPressure:  last.BloodPressure,
+					StatinFirst:    last.StatinFirst,
+					StatinsLast:    last.StatinsLast,
+					BloodTest:      last.BloodTest,
+					MedicalHistory: last.MedicalHistory,
+					FamilyHistory:  last.FamilyHistory,
+					Estimation:     last.Estimation,
+					Prescription:   item.Prescription,
+					TCreate:        time.Now(),
+				}
+
+				err = gAPI.SubjectStore.AppendData(sbj.Id, data)
+				if err != nil {
+					return http.StatusInternalServerError, err
+				}
+			} else {
+				last.Prescription = item.Prescription
+
+				err = gAPI.SubjectStore.UpdateLastData(sbj.Id, last)
+				if err != nil {
+					return http.StatusInternalServerError, err
+				}
+			}
+
+			return http.StatusOK, true
+		})()
+		if err, is := retValue.(error); is {
+			return c.JSON(retCode, &Result{Error: err})
+		} else {
+			return c.JSON(retCode, &Result{Result: retValue})
+		}
+	})
 }
 
 type DAO_Search_Subject struct {
-	Id           string `json:"id,omitempty"`
-	SubjectId    string `json:"subject_id"`
-	Sex          string `json:"sex"`
-	TargetLDL    string `json:"target_ldl"`
-	Prescription string `json:"prescription"`
-	TCreate      string `json:"t_create"`
+	Id             string `json:"id,omitempty"`
+	SubjectId      string `json:"subject_id"`
+	Sex            string `json:"sex"`
+	TargetLDL      string `json:"target_ldl"`
+	DangerousGroup string `json:"dangerous_group"`
+	TCreate        string `json:"t_create"`
 }
 
 func Search_Subjects(Uid string, SubjectId string, Sex string, TargetLDL string, Prescription string) ([]*DAO_Search_Subject, error) {
@@ -290,16 +357,30 @@ func Search_Subjects(Uid string, SubjectId string, Sex string, TargetLDL string,
 			}
 		}
 
-		//TODO : Sex, TargetLDL, Prescription
-
 		dao := &DAO_Search_Subject{
 			Id:        v.Id,
 			SubjectId: v.SubjectId,
-			//Sex:        v.Sex,
-			//TargetLDL:        v.TargetLDL,
-			//Prescription:        v.Prescription,
-			TCreate: convert.String(v.TCreate)[:10],
+			TCreate:   convert.String(v.TCreate)[:10],
 		}
+
+		if len(v.Datas) > 0 {
+			data := v.Datas[len(v.Datas)-1]
+			dao.Sex = data.Demography.Sex
+			dao.DangerousGroup = data.Estimation.DangerousGroup
+			dao.TargetLDL = convert.String(data.Estimation.TargetLDL)
+		}
+
+		if len(Sex) > 0 {
+			if Sex != dao.Sex {
+				continue
+			}
+		}
+		if len(TargetLDL) > 0 {
+			if TargetLDL != dao.TargetLDL {
+				continue
+			}
+		}
+
 		daos = append(daos, dao)
 	}
 	sort.Sort(DAO_Search_Subject_Sort(daos))
@@ -321,18 +402,56 @@ func (s DAO_Search_Subject_Sort) Less(i, j int) bool {
 }
 
 type DAO_Select_Subject struct {
-	Id      string        `json:"id,omitempty"`
-	Data    *subject.Data `json:"data"`
-	TCreate string        `json:"t_create"`
+	Id        string         `json:"id,omitempty"`
+	SubjectId string         `json:"subject_id"`
+	Data      *subject.Data  `json:"data"`
+	History   []*DAO_History `json:"history"`
+	TCreate   string         `json:"t_create"`
+}
+
+type DAO_History struct {
+	Height            float64  `json:"height"`
+	Weight            float64  `json:"weight"`
+	Systolic          int64    `json:"systolic"`
+	Diastolic         int64    `json:"diastolic"`
+	HDL               float64  `json:"hdl"`
+	TotalCholesterol  float64  `json:"total_cholesterol"`
+	Glucose           float64  `json:"glucose"`
+	Diabetes          bool     `json:"diabetes"`
+	HighBloodPressure bool     `json:"high_blood_pressure"`
+	DangerousGroup    string   `json:"dangerous_group"`
+	TargetLDL         float64  `json:"target_ldl"`
+	Statins           []string `json:"statins"`
+	Levels            []string `json:"levels"`
 }
 
 func Select_Subject(subject *subject.Subject) (*DAO_Select_Subject, error) {
 	dao := &DAO_Select_Subject{
-		Id:      subject.Id,
-		TCreate: convert.String(subject.TCreate)[:10],
+		Id:        subject.Id,
+		SubjectId: subject.SubjectId,
+		History:   make([]*DAO_History, 0),
+		TCreate:   convert.String(subject.TCreate)[:10],
 	}
 	if len(subject.Datas) > 0 {
 		dao.Data = subject.Datas[len(subject.Datas)-1]
+	}
+	for _, v := range subject.Datas {
+		h := &DAO_History{
+			Height:            v.Demography.Height,
+			Weight:            v.Demography.Weight,
+			Systolic:          v.BloodPressure.Systolic,
+			Diastolic:         v.BloodPressure.Diastolic,
+			HDL:               v.BloodTest.HDL,
+			TotalCholesterol:  v.BloodTest.TotalCholesterol,
+			Glucose:           v.BloodTest.Glucose,
+			Diabetes:          v.MedicalHistory.Diabetes,
+			HighBloodPressure: v.MedicalHistory.HighBloodPressure,
+			DangerousGroup:    v.Estimation.DangerousGroup,
+			TargetLDL:         v.Estimation.TargetLDL,
+			Statins:           v.Prescription.Statins,
+			Levels:            v.Prescription.Levels,
+		}
+		dao.History = append(dao.History, h)
 	}
 	return dao, nil
 }
@@ -355,11 +474,11 @@ func CalculateEstimation(data *subject.Data) (subject.Estimation, error) {
 	var Estimation subject.Estimation
 	if data.MedicalHistory.CoronaryArtery || data.MedicalHistory.IschemicStroke || data.MedicalHistory.TransientStroke || data.MedicalHistory.PeripheralVascular {
 		//초고위험군 (LDL-C target <70mg/dl) : 병력 中 [관상동맥질환, 허혈성 뇌졸증, 일과성 뇌허혈발작, 말초혈관질환]
-		Estimation.DangerousGroup = "high"
+		Estimation.DangerousGroup = "extream"
 		Estimation.TargetLDL = 70
 	} else if data.MedicalHistory.CoronaryArtery || data.MedicalHistory.AbdominalAneurysm || data.MedicalHistory.Diabetes {
 		//고위험군 (LDL-C target <100mg/dl) : 병력 中 [경동맥질환, 복부동맥류, 당뇨병]
-		Estimation.DangerousGroup = "middle-high"
+		Estimation.DangerousGroup = "high"
 		Estimation.TargetLDL = 100
 	} else {
 		//위험인자 : 흡연, 고혈압(수축기>=140 OR 이완기>=90), HDL-C(<40mg/dL), HDL-C(>=60mg/dL), 연령(남>=45, 여>=55), 관상동맥질환 조기발병 가족력
@@ -384,11 +503,11 @@ func CalculateEstimation(data *subject.Data) (subject.Estimation, error) {
 		}
 		if count >= 2 {
 			//위험인자>=2 (LDL-C target <130mg/dl)
-			Estimation.DangerousGroup = "middle-low"
+			Estimation.DangerousGroup = "danger2"
 			Estimation.TargetLDL = 130
 		} else {
 			//위험인자<=1 (LDL-C target <160mg/dl)
-			Estimation.DangerousGroup = "low"
+			Estimation.DangerousGroup = "danger1"
 			Estimation.TargetLDL = 160
 		}
 	}

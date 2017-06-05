@@ -5,6 +5,7 @@ import (
 )
 
 var (
-	ErrExistSubjectId  = errors.New("exist subject_id")
-	ErrNotExistSubject = errors.New("not exist subject")
+	ErrExistSubjectId      = errors.New("exist subject_id")
+	ErrNotExistSubject     = errors.New("not exist subject")
+	ErrNotExistSubjectData = errors.New("not exist subject data")
 )

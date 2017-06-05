@@ -21,6 +21,11 @@ type Estimation struct {
 	TargetLDL      float64 `json:"target_ldl"`
 }
 
+type Prescription struct {
+	Statins []string `json:"statins"`
+	Levels  []string `json:"levels"`
+}
+
 type Data struct {
 	Demography     Demography     `json:"demography"`
 	BloodPressure  BloodPressure  `json:"blood_pressure"`
@@ -30,6 +35,8 @@ type Data struct {
 	MedicalHistory MedicalHistory `json:"medical_history"`
 	FamilyHistory  FamilyHistory  `json:"family_history"`
 	Estimation     Estimation     `json:"estimation"`
+	Prescription   Prescription   `json:"prescription"`
+	TCreate        time.Time      `json:"t_create"`
 }
 
 type Demography struct {
@@ -118,7 +125,7 @@ func (st *Store) GetBySubjectId(SubjectId string, OwnerId string) (*Subject, err
 		store.ListOption{
 			WhereOption: store.WhereOption{
 				IndexBy:       "owner_id",
-				IndexByValues: []interface{}{SubjectId},
+				IndexByValues: []interface{}{OwnerId},
 				FieldBy:       "subject_id",
 				FieldByValues: []interface{}{SubjectId},
 			},
@@ -190,6 +197,20 @@ func (st *Store) AppendData(id string, Data *Data) error {
 	}
 
 	item.Datas = append(item.Datas, Data)
+	return st.Store.Update(id, &item)
+}
+
+func (st *Store) UpdateLastData(id string, Data *Data) error {
+	var item Subject
+	err := st.Get(id, &item)
+	if err != nil {
+		return err
+	}
+
+	if len(item.Datas) == 0 {
+		return ErrNotExistSubjectData
+	}
+	item.Datas[len(item.Datas)-1] = Data
 	return st.Store.Update(id, &item)
 }
 

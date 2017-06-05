@@ -1,403 +1,525 @@
 <% template "top.html" . %>
+<% template "sidebar.html" . %>
 
-<div id="container" style="margin-left:0px;" class="clearfix" v-root-container>
+<div id="container" class="clearfix" v-root-container>
 	<% template "header.html" . %>
 	<div class="content-wrapper clearfix">
-		<div class="content clearfix">
-			<div class="col-sm-4">
-				<section class="box">
-					<h3 class="title">전체 이상반응</h3>
-					<div class="content">
-						<canvas id="chart-area" style="width:100%; height:230px;"/>
-					</div>
-				</section>
-			</div>
-			<div class="col-sm-4">
-				<section class="box">
-					<h3 class="title">군별 이상반응</h3>
-					<div class="content">
-						<canvas id="chart-area2" style="width:100%; height:230px;"/>
-					</div>
-				</section>
-			</div>
-			<div class="col-sm-4">
-				<compliance>
-					<section class="box">
-						<h3 class="title">의무기록 전체 순응도</h3>
-						<div class="content">
-							<table class="table-default table-pagination">
-								<thead>
-									<th>일</th>
-									<th>국소</th>
-									<th>전신</th>
-									<th>생체</th>
-									<th>순응도</th>
-								</thead>
-								<tbody>
-									<tr v-for="item in constants.compliances">
-										<td v-if="item.day == '1'">접종일</td>
-										<td v-else>접종후 {{parseInt(item.day-1)}}일</td>
-										<td>{{item.local}}%</td>
-										<td>{{item.sysmetic}}%</td>
-										<td>{{item.vital}}%</td>
-										<td>{{item.total}}%</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-					</section>
-					<script type="vue">
-					data: function() {
-						var obj = {
-							constants: {
-								compliances: Store.get("page-initial").compliances,
-							}
-						};
-						return obj;
-					},
-					methods: {
-					}
-					</script>
-				</compliance>
-			</div>
-		</div>
-		<div class="content clearfix">
-			<div class="col-sm-8">
-				<section class="box">
-					<h3 class="title">전체 피험자 Enroll 그래프</h3>
-					<div class="content">
-						<canvas id="bar-chart" style="width:100%; height:230px;"/>
-					</div>
-				</section>
-			</div>
-			<div class="col-sm-4">
-				<reservation>
-					<section class="box">
-						<h3 class="title">
-							예약
+		<main-content>
+			<div class="content clearfix" id="main-content">
+				<div class="col-xs-12">
+					<section class="box box-height-sm box-subject-info">
+						<h3 class="title">대상자 정보
+							<div class="btn-grp right">
+								<span class="btn btn-sm btn-aqua" v-on:click="openModal(true)" v-if="selected.follow == 'initial'">작성</span>
+								<span class="btn btn-sm btn-gray" v-on:click="openModal(false)" v-if="selected.follow == 'followup'">수정</span>
+								<span class="btn btn-sm btn-dark" v-on:click="switchContent" v-if="selected != ''">처방</span>
+							</div>
 						</h3>
-						<div class="content">
-							<table class="table-default table-height-full">
-								<thead>
-									<th>대상군</th>
-									<th>예약 인원</th>
-								</thead>
-								<tbody>
+						<div v-if="selected == ''">대상자를 선택해주세요</div>
+						<div v-else>
+							<div class="content clearfix content-subject-info">
+								<table class="table-default table-subject-info">
+									<colgroup>
+										<col width="10%">
+										<col width="10%">
+										<col width="10%">
+										<col width="10%">
+										<col width="10%">
+										<col width="10%">
+										<col width="10%">
+										<col width="10%">
+										<col width="10%">
+										<col width="10%">
+									</colgroup>
 									<tr>
-										<td>전체</td>
-										<td>{{constants.reservations["total"]}}명</td>
+										<th>등록번호</th>
+										<td>{{selected.subject_id}}</td>
+										<th>수축혈압</th>
+										<td>{{selected.data.blood_pressure.systolic}}</td>
+										<th>스타틴 첫 처방 약물코드</th>
+										<td>{{selected.data.statin_first.code}}</td>
+										<th>최근 처방 일수</th>
+										<td>{{selected.data.statin_last.period}}</td>
+										<th>관상동맥질환</th>
+										<td>{{constants.bool_hash[selected.data.family_history.coronary_artery]}}</td>
 									</tr>
-									<tr v-for="arm in constants.arms">
-										<td>{{arm}}</td>
-										<td>{{constants.reservations[arm]}}명</td>
+									<tr>
+										<th>생년월일</th>
+										<td>{{selected.data.demography.birth_date}}</td>
+										<th>이완혈압</th>
+										<td>{{selected.data.blood_pressure.diastolic}}</td>
+										<th>스타틴 처음 처방일</th>
+										<td>{{selected.data.statin_first.date}}</td>
+										<th>일과성 뇌졸중 발작</th>
+										<td>{{constants.bool_hash[selected.data.medical_history.transient_stroke]}}</td>
+										<th>허혈성 뇌졸중</th>
+										<td>{{constants.bool_hash[selected.data.medical_history.ischemic_stroke]}}</td>
 									</tr>
-								</tbody>
-							</table>
-						</div>
-					</section>
-					<script type="vue">
-					data: function() {
-						var obj = {
-							constants: {
-								arms: ["실험군", "대조군", "위약군"],
-								reservations: Store.get("page-initial").reservations
-							}
-						};
-						return obj;
-					},
-					methods: {
-					}
-					</script>
-				</reservation>
-			</div>
-		</div>
-		<div class="content clearfix">
-			<div class="col-sm-12">
-				<notices>
-					<section class="box">
-						<h3 class="title">공지사항</h3>
-						<div class="content notice clearfix">
-							<div class="col-xs-7">
-								<textarea v-model="input.content"></textarea>
-								<div class="btn-grp">
-									<button type="button" class="btn btn-sm btn-aqua" v-on:click="saveNotice">공지사항 내용 등록</button>
-									<div class="right">
-									<button type="button" class="btn btn-sm btn-dark" v-on:click="sendNotice">전송</button>
+									<tr>
+										<th>나이</th>
+										<td>{{selected.data.demography.age}}</td>
+										<th>HDL 수치</th>
+										<td>{{selected.data.blood_test.hdl}}</td>
+										<th>첫 처방 일수</th>
+										<td>{{selected.data.statin_first.period}}</td>
+										<th>말초혈관질환</th>
+										<td>{{constants.bool_hash[selected.data.medical_history.peripheral_vascular]}}</td>
+										<th>고혈압 이력 유무</th>
+										<td>{{constants.bool_hash[selected.data.medical_history.high_blood_pressure]}}</td>
+									</tr>
+									<tr>
+										<th>성별</th>
+										<td>{{constants.sex_hash[selected.data.demography.sex]}}</td>
+										<th>T-cholesterol 수치</th>
+										<td>{{selected.data.blood_test.total_cholesterol}}</td>
+										<th>스타틴 최근 처방과</th>
+										<td>{{selected.data.statin_last.dept}}</td>
+										<th>경동맥 질환</th>
+										<td>{{constants.bool_hash[selected.data.medical_history.carotid]}}</td>
+										<th>흡연</th>
+										<td>{{constants.bool_hash[selected.data.medical_history.smoking]}}</td>
+									</tr>
+									<tr>
+										<th>키</th>
+										<td>{{selected.data.demography.height}}</td>
+										<th>공복 시 혈당</th>
+										<td>{{selected.data.blood_test.glucose}}</td>
+										<th>스타틴 최근 처방 약물코드</th>
+										<td>{{selected.data.statin_last.code}}</td>
+										<th>복부동맥류</th>
+										<td>{{constants.bool_hash[selected.data.medical_history.abdominal_aneurysm]}}</td>
+										<td></td>
+										<td></td>
+									</tr>
+									<tr>
+										<th>몸무게</th>
+										<td>{{selected.data.demography.weight}}</td>
+										<th>스타틴 첫 처방과</th>
+										<td>{{selected.data.statin_first.dept}}</td>
+										<th>스타틴 가장 최근 처방일</th>
+										<td>{{selected.data.statin_last.date}}</td>
+										<th>당뇨병</th>
+										<td>{{constants.bool_hash[selected.data.medical_history.diabetes]}}</td>
+										<td></td>
+										<td></td>
+									</tr>
+								</table>
+							</div>
+							<div class="content clearfix content-prescription">
+								<div class="prescription">
+									<div class="col-sm-3">
+										<h1 v-bind:class="{red : (selected.data.estimation.dangerous_group == 'extream'), yellow : (selected.data.estimation.dangerous_group == 'high'), skyblue : (selected.data.estimation.dangerous_group == 'danger2'), aqua : (selected.data.estimation.dangerous_group == 'danger1')}">{{selected.follow=='initial' ? '-' : constants.dangerous_hash[selected.data.estimation.dangerous_group]}}</h1>
+										<p class="prescription-title">대상자 상태</p>
+									</div>
+									<div class="col-sm-3">
+										<h1>{{selected.data.estimation.target_ldl}}mg/dL</h1>
+										<p class="prescription-title">LDL-C 목표</p>
+									</div>
+									<div class="col-sm-3">
+										<ul class="prescription-statin-list">
+											<li v-for="statin in selected.data.prescription.statins"><h3>{{statin}}</h3></li>
+										</ul>
+										<p class="prescription-title">처방하신 스타틴 종류</p>
+									</div>
+									<div class="col-sm-3">
+										<ul class="prescription-statin-list">
+											<li v-for="level in selected.data.prescription.levels"><h3>{{level}}</h3></li>
+										</ul>
+										<p class="prescription-title">스타틴 강도</p>
 									</div>
 								</div>
 							</div>
-							<div class="col-xs-1">
-								<div class="icon-left">
-									<i class="fa fa-caret-left"></i>
-								</div>
-							</div>
-							<div class="col-xs-4">
-								<table class="table-default table-pagination">
-									<thead>
-										<tr>
-											<th>자주 사용하는 공지사항</th>
-											<th>삭제</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr v-for="item in constants.notices">
-											<td v-on:click="readNotice(item)" style="cursor:pointer;">{{item.content}}</td>
-											<td><button type="button" class="btn btn-sm btn-danger" v-on:click="deleteNotice(item)">삭제</button></td>
-										</tr>
-									</tbody>
-									<tfoot>
-										<tr>
-											<td colspan='2'>
-												<div class="pagination">
-													<button type="button" class="btn btn-sm btn-prev" v-on:click="loadPage(start_page-1)">&lt;</button>
-													<button type="button" class="btn btn-sm" v-for="page in pages" v-bind:class="{active: (page==current_page)}" v-on:click="loadPage(page)">{{page}}</button>
-													<button type="button" class="btn btn-sm btn-next" v-on:click="loadPage(end_page+1)">&gt;</button>
-												</div>
-											</td>
-										</tr>
-									</tfoot>
-								</table>
+						</div>
+					</section>
+				</div>
+				<div class="col-xs-12">
+					<section class="box box-height-sm">
+						<h3 class="title">경제성 그래프</h3>
+						<div class="content clearfix">
+							<div class="graph-wrapper col-lg-3 col-md-6 col-sm-12"><canvas v-show="selected != ''" id="canvas" height="230"></canvas></div>
+							<div class="graph-wrapper col-lg-3 col-md-6 col-sm-12"><canvas v-show="selected != ''" id="canvas2" height="230"></canvas></div>
+							<div class="graph-wrapper col-lg-3 col-md-6 col-sm-12"><canvas v-show="selected != ''" id="canvas3" height="230"></canvas></div>
+							<div class="graph-wrapper col-lg-3 col-md-6 col-sm-12"><canvas v-show="selected != ''" id="canvas4" height="230"></canvas></div>
+						</div>
+					</section>
+				</div>
+				<div class="col-sm-12">
+					<section class="box box-height-sm">
+						<h3 class="title">대상자 히스토리</h3>
+						<div class="content">
+							<table class="table-default table-pagination" v-if="selected.history != ''">
+								<colgroup>
+									<col width="auto"/>
+									<col width="auto"/>
+									<col width="auto"/>
+									<col width="auto"/>
+									<col width="auto"/>
+									<col width="auto"/>
+									<col width="auto"/>
+									<col width="auto"/>
+									<col width="auto"/>
+								</colgroup>
+								<thead>
+									<th>일자</th>
+									<th>몸무게(kg)</th>
+									<th>키(cm)</th>
+									<th>혈압(mmHg)</th>
+									<th>HDL(mmHg)</th>
+									<th>공복혈당(mmHg)</th>
+									<th>대상자 상태</th>
+									<th>LDL-C 목표</th>
+									<th>처방하신 스타틴 종류</th>
+									<th>처방 강도</th>
+								</thead>
+								<tbody>
+									<tr v-for="item in selected.history">
+										<td>{{selected.t_create}}</td>
+										<td>{{item.weight}}</td>
+										<td>{{item.height}}</td>
+										<td>{{item.systolic}} / {{item.diastolic}}</td>
+										<td>{{item.hdl}}</td>
+										<td>{{item.glucose}}</td>
+										<td>{{constants.dangerous_hash[item.dangerous_group]}}</td>
+										<td>{{item.target_ldl}}</td>
+										<td>{{item.statins}}</td>
+										<td>{{item.levels}}</td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<td colspan='9'>
+											<div class="pagination">
+												<button type="button" class="btn btn-sm btn-prev" v-on:click="loadPage(start_page-1)">&lt;</button>
+												<button type="button" class="btn btn-sm" v-for="page in pages" v-bind:class="{active: (page==current_page)}" v-on:click="loadPage(page)">{{page}}</button>
+												<button type="button" class="btn btn-sm btn-next" v-on:click="loadPage(end_page+1)">&gt;</button>
+											</div>
+										</td>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</section>
+				</div>
+			</div>
+			<script type="vue">
+				data : function(){
+					var obj = {
+						constants :{
+							dangerous_hash : {
+								'extream' : '초고위험군',
+								'high' : '고위험군',
+								'danger2' : '위험인자2',
+								'danger1' : '위험인자1'
+							},
+							sex_hash : {
+								'M' : '남성',
+								'F' : '여성'
+							},
+							bool_hash : {
+								true : '유',
+								false : '무',
+								'1' : '유',
+								'0' : '무'
+							}
+						},
+						pages :{
+						},
+						selected: ''
+					}
+					Callback.add("update-subject-data", this.updateSubjectData);
+					return obj;
+				},
+				methods :{
+					openModal : function(isInitial){
+						Callback.call("select_subject", this.selected);
+						$("#add-info").modal('show');
+					},
+					switchContent : function(){
+						Callback.call("select_subject", this.selected);
+						$("#main-content").hide();
+						$("#prescription-content").show();
+					},
+					updateSubjectData : function(item){
+						if(item == null){
+							this.selected = '';
+						}else if(item.data == null){
+							this.selected = {subject_id : item.subject_id, data : {
+								demography : {
+									birth_date : '',
+									age : '',
+									sex : '',
+									height : '',
+									weight: ''
+								},
+								blood_pressure : {
+									date : '',
+									systolic : '',
+									diastolic : '',
+								},
+								statin_first : {
+									dept :'',
+									code : '',
+									date : '',
+									period : ''
+								},
+								statin_last : {
+									dept :'',
+									code : '',
+									date : '',
+									period : ''
+								},
+								blood_test : {
+									date : '',
+									hdl : '',
+									total_cholesterol : '',
+									glucose : ''
+								},
+								medical_history : {
+									transient_stroke: '',
+									peripheral_vascular : '',
+									carotid : '',
+									abdominal_aneurysm : '',
+									diabetes : '',
+									ischemic_stroke :'',
+									high_blood_pressure : '',
+									smoking: ''
+								},
+								family_history : {
+									coronary_artery :''
+								},
+								estimation : {
+									dangerous_group : '',
+									target_ldl : ''
+								},
+								prescription : {
+									statins : '',
+									levels : ''
+								}
+							}, t_create :item.t_create, follow : 'initial'}
+						}else{
+							this.selected = item;
+							this.selected.follow = 'followup'
+						}
+					},
+					loadPgae : function(){
+
+					}
+				}
+			</script>
+		</main-content>
+		<prescription-content>
+			<div class="content clearfix" id="prescription-content" style="display:none">
+				<div class="col-xs-12">
+					<section class="box box-height-sm box-status-info" v-bind:class="{red : (selected.data.estimation.dangerous_group == 'extream'), yellow : (selected.data.estimation.dangerous_group == 'high'), skyblue : (selected.data.estimation.dangerous_group == 'danger2'), aqua : (selected.data.estimation.dangerous_group == 'danger1')}">
+						<h1>대상자는 <span>{{selected.follow=='initial' ? '-' : constants.dangerous_hash[selected.data.estimation.dangerous_group]}}</span> 입니다.</h1>
+						<p class="">대상자의 공복혈당은 <span class="point">{{selected.data.blood_test.glucose}}mg/dL</span> 입니다.</p>
+					</section>
+				</div>
+				<div class="col-xs-6">
+					<section class="box box-height-sm">
+						<h3 class="title">강도 <span class="sub-title">스타틴 처방 강도를 선택해 주세요</span></h3>
+						<div class="content">
+							<div class="btn-grp btn-strong-grp">
+								<button class="btn btn-gray" type="button" v-for="item in levels" v-bind:value="item.val" v-bind:class="{'active' : item.selected}" v-on:click="selectBtn(item)">{{item.name}}</button>
 							</div>
 						</div>
 					</section>
-					<script type="vue">
-					data: function() {
-						var obj = {
-							constants: {
-								notices: Store.get("page-initial").notices,
-								count: Store.get("page-initial").notice_count,
+				</div>
+				<div class="col-xs-6">
+					<section class="box box-height-sm">
+						<h3 class="title">스타틴 <span class="sub-title">선호하는 스타틴의 종류를 선택해 주세요.</span></h3>
+						<div class="content clearfix">
+							<div class="btn-grp btn-statin-grp">
+								<button class="btn btn-gray" type="button" v-for="item in statins" v-bind:value="item.name" v-bind:class="{'active' : item.selected}" v-on:click="selectBtn(item)">{{item.name}}</button>
+							</div>
+						</div>
+					</section>
+				</div>
+				<div class="col-sm-12">
+					<section class="box box-height-md">
+						<div class="content clearfix">
+							<div class="col-xs-3">
+								<ul class="nav-list">
+									<li class="nav-item"><a href="#" class="active">비교 테이블</a></li>
+									<li class="nav-item"><a href="#">스타틴 용량표</a></li>
+									<li class="nav-item"><a href="#">스타틴 경제성 분석</a></li>
+								</ul>
+							</div>
+							<div class="col-xs-9">
+								<div class="content"> 
+									<h3 class="title">스타틴 사용시 예상 GRF 변화표</h3>
+									<table class="table-default">
+										<thead>
+											<th></th>
+											<th>3달 뒤 예상 GFR 변화</th>
+											<th>4년 뒤 예상 GFR 변화</th>
+											<th>From Prediabetes to DM</th>
+										</thead>
+										<tbody>
+											<td>고강도 스타틴</td>
+											<td>26+2.2</td>
+											<td>-6.5+2.5</td>
+											<td>1.25</td>
+										</tbody>
+										<tfoot>
+											<tr>
+												<td colspan='4' class="align-left">
+													<p><strong>* p &lt; 0.05 versus baseline</strong></p>
+													<p><strong>** p &lt; 0.001 versus baseline</strong></p>
+												</td>
+											</tr>
+										</tfoot>
+									</table>
+								</div>
+								<div class="content clearfix"> 
+									<h3 class="title">스타틴 용량표</h3>
+									<table class="table-default">
+										<thead>
+											<th></th>
+											<th>3달 뒤 예상 GFR 변화</th>
+											<th>4년 뒤 예상 GFR 변화</th>
+											<th>From Prediabetes to DM</th>
+										</thead>
+										<tbody>
+											<td>고강도 스타틴</td>
+											<td>26+2.2</td>
+											<td>-6.5+2.5</td>
+											<td>1.25</td>
+										</tbody>
+										<tfoot>
+											<tr>
+												<td colspan='4' class="align-left">
+													<p><strong>* p &lt; 0.05 versus baseline</strong></p>
+													<p><strong>** p &lt; 0.001 versus baseline</strong></p>
+												</td>
+											</tr>
+										</tfoot>
+									</table>
+								</div>
+								<div class="content clearfix"> 
+									<h3 class="title">고강도 스타틴 사용시 경제성 분석 그래프</h3>
+									<div class="col-xs-6 graph-wrapper">graph</div>
+									<div class="col-xs-6 graph-wrapper">graph</div>
+									<div class="col-xs-6 graph-wrapper">graph</div>
+									<div class="col-xs-6 graph-wrapper">graph</div>
+								</div>
+							</div>
+						</div>
+					</section>
+				</div>
+				<div class="col-xs-12 align-center btn-presciption-wrapper">
+					<button type="button" class="btn btn-dark btn-presciption" v-on:click="doPrescription()">처 방</button>
+				</div>
+			</div>
+			<script type="vue">
+				data : function(){
+					var obj = {
+						constants : {
+							dangerous_hash : {
+								'extream' : '초고위험군',
+								'high' : '고위험군',
+								'danger2' : '위험인자2',
+								'danger1' : '위험인자1'
 							},
-							input: {
-								content: ""
-							},
-							offset: 0,
-							limit: 15,
-							current_page: 1
-						};
-						return obj;
-					},
-					computed: {
-						max_page: function() {
-							if(this.constants.count == 0) {
-								return 1;
-							} else {
-								return Math.floor((this.constants.count - 1)/this.limit) + 1;
+						},
+						levels : [{
+								val : 'low',
+								name : '저강도',
+								selected : false
+						},{
+								val : 'middle-low',
+								name : '중저강도',
+								selected : false
+						},{
+								val : 'middle-high',
+								name : '중고강도',
+								selected : false
+						},{
+								val : 'high',
+								name : '고강도',
+								selected : false
+						}],
+						statins : [{
+							name : 'Atorvastatin',
+							selected : false
+						},{
+							name : 'Pitavastatin',
+							selected : false
+						},{
+							name : 'Simvastatin',
+							selected : false
+						},{
+							name : 'Pravastatin',
+							selected : false
+						},{
+							name : 'Fluvastatin',
+							selected : false
+						},{
+							name : 'Rosuvastatin',
+							selected : false
+						}],
+						selected : {
+							data : {
+								estimation : {
+									dangerous_group:''
+								},
+								blood_test:{
+									glucose :''
+								}
 							}
-						},
-						start_page: function() {
-							return Math.floor((this.current_page - 1)/5)*5 + 1;
-						},
-						end_page: function() {
-							return Math.min(this.max_page, Math.floor((this.current_page - 1)/5)*5 + 5);
-						},
-						pages: function() {
-							var pages = [];
-							for(var i=this.start_page; i<=this.end_page; i++) {
-								pages.push(i);
-							}
-							return pages;
+						}
+					}
+					Callback.add("select_subject", this.select_subject);
+					return obj;
+				},
+				methods : {
+					selectBtn : function(item){
+						if(!item.selected){
+							item.selected = true
+						}else{
+							item.selected = false
 						}
 					},
-					methods: {
-						readNotice: function(item) {
-							this.input.content = item.content;
-						},
-						loadPage: function(page) {
-							if(page < 1) {
-								page = 1;
-							} else if(page > this.max_page) {
-								page = this.max_page;
+					doPrescription :function(){
+						var levels = [];
+						var statins = [];
+						for (var i in this.levels){
+							if(this.levels[i]['selected'] == true){
+								levels.push(this.levels[i]['val']);
 							}
-							this.current_page = page;
-							this.offset = this.limit*(page - 1);
-							this.$http.get("/api/notices?offset=" + this.offset + "&limit=" + this.limit).then(function(res) {
-								if(res.body.error != null) {
-									alert(res.body.error);
-								} else {
-									this.constants.notices = res.body.result.notices;
-									this.constants.count = res.body.result.notice_count;
-								}
-							}, function(err) {
-								console.error(err.body);
-							});
-						},
-						saveNotice: function() {
-							if(this.input.content.length == 0) {
-								alert("공지사항 내용을 입력해주세요");
-								return;
+						}
+						for (var i in this.statins){
+							if(this.statins[i]['selected'] == true){
+								statins.push(this.statins[i]['name']);
 							}
-							this.$http.post("/api/notices", {
-								content: this.input.content
-							}).then(function(res) {
-								if(res.body.error != null) {
-									alert(res.body.error);
-								} else {
-									alert("등록되었습니다.");
-									this.loadPage(this.current_page);
-								}
-							}, function(err) {
-								console.error(err.body);
-							});
-						},
-						sendNotice: function() {
-							if(this.input.content.length == 0) {
-								alert("공지사항 내용을 입력해주세요");
-								return;
+						}
+						console.log(levels, statins);
+						this.$http.post("/api/subjects/"+this.selected.subject_id+"/prescription", {'statins' : statins, 'levels' : levels}).then(function(res) {
+							if(res.body.error != null) {
+								alert(res.body.error);
+							} else {
+								console.log(res.body.result);
+								Callback.call("update-subject-data", this.selected);
+								$("#prescription-content").hide();
+								$("#main-content").show();
 							}
-							this.$http.post("/api/notice_push", {
-								content: this.input.content
-							}).then(function(res) {
-								if(res.body.error != null) {
-									alert(res.body.error);
-								} else {
-									alert("전송되었습니다,");
-								}
-							}, function(err) {
-								console.error(err.body);
-							});
-						},
-						deleteNotice: function(item) {
-							if(window.confirm("정말 삭제하시겠습니까?")) {
-								this.$http.delete("/api/notices/" + item.id).then(function(res) {
-									if(res.body.error != null) {
-										alert(res.body.error);
-									} else {
-										alert("삭제되었습니다,");
-										this.loadPage(this.current_page);
-									}
-								}, function(err) {
-									console.error(err.body);
-								});
-							}
-						},
+						}, function(err) {
+							console.error(err.body);
+						});
+					},
+					select_subject : function(item){
+						this.selected = item;
 					}
-					</script>
-				</notices>
-			</div>
-		</div>
+				}
+			</script>
+		</prescription-content>
 	</div>
 </div>
-
-<script type="text/javascript">
-var randomScalingFactor = function() {
-        return Math.round(Math.random() * 100);
-    };
-    var config = {
-        type: 'doughnut',
-        data: {
-			labels: ["정상", "이상반응"],
-            datasets: [{
-                data: [
-                    Store.get("page-initial").total_ae["정상"],
-                    Store.get("page-initial").total_ae["이상반응"]
-                ],
-                backgroundColor: [
-                    window.chartColors.yellow,
-                    window.chartColors.blue,
-                ],
-                label: 'Dataset 1'
-            }],
-        },
-        options: {
-            responsive: true,
-			maintainAspectRatio: false,
-            legend: {
-                position: 'top',
-            },
-            title: {
-                display: false,
-                text: ''
-            },
-            animation: {
-                animateScale: true,
-                animateRotate: true
-            },
-            cutoutPercentage: 55
-        }
-    };
-    var config2 = {
-        type: 'doughnut',
-        data: {
-			labels: ["실험군", "대조군", "위약군"],
-            datasets: [{
-                data: [
-                    Store.get("page-initial").arm_ae["실험군"],
-                    Store.get("page-initial").arm_ae["대조군"],
-					Store.get("page-initial").arm_ae["위약군"],
-                ],
-                backgroundColor: [
-                    window.chartColors.yellow,
-                    window.chartColors.blue,
-					window.chartColors.green,
-                ],
-                label: 'Dataset 1'
-            }],
-        },
-        options: {
-            responsive: true,
-			maintainAspectRatio: false,
-            legend: {
-                position: 'top',
-            },
-            title: {
-                display: false,
-                text: ''
-            },
-            animation: {
-                animateScale: true,
-                animateRotate: true
-            },
-            cutoutPercentage: 55
-        }
-    };
-    var config3 = {
-        type: 'bar',
-        data: {
-			labels: ["전체", "이상반응", "이행률 저조", "관리필요", "오늘 예약", "중도 탈락"],
-			datasets: [
-				{
-					backgroundColor: [
-						'rgba(255, 99, 132, 0.2)',
-						'rgba(54, 162, 235, 0.2)',
-						'rgba(255, 206, 86, 0.2)',
-						'rgba(75, 192, 192, 0.2)',
-						'rgba(153, 102, 255, 0.2)',
-						'rgba(255, 159, 64, 0.2)'
-					],
-					borderColor: [
-						'rgba(255,99,132,1)',
-						'rgba(54, 162, 235, 1)',
-						'rgba(255, 206, 86, 1)',
-						'rgba(75, 192, 192, 1)',
-						'rgba(153, 102, 255, 1)',
-						'rgba(255, 159, 64, 1)'
-					],
-					borderWidth: 1,
-					data: [65, 59, 80, 81, 56, 55, 40],
-				}
-			]
-		},
-        options: {
-            responsive: true,
-			maintainAspectRatio: false,
-            legend: {
-                display : false
-            },
-            animation: {
-                animateScale: true,
-                animateRotate: true
-            }
-        }
-    };
-    window.onload = function() {
-        var ctx = document.getElementById("chart-area").getContext("2d");
-        var ctx2 = document.getElementById("chart-area2").getContext("2d");
-        var ctx3 = document.getElementById("bar-chart").getContext("2d");
-        window.myDoughnut = new Chart(ctx, config);
-        window.myDoughnut = new Chart(ctx2, config2);
-        window.myDoughnut = new Chart(ctx3, config3);
-    };
-
-    </script>
+<div class="modal fade" id="add-info" v-root-container>
+	<% template "add_info.html" . %>
+	<% template "modify_info.html" . %>
+	
+	
+</div>
 
 <% template "bottom.html" . %>
