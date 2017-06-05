@@ -28,7 +28,6 @@ func main() {
 	route_api_subjects(g)
 
 	//Web Pages
-	web := util.NewWebServer(e, "./webfiles")
 	StaticFiles := make(map[string]*util.StaticFilesFile)
 	for k, v := range staticFiles {
 		StaticFiles[k] = &util.StaticFilesFile{
@@ -39,7 +38,7 @@ func main() {
 			Hash:  v.hash,
 		}
 	}
-	util.SetStaticFiles(StaticFiles)
+	web := util.NewWebServer(e, "./webfiles", StaticFiles)
 
 	e.Renderer = web
 	web.SetupStatic(e, "/public", "./webfiles/public")

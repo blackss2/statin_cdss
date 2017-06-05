@@ -31,25 +31,21 @@ type StaticFilesFile struct {
 	Hash string
 }
 
-var staticFiles = make(map[string]*StaticFilesFile)
-
-func SetStaticFiles(sf map[string]*StaticFilesFile) {
-	staticFiles = sf
-}
-
 type WebServer struct {
 	path            string
 	hasWatch        bool
 	templates       *template.Template
 	echo            *echo.Echo
+	staticFiles     map[string]*StaticFilesFile
 	isRequireReload bool
 	sync.Mutex
 }
 
-func NewWebServer(echo *echo.Echo, path string) *WebServer {
+func NewWebServer(echo *echo.Echo, path string, sf map[string]*StaticFilesFile) *WebServer {
 	web := &WebServer{
-		echo: echo,
-		path: path,
+		echo:        echo,
+		path:        path,
+		staticFiles: sf,
 	}
 
 	if fi, err := os.Stat(path); err == nil && fi.IsDir() {
@@ -109,7 +105,7 @@ func (web *WebServer) UpdateRender() error {
 			return nil
 		})
 	} else {
-		for path, v := range staticFiles {
+		for path, v := range web.staticFiles {
 			if strings.HasPrefix(filepath.Ext(path), ".htm") {
 				var data []byte
 				if v.Size == 0 {
@@ -152,7 +148,7 @@ func (web *WebServer) SetupStatic(e *echo.Echo, prefix string, root string) {
 				}
 				data = b
 			} else {
-				if file, has := staticFiles[upath]; !has {
+				if file, has := web.staticFiles[upath]; !has {
 					return c.NoContent(http.StatusNotFound)
 				} else {
 					reader, err := gzip.NewReader(strings.NewReader(file.Data))
@@ -198,7 +194,7 @@ func (web *WebServer) SetupStatic(e *echo.Echo, prefix string, root string) {
 				fpath := path.Join(root, fname)
 				return c.File(fpath)
 			} else {
-				if file, has := staticFiles[upath]; !has {
+				if file, has := web.staticFiles[upath]; !has {
 					return c.NoContent(http.StatusNotFound)
 				} else {
 					rw := c.Response().Writer
