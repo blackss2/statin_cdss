@@ -423,6 +423,7 @@ type DAO_History struct {
 	TargetLDL         float64  `json:"target_ldl"`
 	Statins           []string `json:"statins"`
 	Levels            []string `json:"levels"`
+	TCreate           string   `json:"t_create"`
 }
 
 func Select_Subject(subject *subject.Subject) (*DAO_Select_Subject, error) {
@@ -435,7 +436,8 @@ func Select_Subject(subject *subject.Subject) (*DAO_Select_Subject, error) {
 	if len(subject.Datas) > 0 {
 		dao.Data = subject.Datas[len(subject.Datas)-1]
 	}
-	for _, v := range subject.Datas {
+	for i, _ := range subject.Datas {
+		v := subject.Datas[len(subject.Datas)-i-1]
 		h := &DAO_History{
 			Height:            v.Demography.Height,
 			Weight:            v.Demography.Weight,
@@ -450,6 +452,7 @@ func Select_Subject(subject *subject.Subject) (*DAO_Select_Subject, error) {
 			TargetLDL:         v.Estimation.TargetLDL,
 			Statins:           v.Prescription.Statins,
 			Levels:            v.Prescription.Levels,
+			TCreate:           convert.String(v.TCreate)[:10],
 		}
 		dao.History = append(dao.History, h)
 	}

@@ -37,12 +37,20 @@
 							</td>
 						</tr>
 						<tr>
-							<th>수축혈압</th>
-							<td>
-								<div class="col-xs-9">
-									<input type="text" class="col-xs-12" v-model="selected.data.blood_pressure.systolic"/>
+							<th>혈압 측정일자</th>
+							<td class="birth">
+								<div class="col-xs-4">
+									<input type="text" class="col-xs-12" maxlength="4" v-model="date.blood_pressure.year"/>
 								</div>
-								<span class="col-xs-1">mg/dL</span>
+								<span class="col-xs-1">년</span>
+								<div class="col-xs-2">
+									<input type="text" class="col-xs-12" maxlength="2" v-model="date.blood_pressure.month"/>
+								</div>
+								<span class="col-xs-1">월</span>
+								<div class="col-xs-2">
+									<input type="text" class="col-xs-12" maxlength="2" v-model="date.blood_pressure.day"/>
+								</div>
+								<span class="col-xs-1">일</span>
 							</td>
 							<th>말초혈관질환</th>
 							<td>
@@ -57,10 +65,10 @@
 							</td>
 						</tr>
 						<tr>
-							<th>이완혈압</th>
+							<th>수축혈압</th>
 							<td>
 								<div class="col-xs-9">
-									<input type="text" class="col-xs-12" v-model="selected.data.blood_pressure.diastolic"/>
+									<input type="text" class="col-xs-12" v-model="selected.data.blood_pressure.systolic"/>
 								</div>
 								<span class="col-xs-1">mg/dL</span>
 							</td>
@@ -77,20 +85,12 @@
 							</td>
 						</tr>
 						<tr>
-							<th>혈압 측정일자</th>
-							<td class="birth">
-								<div class="col-xs-4">
-									<input type="text" class="col-xs-12" maxlength="4" v-model="date.blood_pressure.year"/>
+							<th>이완혈압</th>
+							<td>
+								<div class="col-xs-9">
+									<input type="text" class="col-xs-12" v-model="selected.data.blood_pressure.diastolic"/>
 								</div>
-								<span class="col-xs-1">년</span>
-								<div class="col-xs-2">
-									<input type="text" class="col-xs-12" maxlength="2" v-model="date.blood_pressure.month"/>
-								</div>
-								<span class="col-xs-1">월</span>
-								<div class="col-xs-2">
-									<input type="text" class="col-xs-12" maxlength="2" v-model="date.blood_pressure.day"/>
-								</div>
-								<span class="col-xs-1">일</span>
+								<span class="col-xs-1">mg/dL</span>
 							</td>
 							<th>복부동맥류</th>
 							<td>
@@ -277,7 +277,7 @@
 							alert(res.body.error);
 						} else {
 							console.log(res.body.result);
-							Callback.call("update-subject-data", this.selected);
+							Callback.call("load-subject-data");
 							$('[data-dismiss]').click();
 						}
 					}, function(err) {

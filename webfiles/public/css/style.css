@@ -414,7 +414,7 @@ body.breakpoint{
 				}
 				.prescription-statin-list{
 					list-style:none; padding:0;
-					margin-top:-25px;
+					/* margin-top:-25px; */
 					li{
 						display:inline-block;
 						h3{

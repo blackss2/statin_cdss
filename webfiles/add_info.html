@@ -497,7 +497,7 @@
 							if(res.body.error != null) {
 								alert(res.body.error);
 							} else {
-								Callback.call("update-subject-data", this.selected);
+								Callback.call("load-subject-data");
 								$('[data-dismiss]').click();
 							}
 						}, function(err) {
