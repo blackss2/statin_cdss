@@ -114,6 +114,7 @@
 							} else {
 								var labels = ["100-129", "130-159", "160-189", ">=190"];
 	        			var colorNames = Object.keys(window.chartColors);
+	        			this.showMainContent();
 	        			Callback.call("update-subject-data", res.body.result);
 
 								if(window.myLine != null) {
@@ -367,6 +368,10 @@
 						});
 					}
 				},
+				showMainContent : function(){
+					$("#prescription-content").hide();
+					$("#main-content").show();
+				},
 				updateSubjectList : function(list){
 					this.subjects = list;
 					if(list.length > 0){
@@ -509,14 +514,15 @@
 	$(function(){
 		// var container_height = $("#container").height();
 		// $("#sidebar").css("height", container_height);
-
-		var ul_height = $(".add-subject-wrapper").offset().top - $('.subject-list').offset().top;
-		$(".subject-list").height(ul_height);
-
-		$(window).resize(function(){
+		
 			var ul_height = $(".add-subject-wrapper").offset().top - $('.subject-list').offset().top;
 			$(".subject-list").height(ul_height);
-		}).resize();
+
+			$(window).resize(function(){
+				var ul_height = $(".add-subject-wrapper").offset().top - $('.subject-list').offset().top;
+				$(".subject-list").height(ul_height);
+			}).resize();
+		
 
 	})
 </script>

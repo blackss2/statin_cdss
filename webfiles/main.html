@@ -12,7 +12,7 @@
 							<div class="btn-grp right">
 								<span class="btn btn-sm btn-aqua" v-on:click="openModal(true)" v-if="selected.follow == 'initial'">작성</span>
 								<span class="btn btn-sm btn-gray" v-on:click="openModal(false)" v-if="selected.follow == 'followup'">수정</span>
-								<span class="btn btn-sm btn-dark" v-on:click="switchContent" v-if="selected != ''">처방</span>
+								<span class="btn btn-sm btn-dark" v-on:click="showPreContent" v-if="selected != ''">처방</span>
 							</div>
 						</h3>
 						<div v-if="selected == ''">대상자를 선택해주세요</div>
@@ -234,7 +234,7 @@
 						Callback.call("select_subject", this.selected);
 						$("#add-info").modal('show');
 					},
-					switchContent : function(){
+					showPreContent : function(){
 						Callback.call("select_subject", this.selected);
 						$("#main-content").hide();
 						$("#prescription-content").show();
@@ -308,7 +308,7 @@
 			</script>
 		</main-content>
 		<prescription-content>
-			<div class="content clearfix" id="prescription-content" style="display:none">
+			<div class="content clearfix" id="prescription-content" style="display:none" v-if="selected != ''">
 				<div class="col-xs-12">
 					<section class="box box-height-sm box-status-info" v-bind:class="{red : (selected.data.estimation.dangerous_group == 'extream'), yellow : (selected.data.estimation.dangerous_group == 'high'), skyblue : (selected.data.estimation.dangerous_group == 'danger2'), aqua : (selected.data.estimation.dangerous_group == 'danger1')}">
 						<h1>대상자는 <span>{{selected.follow=='initial' ? '-' : constants.dangerous_hash[selected.data.estimation.dangerous_group]}}</span> 입니다.</h1>
@@ -480,6 +480,10 @@
 							item.selected = false
 						}
 					},
+					showMainContent : function(){
+						$("#prescription-content").hide();
+						$("#main-content").show();
+					},
 					doPrescription :function(){
 						var levels = [];
 						var statins = [];
@@ -500,8 +504,7 @@
 							} else {
 								console.log(res.body.result);
 								Callback.call("update-subject-data", this.selected);
-								$("#prescription-content").hide();
-								$("#main-content").show();
+								this.showMainContent();
 							}
 						}, function(err) {
 							console.error(err.body);
