@@ -219,6 +219,24 @@
 					Callback.add("update-subject-data", this.updateSubjectData);
 					return obj;
 				},
+				computed: {
+					selected_levels: function() {
+						var hash = {};
+						for(var i=0; i<this.selected.data.prescription.levels.length; i++) {
+							var level = this.selected.data.prescription.levels[i];
+							hash[level] = true;
+						}
+						return hash;
+					},
+					selected_statins: function() {
+						var hash = {};
+						for(var i=0; i<this.selected.data.prescription.statins.length; i++) {
+							var statin = this.selected.data.prescription.statins[i];
+							hash[statin] = true;
+						}
+						return hash;
+					}
+				},
 				methods :{
 					openModal : function(isInitial){
 						Callback.call("select_subject", this.selected);
@@ -309,33 +327,42 @@
 							this.selected.follow = 'followup';
 
 							var labels = ["100-129", "130-159", "160-189", ">=190"];
-							window.main_chart1 = new Chart(document.getElementById("canvas").getContext("2d"), {
+							var datas = [];
+
+							datas = [];
+							if(this.selected_levels['high'] && this.selected_statins['Atorvastatin']) {
+								datas.push({
+									label : 'Atorvastatin',
+									backgroundColor: window.chartColors.red,
+									borderColor: window.chartColors.red,
+									data: [
+										9980,
+										35470,
+										10131,
+										9049
+									],
+									fill: false,
+								});
+							}
+							if(this.selected_levels['high'] && this.selected_statins['Rosuvastatin']) {
+								datas.push({
+									label : 'Rosuvastatin',
+									backgroundColor: window.chartColors.blue,
+									borderColor: window.chartColors.blue,
+									data: [
+										8150,
+										10224,
+										11436,
+										7126
+									],
+									fill: false,
+								});
+							}
+							window.pre_chart1 = new Chart(document.getElementById("canvas").getContext("2d"), {
 								type: 'line',
 								data: {
 									labels: labels,
-									datasets: [{
-										label : 'Atorvastatin',
-										backgroundColor: window.chartColors.red,
-										borderColor: window.chartColors.red,
-										data: [
-											9980,
-											35470,
-											10131,
-											9049
-										],
-										fill: false,
-									}, {
-										label : 'Rosuvastatin',
-										backgroundColor: window.chartColors.blue,
-										borderColor: window.chartColors.blue,
-										data: [
-											8150,
-											10224,
-											11436,
-											7126
-										],
-										fill: false,
-									}]
+									datasets: datas
 								},
 								options: {
 									animation: false,
@@ -362,33 +389,41 @@
 									}
 								}
 							});
-							window.main_chart2 = new Chart(document.getElementById("canvas2").getContext("2d"), {
+							
+							datas = [];
+							if(this.selected_levels['middle-high'] && this.selected_statins['Atorvastatin']) {
+								datas.push({
+									label : 'Atorvastatin',
+									backgroundColor: window.chartColors.red,
+									borderColor: window.chartColors.red,
+									data: [
+										10294,
+										9834,
+										6920,
+										6114
+									],
+									fill: false,
+								});
+							}
+							if(this.selected_levels['middle-high'] && this.selected_statins['Rosuvastatin']) {
+								datas.push({
+									label : 'Rosuvastatin',
+									backgroundColor: window.chartColors.blue,
+									borderColor: window.chartColors.blue,
+									data: [
+										8715,
+										7320,
+										6330,
+										6297
+									],
+									fill: false,
+								});
+							}
+							window.pre_chart2 = new Chart(document.getElementById("canvas2").getContext("2d"), {
 								type: 'line',
 								data: {
 									labels: labels,
-									datasets: [{
-										label : 'Atorvastatin',
-										backgroundColor: window.chartColors.red,
-										borderColor: window.chartColors.red,
-										data: [
-											10294,
-											9834,
-											6920,
-											6114
-										],
-										fill: false,
-									}, {
-										label : 'Rosuvastatin',
-										backgroundColor: window.chartColors.blue,
-										borderColor: window.chartColors.blue,
-										data: [
-											8715,
-											7320,
-											6330,
-											6297
-										],
-										fill: false,
-									}]
+									datasets: datas
 								},
 								options: {
 									animation: false,
@@ -415,66 +450,83 @@
 									}
 								}
 							});
-							window.main_chart3 = new Chart(document.getElementById("canvas3").getContext("2d"), {
+							
+							datas = [];
+							if(this.selected_levels['middle-low'] && this.selected_statins['Atorvastatin']) {
+								datas.push({
+									label : 'Atorvastatin',
+									backgroundColor: window.chartColors.red,
+									borderColor: window.chartColors.red,
+									data: [
+										11766,
+										10525,
+										8253,
+										7858
+									],
+									fill: false,
+								});
+							}
+							if(this.selected_levels['middle-low'] && this.selected_statins['Pitavastatin']) {
+								datas.push({
+									label : 'Pitavastatin',
+									backgroundColor: window.chartColors.orange,
+									borderColor: window.chartColors.orange,
+									data: [
+										10418,
+										8653,
+										8038,
+										5090
+									],
+									fill: false,
+								});
+							}
+							if(this.selected_levels['middle-low'] && this.selected_statins['Pravastatin']) {
+								datas.push({
+									label : 'Pravastatin',
+									backgroundColor: window.chartColors.green,
+									borderColor: window.chartColors.green,
+									data: [
+										15645,
+										12906,
+										10405,
+										11022
+									],
+									fill: false,
+								});
+							}
+							if(this.selected_levels['middle-low'] && this.selected_statins['Rosuvastatin']) {
+								datas.push({
+									label : 'Rosuvastatin',
+									backgroundColor: window.chartColors.blue,
+									borderColor: window.chartColors.blue,
+									data: [
+										5382,
+										3640,
+										5494,
+										2506
+									],
+									fill: false,
+								});
+							}
+							if(this.selected_levels['middle-low'] && this.selected_statins['Simvastatin']) {
+								datas.push({
+									label : 'Simvastatin',
+									backgroundColor: window.chartColors.purple,
+									borderColor: window.chartColors.purple,
+									data: [
+										16132,
+										8492,
+										10897,
+										7779
+									],
+									fill: false,
+								});
+							}
+							window.pre_chart3 = new Chart(document.getElementById("canvas3").getContext("2d"), {
 								type: 'line',
 								data: {
 									labels: labels,
-									datasets: [{
-										label : 'Atorvastatin',
-										backgroundColor: window.chartColors.red,
-										borderColor: window.chartColors.red,
-										data: [
-											11766,
-											10525,
-											8253,
-											7858
-										],
-										fill: false,
-									}, {
-										label : 'Pitavastatin',
-										backgroundColor: window.chartColors.orange,
-										borderColor: window.chartColors.orange,
-										data: [
-											10418,
-											8653,
-											8038,
-											5090
-										],
-										fill: false,
-									}, {
-										label : 'Pravastatin',
-										backgroundColor: window.chartColors.green,
-										borderColor: window.chartColors.green,
-										data: [
-											15645,
-											12906,
-											10405,
-											11022
-										],
-										fill: false,
-									}, {
-										label : 'Rosuvastatin',
-										backgroundColor: window.chartColors.blue,
-										borderColor: window.chartColors.blue,
-										data: [
-											5382,
-											3640,
-											5494,
-											2506
-										],
-										fill: false,
-									}, {
-										label : 'Simvastatin',
-										backgroundColor: window.chartColors.purple,
-										borderColor: window.chartColors.purple,
-										data: [
-											16132,
-											8492,
-											10897,
-											7779
-										],
-										fill: false,
-									}]
+									datasets: datas
 								},
 								options: {
 									animation: false,
@@ -501,34 +553,42 @@
 									}
 								}
 							});
-							window.main_chart4 = new Chart(document.getElementById("canvas4").getContext("2d"), {
+
+							datas = [];
+							if(this.selected_levels['low'] && this.selected_statins['Pravastatin']) {
+								datas.push({
+									label : 'Pravastatin',
+									backgroundColor: window.chartColors.green,
+									borderColor: window.chartColors.green,
+									data: [
+										20053,
+										10205,
+										6931,
+										8916
+									],
+									fill: false,
+								});
+							}
+							if(this.selected_levels['low'] && this.selected_statins['Pravastatin']) {
+								datas.push({
+									label : 'Pravastatin',
+									backgroundColor: window.chartColors.green,
+									borderColor: window.chartColors.green,
+									borderDash: [10, 15],
+									data: [
+										13870,
+										10538,
+										10871,
+										16302
+									],
+									fill: false,
+								});
+							}
+							window.pre_chart4 = new Chart(document.getElementById("canvas4").getContext("2d"), {
 								type: 'line',
 								data: {
 									labels: labels,
-									datasets: [{
-										label : 'Pravastatin',
-										backgroundColor: window.chartColors.green,
-										borderColor: window.chartColors.green,
-										data: [
-											20053,
-											10205,
-											6931,
-											8916
-										],
-										fill: false,
-									}, {
-										label : 'Pravastatin',
-										backgroundColor: window.chartColors.green,
-										borderColor: window.chartColors.green,
-										borderDash: [10, 15],
-										data: [
-											13870,
-											10538,
-											10871,
-											16302
-										],
-										fill: false,
-									}]
+									datasets: datas
 								},
 								options: {
 									animation: false,
