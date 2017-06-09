@@ -8,7 +8,7 @@
 			<div class="content clearfix" id="main-content">
 				<div class="col-xs-12">
 					<section class="box box-height-sm box-subject-info">
-						<h3 class="title">대상자 정보 <span v-if="selected.share && selected.own">(공유함)</span><span v-if="selected.share && !selected.own">(공유받음)</span><i class="fa fa-share-alt-square" v-on:click="shareSubject"></i>
+						<h3 class="title">대상자 정보 <span v-if="selected.share && selected.own">(공유함) </span><span v-if="selected.share && !selected.own">(공유받음)</span><i class="fa fa-share-alt-square" v-on:click="shareSubject"></i>
 							<div class="btn-grp right">
 								<span class="btn btn-sm btn-aqua" v-on:click="openModal(true)" v-if="selected.follow == 'initial'">작성</span>
 								<span class="btn btn-sm btn-gray" v-on:click="openModal(false)" v-if="selected.follow == 'followup'">수정</span>
