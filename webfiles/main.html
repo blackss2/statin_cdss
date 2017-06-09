@@ -8,7 +8,7 @@
 			<div class="content clearfix" id="main-content">
 				<div class="col-xs-12">
 					<section class="box box-height-sm box-subject-info">
-						<h3 class="title">대상자 정보 <i class="fa fa-share-alt-square"></i>
+						<h3 class="title">대상자 정보 <span v-if="selected.share && selected.own">(공유함)</span><span v-if="selected.share && !selected.own">(공유받음)</span><i class="fa fa-share-alt-square" v-on:click="shareSubject"></i>
 							<div class="btn-grp right">
 								<span class="btn btn-sm btn-aqua" v-on:click="openModal(true)" v-if="selected.follow == 'initial'">작성</span>
 								<span class="btn btn-sm btn-gray" v-on:click="openModal(false)" v-if="selected.follow == 'followup'">수정</span>
@@ -32,7 +32,7 @@
 										<col width="10%">
 									</colgroup>
 									<tr>
-										<th>등록번호</th>
+										<th>일련번호</th>
 										<td>{{selected.subject_id}}</td>
 										<th>수축혈압</th>
 										<td>{{selected.data.blood_pressure.systolic}}</td>
@@ -122,9 +122,10 @@
 									<div class="col-sm-3">
 										<ul class="prescription-statin-list">
 											<li class="recommend_level"><h4>{{constants.level_hash[selected.recommend_level]}}</h4></li>
+											<br/>
 											<li v-for="level in selected.data.prescription.levels"><h4>{{constants.level_hash[level]}}</h4></li>
 										</ul>
-										<p class="prescription-title">스타틴 강도</p>
+										<p class="prescription-title">처방하신 스타틴 강도</p>
 									</div>
 									<div class="col-sm-3">
 										<ul class="prescription-statin-list">
@@ -263,6 +264,31 @@
 						$("#prescription-content").hide();
 						$("#main-content").show();
 					},
+					shareSubject: function() {
+						var msg = null;
+						if(this.selected.share) {
+							msg = "공유 해제하시겠습니까?";
+						} else {
+							msg = "공유 하시겠습니까?";
+						}
+						if(window.confirm(msg)) {
+							this.$http.put("/api/subjects/" + this.selected.subject_id + "/share", {
+								share: !this.selected.share
+							}).then(function(res) {
+								if(res.body.error != null) {
+									switch(res.body.error.message) {
+									default:
+										alert(res.body.error.message);
+										return;
+									}
+								} else {
+									Callback.call("load-subject-data");
+									alert("변경되었습니다.");
+								}
+							}, function(err) {
+							});
+						}
+					},
 					updateSubjectData : function(item){
 						this.showMainContent();
 						if(window.main_chart1 != null) {
@@ -281,68 +307,80 @@
 						if(item == null){
 							this.selected = '';
 						} else if(item.data == null){
-							this.selected = {subject_id : item.subject_id, data : {
-								demography : {
-									birth_date : '',
-									age : '',
-									sex : '',
-									height : '',
-									weight: ''
+							this.selected = {
+								subject_id : item.subject_id, 
+								share: item.share,
+								own: item.own,
+								data : {
+									demography : {
+										birth_date : '',
+										age : '',
+										sex : '',
+										height : '',
+										weight: ''
+									},
+									blood_pressure : {
+										date : '',
+										systolic : '',
+										diastolic : '',
+									},
+									statin_first : {
+										dept :'',
+										code : '',
+										date : '',
+										period : ''
+									},
+									statin_last : {
+										dept :'',
+										code : '',
+										date : '',
+										period : ''
+									},
+									blood_test : {
+										date : '',
+										ldl_c : '',
+										hdl : '',
+										total_cholesterol : '',
+										glucose : ''
+									},
+									medical_history : {
+										transient_stroke: '',
+										peripheral_vascular : '',
+										carotid : '',
+										abdominal_aneurysm : '',
+										diabetes : '',
+										ischemic_stroke :'',
+										high_blood_pressure : '',
+										smoking: ''
+									},
+									family_history : {
+										coronary_artery :''
+									},
+									estimation : {
+										dangerous_group : '',
+										target_ldl : ''
+									},
+									prescription : {
+										statins : '',
+										levels : ''
+									}
 								},
-								blood_pressure : {
-									date : '',
-									systolic : '',
-									diastolic : '',
-								},
-								statin_first : {
-									dept :'',
-									code : '',
-									date : '',
-									period : ''
-								},
-								statin_last : {
-									dept :'',
-									code : '',
-									date : '',
-									period : ''
-								},
-								blood_test : {
-									date : '',
-									ldl_c : '',
-									hdl : '',
-									total_cholesterol : '',
-									glucose : ''
-								},
-								medical_history : {
-									transient_stroke: '',
-									peripheral_vascular : '',
-									carotid : '',
-									abdominal_aneurysm : '',
-									diabetes : '',
-									ischemic_stroke :'',
-									high_blood_pressure : '',
-									smoking: ''
-								},
-								family_history : {
-									coronary_artery :''
-								},
-								estimation : {
-									dangerous_group : '',
-									target_ldl : ''
-								},
-								prescription : {
-									statins : '',
-									levels : ''
-								}
-							}, t_create :item.t_create, follow : 'initial', bmi : '', recommend_level:''}
+								t_create :item.t_create,
+								follow : 'initial',
+								bmi : '',
+								recommend_level:''
+							};
 						}else{
 							this.selected = item;
 							this.selected.follow = 'followup';
 							//BMI
 							var weight = this.selected.data.demography.weight;
 							var height = this.selected.data.demography.height * 0.01;
-							var bmi = weight/(height*height);
-							bmi = bmi.toFixed(2);
+							var bmi = "-";
+							if(height > 0 && weight > 0) {
+								bmi = weight/(height*height);
+								bmi = bmi.toFixed(2);
+							}
 							this.selected.bmi = bmi;
 
 							//recommend

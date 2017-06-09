@@ -193,8 +193,8 @@
 				data : function(){
 					var obj = {
 						message_hash : {
-							success : '사용 가능한 등록번호 입니다.',
-							error :  '사용 중인 등록번호 입니다.',
+							success : '사용 가능한 일련번호 입니다.',
+							error :  '사용 중인 일련번호 입니다.',
 							isSuccess : false,
 							isError : false
 						},
@@ -237,7 +237,7 @@
 					},
 					doNew : function(){
 						if(this.input.subjectid.length == 0 ){
-							alert("등록번호를 입력해주세요");
+							alert("일련번호를 입력해주세요");
 						}else{
 							this.$http.post("/api/subjects",{'subjectid' : this.input.subjectid}).then(function(res) {
 								if(res.body.error != null) {

@@ -12,6 +12,7 @@ type Subject struct {
 	Id        string    `json:"id,omitempty"`
 	SubjectId string    `json:"subject_id"`
 	Datas     []*Data   `json:"datas"`
+	Share     bool      `json:"share"`
 	OwnerId   string    `json:"owner_id"`
 	TCreate   time.Time `json:"t_create"`
 }
@@ -107,7 +108,7 @@ func NewStore(u *url.URL, tableName string) (*Store, error) {
 	err = s.InitTable(store.TableOption{
 		TableName:   tableName,
 		TableCreate: true,
-		IndexNames:  []string{"owner_id", "t_create"},
+		IndexNames:  []string{"owner_id", "share", "t_create"},
 		IndexCreate: true,
 		IndexDelete: true,
 	})
@@ -152,8 +153,26 @@ func (st *Store) ListByOwnerId(OwnerId string) ([]*Subject, error) {
 	opts := []store.ListOption{
 		store.ListOption{
 			WhereOption: store.WhereOption{
-				FieldBy:       "owner_id",
-				FieldByValues: []interface{}{OwnerId},
+				IndexBy:       "owner_id",
+				IndexByValues: []interface{}{OwnerId},
+			},
+		},
+	}
+
+	var list []*Subject
+	err := st.List(&list, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return list, nil
+}
+
+func (st *Store) ListShare() ([]*Subject, error) {
+	opts := []store.ListOption{
+		store.ListOption{
+			WhereOption: store.WhereOption{
+				IndexBy:       "share",
+				IndexByValues: []interface{}{true},
 			},
 		},
 	}
@@ -212,6 +231,17 @@ func (st *Store) UpdateLastData(id string, Data *Data) error {
 		return ErrNotExistSubjectData
 	}
 	item.Datas[len(item.Datas)-1] = Data
+	return st.Store.Update(id, &item)
+}
+
+func (st *Store) SetShare(id string, Share bool) error {
+	var item Subject
+	err := st.Get(id, &item)
+	if err != nil {
+		return err
+	}
+
+	item.Share = Share
 	return st.Store.Update(id, &item)
 }
 

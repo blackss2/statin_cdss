@@ -612,7 +612,7 @@
 				mounted: function() {
 					$(window).scroll(function() {
 						var scrtop = $(window).scrollTop();
-						var diff = scrtop - 400;
+						var diff = scrtop - 350;
 						if(diff < 0) {
 							diff = 0;
 						}
@@ -646,14 +646,14 @@
 					}
 				},
 				methods : {
-					initData: function() {
+					initData: function(recommend_level) {
 						for(var i=0; i<this.levels.length; i++) {
 							var level = this.levels[i];
-							level.selected = true;
+							level.selected = (level.val == recommend_level);
 						}
 						for(var i=0; i<this.statins.length; i++) {
 							var statin = this.statins[i];
-							statin.selected = true;
+							statin.selected = false;
 						}
 					},
 					selectBtn : function(item){
@@ -1009,7 +1009,7 @@
 					},
 					select_subject : function(item){
 						this.selected = item;
-						this.initData();
+						this.initData(this.selected.recommend_level);
 						this.updateChart();
 					}
 				}

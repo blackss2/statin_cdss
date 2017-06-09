@@ -64,7 +64,7 @@ func route_api_subjects(g *echo.Group) {
 			if err != nil {
 				return http.StatusInternalServerError, err
 			}
-			dao, err := Select_Subject(sbj)
+			dao, err := Select_Subject(Uid, sbj)
 			if err != nil {
 				return http.StatusInternalServerError, err
 			}
@@ -267,6 +267,41 @@ func route_api_subjects(g *echo.Group) {
 			return c.JSON(retCode, &Result{Result: retValue})
 		}
 	})
+	g.PUT("/subjects/:subjectid/share", func(c echo.Context) error {
+		Uid := c.Get(UID_KEY).(string)
+
+		retCode, retValue := (func() (int, interface{}) {
+			subjectid, err := util.PathToString(c, "subjectid")
+			if err != nil {
+				return http.StatusBadRequest, err
+			}
+
+			var item struct {
+				Share bool `json:"share"`
+			}
+			err = util.BodyToStruct(c.Request().Body, &item)
+			if err != nil {
+				return http.StatusBadRequest, err
+			}
+			//////////////////////////////////////////////////
+
+			sbj, err := gAPI.SubjectStore.GetBySubjectId(subjectid, Uid)
+			if err != nil {
+				return http.StatusInternalServerError, err
+			}
+
+			err = gAPI.SubjectStore.SetShare(sbj.Id, item.Share)
+			if err != nil {
+				return http.StatusInternalServerError, err
+			}
+			return http.StatusOK, true
+		})()
+		if err, is := retValue.(error); is {
+			return c.JSON(retCode, &Result{Error: err})
+		} else {
+			return c.JSON(retCode, &Result{Result: retValue})
+		}
+	})
 
 	g.POST("/subjects/:subjectid/prescription", func(c echo.Context) error {
 		Uid := c.Get(UID_KEY).(string)
@@ -337,6 +372,8 @@ func route_api_subjects(g *echo.Group) {
 type DAO_Search_Subject struct {
 	Id             string `json:"id,omitempty"`
 	SubjectId      string `json:"subject_id"`
+	Share          bool   `json:"share"`
+	Own            bool   `json:"own"`
 	Sex            string `json:"sex"`
 	TargetLDL      string `json:"target_ldl"`
 	DangerousGroup string `json:"dangerous_group"`
@@ -347,6 +384,15 @@ func Search_Subjects(Uid string, SubjectId string, Sex string, TargetLDL string,
 	list, err := gAPI.SubjectStore.ListByOwnerId(Uid)
 	if err != nil {
 		return nil, err
+	}
+	list_share, err := gAPI.SubjectStore.ListShare()
+	if err != nil {
+		return nil, err
+	}
+	for _, v := range list_share {
+		if v.OwnerId != Uid {
+			list = append(list, v)
+		}
 	}
 
 	daos := make([]*DAO_Search_Subject, 0)
@@ -360,6 +406,8 @@ func Search_Subjects(Uid string, SubjectId string, Sex string, TargetLDL string,
 		dao := &DAO_Search_Subject{
 			Id:        v.Id,
 			SubjectId: v.SubjectId,
+			Share:     v.Share,
+			Own:       v.OwnerId == Uid,
 			TCreate:   convert.String(v.TCreate)[:10],
 		}
 
@@ -404,6 +452,8 @@ func (s DAO_Search_Subject_Sort) Less(i, j int) bool {
 type DAO_Select_Subject struct {
 	Id        string         `json:"id,omitempty"`
 	SubjectId string         `json:"subject_id"`
+	Share     bool           `json:"share"`
+	Own       bool           `json:"own"`
 	Data      *subject.Data  `json:"data"`
 	History   []*DAO_History `json:"history"`
 	TCreate   string         `json:"t_create"`
@@ -426,10 +476,12 @@ type DAO_History struct {
 	TCreate           string   `json:"t_create"`
 }
 
-func Select_Subject(subject *subject.Subject) (*DAO_Select_Subject, error) {
+func Select_Subject(Uid string, subject *subject.Subject) (*DAO_Select_Subject, error) {
 	dao := &DAO_Select_Subject{
 		Id:        subject.Id,
 		SubjectId: subject.SubjectId,
+		Share:     subject.Share,
+		Own:       subject.OwnerId == Uid,
 		History:   make([]*DAO_History, 0),
 		TCreate:   convert.String(subject.TCreate)[:10],
 	}

@@ -430,7 +430,7 @@ body.breakpoint{
 						&.recommend_level{
 							display:block;
 							&:after{
-								content:'추천강도';
+								content:'(추천 스타틴강도)';
 								color:red;
 								font-size:16px;
 								font-weight: 600;
