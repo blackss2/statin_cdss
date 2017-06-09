@@ -69,6 +69,7 @@ type StatinsLast struct {
 
 type BloodTest struct {
 	Date             string  `json:"date"`
+	LDL              float64 `json:"ldl_c"`
 	HDL              float64 `json:"hdl"`
 	TotalCholesterol float64 `json:"total_cholesterol"`
 	Glucose          float64 `json:"glucose"`

@@ -3,7 +3,7 @@
 	<subject-search>
 		<section class="search-box">
 			<p class="clearfix">
-				<label class="col-xs-5">PID</label>
+				<label class="col-xs-5">일련번호</label>
 				<input type="text" class="input-search col-xs-7" v-model="input.subjectid" maxlength="9" />
 			</p>
 			<p class="clearfix">
@@ -14,7 +14,7 @@
 				</select>
 			</p>
 			<p class="clearfix">
-				<label class="col-xs-5">목표 ldl-C</label>
+				<label class="col-xs-5">목표 LDL-C</label>
 				<select class="select-search col-xs-7" v-model="input.target_ldl">
 					<option value="">전체</option>
 					<option v-for="target_ldl in constants.target_ldl" v-bind:value="target_ldl">{{target_ldl}}</option>

@@ -286,6 +286,12 @@ body.breakpoint{
 				color: #8e96ad;
 				line-height:25px;
 			}
+			.fa-share-alt-square{
+				font-size:1.2em;
+				cursor:pointer;
+				color: $color-dark;
+				vertical-align: top;
+			}
 		}
 		.sub-title{
 			font-size:12px;
@@ -386,10 +392,11 @@ body.breakpoint{
 				> [class^= 'col-']{
 					border-right:1px solid #d9d9d9;
 					margin-top:30px;
+					min-height: 163px;
 					&:last-child{
 						border:none;
 					}
-					h1{
+					h2{
 						font-weight:700;
 						margin-top:10px;
 						color:#2980b9;
@@ -412,14 +419,32 @@ body.breakpoint{
 						color:#555;
 					}
 				}
+				> .col-sm-2{
+					padding-top:30px;
+				}
 				.prescription-statin-list{
-					list-style:none; padding:0;
-					/* margin-top:-25px; */
+					list-style:none; 
+					padding:0;
 					li{
 						display:inline-block;
-						h3{
+						&.recommend_level{
+							display:block;
+							&:after{
+								content:'추천강도';
+								color:red;
+								font-size:16px;
+								font-weight: 600;
+								margin: 0 0 10px;
+							};
+							h4:after{
+								margin: 0;
+								background:none;
+							}
+						}
+						h4{
 							margin:7px 0;
 							color:#333;
+							font-size:19.8px;
 							font-weight:700;
 							&:after{
 								position:relative;
@@ -435,6 +460,7 @@ body.breakpoint{
 						}
 					}
 				}
+				
 				.table-subject-info{
 					td{
 						min-width:5%;
@@ -605,6 +631,9 @@ body.breakpoint{
 }
 
 #prescription-content{
+	table{
+		margin-bottom:30px;
+	}
 	.btn-grp{
 		.btn{
 			box-shadow:0 0 5px rgba(0,0,0,.05);
@@ -1119,4 +1148,10 @@ table{
 }
 .fc-row .fc-content-skeleton td, .fc-row .fc-helper-skeleton td{
 	background:none;
+}
+
+#table_cost{
+	canvas{
+		margin-bottom:20px;
+	}
 }

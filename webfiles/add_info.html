@@ -32,20 +32,6 @@
 								</div>
 								<span class="col-xs-1">일</span>
 							</td>
-							<th>최근 처방일수</th>
-							<td>
-								<div class="col-xs-12">
-									<input type="number" class="col-xs-12" maxlength="9" v-model="selected.data.statin_last.period"/>
-								</div>
-							</td>
-						</tr>
-						<tr>
-							<th>나이</th>
-							<td>
-								<div class="col-xs-12">
-									<input type="number" class="col-xs-12" maxlength="9" v-model="selected.data.demography.age"/>
-								</div>
-							</td>
 							<th>혈액 검사일자</th>
 							<td class="birth">
 								<div class="col-xs-4">
@@ -61,6 +47,22 @@
 								</div>
 								<span class="col-xs-1">일</span>
 							</td>
+						</tr>
+						<tr>
+							<th>나이</th>
+							<td>
+								<div class="col-xs-12">
+									<input type="number" class="col-xs-12" maxlength="9" v-model="selected.data.demography.age"/>
+								</div>
+							</td>
+							<th>현재 LDL-C</th>
+							<td>
+								<div class="col-xs-9">
+									<input type="text" class="col-xs-12" v-model="selected.data.blood_test.hdl"/>
+								</div>
+								<span class="col-xs-1">mg/dL</span>
+							</td>
+							
 						</tr>
 						<tr>
 							<th v-if="selected.follow == 'initial'">성별</th>
@@ -153,6 +155,7 @@
 									<span class="fake-btn"></span>
 								</label>
 							</td>
+							
 						</tr>
 						<tr>
 							<th>혈압 측정일자</th>
@@ -181,6 +184,7 @@
 									<span class="fake-btn"></span>
 								</label>
 							</td>
+							
 						</tr>
 						<tr>
 							<th>스타틴 첫 처방과</th>
@@ -200,6 +204,7 @@
 									<span class="fake-btn"></span>
 								</label>
 							</td>
+							
 						</tr>
 						<tr>
 							<th>스타틴 첫 처방약물코드</th>
@@ -219,6 +224,7 @@
 									<span class="fake-btn"></span>
 								</label>
 							</td>
+							
 						</tr>
 						<tr>
 							<th>스타틴 첫 처방일</th>
@@ -247,12 +253,13 @@
 									<span class="fake-btn"></span>
 								</label>
 							</td>
+							
 						</tr>
 						<tr>
-							<th>첫 처방 일수</th>
+							<th>스타틴 최근 처방 과</th>
 							<td>
 								<div class="col-xs-12">
-									<input type="text" class="col-xs-12" v-model="selected.data.statin_first.period"/>
+									<input type="text" class="col-xs-12" v-model="selected.data.statin_last.dept"/>
 								</div>
 							</td>
 							<th>허혈성 뇌졸중</th>
@@ -266,12 +273,13 @@
 									<span class="fake-btn"></span>
 								</label>
 							</td>
+							
 						</tr>
 						<tr>
-							<th>스타틴 최근 처방 과</th>
+							<th>스타틴 최근 처방 약물 코드</th>
 							<td>
 								<div class="col-xs-12">
-									<input type="text" class="col-xs-12" v-model="selected.data.statin_last.dept"/>
+									<input type="text" class="col-xs-12" v-model="selected.data.statin_last.code"/>
 								</div>
 							</td>
 							<th>고혈압 이력 유무</th>
@@ -285,25 +293,7 @@
 									<span class="fake-btn"></span>
 								</label>
 							</td>
-						</tr>
-						<tr>
-							<th>스타틴 최근 처방 약물 코드</th>
-							<td>
-								<div class="col-xs-12">
-									<input type="text" class="col-xs-12" v-model="selected.data.statin_last.code"/>
-								</div>
-							</td>
-							<th>흡연 유무</th>
-							<td>
-								<label class="input-radio">유
-									<input type="radio" value="1" class="radio-btn" v-model="selected.data.medical_history.smoking" name="smoking"/>
-									<span class="fake-btn"></span>
-								</label>
-								<label class="input-radio">무
-									<input type="radio" value="0" class="radio-btn" v-model="selected.data.medical_history.smoking" name="smoking"/>
-									<span class="fake-btn"></span>
-								</label>
-							</td>
+							
 						</tr>
 						<tr>
 							<th>스타틴 가장 최근 처방일</th>
@@ -321,8 +311,17 @@
 								</div>
 								<span class="col-xs-1">일</span>
 							</td>
-							<th></th>
-							<td></td>
+							<th>흡연 유무</th>
+							<td>
+								<label class="input-radio">유
+									<input type="radio" value="1" class="radio-btn" v-model="selected.data.medical_history.smoking" name="smoking"/>
+									<span class="fake-btn"></span>
+								</label>
+								<label class="input-radio">무
+									<input type="radio" value="0" class="radio-btn" v-model="selected.data.medical_history.smoking" name="smoking"/>
+									<span class="fake-btn"></span>
+								</label>
+							</td>
 						</tr>
 					</table>
 				</div>
@@ -382,7 +381,8 @@
 					// parseFloat
 					selected.data.demography.height = parseFloat(selected.data.demography.height);
 					selected.data.demography.weight = parseFloat(selected.data.demography.weight);
-					selected.data.blood_test.hdl = parseFloat(selected.data.blood_test.hdl);
+					selected.data.blood_test.ldl_c = parseFloat(selected.data.blood_test.ldl_c);
+					selected.data.blood_test.hdl = parseFloat(selected.data.blood_test.hdl); 
 					selected.data.blood_test.total_cholesterol = parseFloat(selected.data.blood_test.total_cholesterol);
 					selected.data.blood_test.glucose = parseFloat(selected.data.blood_test.glucose);
 
@@ -390,8 +390,6 @@
 					selected.data.demography.age = parseInt(selected.data.demography.age);
 					selected.data.blood_pressure.systolic = parseInt(selected.data.blood_pressure.systolic);
 					selected.data.blood_pressure.diastolic = parseInt(selected.data.blood_pressure.diastolic);
-					selected.data.statin_first.period = parseInt(selected.data.statin_first.period);
-					selected.data.statin_last.period = parseInt(selected.data.statin_last.period);
 
 					function parseBool(boolObj){
 						for (var key in boolObj){
@@ -454,10 +452,6 @@
 						alert("스타틴 첫 처방약물코드를 입력하셔야 합니다.");
 						return;
 					}
-					if(selected.data.statin_first.period.length < 0){
-						alert("스타틴 첫 처방 일수를 입력하셔야 합니다.");
-						return;
-					}
 					if(selected.data.statin_last.dept.length == 0){
 						alert("스타틴 최근 처방과를 입력하셔야 합니다.");
 						return;
@@ -466,8 +460,8 @@
 						alert("스타틴 최근 처방약물코드를 입력하셔야 합니다.");
 						return;
 					}
-					if(selected.data.statin_last.period.length < 0){
-						alert("스타틴 최근 처방 일수를 입력하셔야 합니다.");
+					if(selected.data.blood_test.ldl_c.length < 0){
+						alert("LDL-C 수치를 입력하셔야 합니다.");
 						return;
 					}
 					if(selected.data.blood_test.hdl.length < 0){

@@ -132,10 +132,10 @@
 							</td>
 						</tr>
 						<tr>
-							<th>HDL 수치</th>
+							<th>LDL-C 수치</th>
 							<td>
 								<div class="col-xs-9">
-									<input type="text" class="col-xs-12" v-model="selected.data.blood_test.hdl"/>
+									<input type="text" class="col-xs-12" v-model="selected.data.blood_test.ldl_c"/>
 								</div>
 								<span class="col-xs-1">mg/dL</span>
 							</td>
@@ -152,10 +152,10 @@
 							</td>
 						</tr>
 						<tr>
-							<th>T-cholesterol 수치</th>
+							<th>HDL 수치</th>
 							<td>
 								<div class="col-xs-9">
-									<input type="text" class="col-xs-12" v-model="selected.data.blood_test.total_cholesterol"/>
+									<input type="text" class="col-xs-12" v-model="selected.data.blood_test.hdl"/>
 								</div>
 								<span class="col-xs-1">mg/dL</span>
 							</td>
@@ -172,10 +172,10 @@
 							</td>
 						</tr>
 						<tr>
-							<th>공복시 혈당</th>
+							<th>T-cholesterol 수치</th>
 							<td>
 								<div class="col-xs-9">
-									<input type="text" class="col-xs-12" v-model="selected.data.blood_test.glucose"/>
+									<input type="text" class="col-xs-12" v-model="selected.data.blood_test.total_cholesterol"/>
 								</div>
 								<span class="col-xs-1">mg/dL</span>
 							</td>
@@ -192,8 +192,13 @@
 							</td>
 						</tr>
 						<tr>
-							<th></th>
-							<td></td>
+							<th>공복시 혈당</th>
+							<td>
+								<div class="col-xs-9">
+									<input type="text" class="col-xs-12" v-model="selected.data.blood_test.glucose"/>
+								</div>
+								<span class="col-xs-1">mg/dL</span>
+							</td>
 							<th>흡연 유무</th>
 							<td>
 								<label class="input-radio">유
@@ -244,6 +249,7 @@
 
 					// parseFloat
 					selected.data.demography.weight = parseFloat(selected.data.demography.weight);
+					selected.data.blood_test.ldl_c = parseFloat(selected.data.blood_test.ldl_c);
 					selected.data.blood_test.hdl = parseFloat(selected.data.blood_test.hdl);
 					selected.data.blood_test.total_cholesterol = parseFloat(selected.data.blood_test.total_cholesterol);
 					selected.data.blood_test.glucose = parseFloat(selected.data.blood_test.glucose);
