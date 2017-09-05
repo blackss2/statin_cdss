@@ -58,7 +58,7 @@
 							<th>현재 LDL-C</th>
 							<td>
 								<div class="col-xs-9">
-									<input type="text" class="col-xs-12" v-model="selected.data.blood_test.hdl"/>
+									<input type="text" class="col-xs-12" v-model="selected.data.blood_test.ldl_c"/>
 								</div>
 								<span class="col-xs-1">mg/dL</span>
 							</td>
@@ -117,47 +117,6 @@
 							</td>
 						</tr>
 						<tr>
-							<th>수축혈압</th>
-							<td>
-								<div class="col-xs-9">
-									<input type="text" class="col-xs-12" v-model="selected.data.blood_pressure.systolic"/>
-								</div>
-								<span class="col-xs-1">mg/dL</span>
-							</td>
-							<th>일과성 뇌졸중 발작</th>
-							<td>
-								<label class="input-radio">유
-									<input type="radio" value="1" class="radio-btn" v-model="selected.data.medical_history.transient_stroke" name="transient_stroke" />
-									<span class="fake-btn"></span>
-								</label>
-								<label class="input-radio">무
-									<input type="radio" value="0" class="radio-btn" v-model="selected.data.medical_history.transient_stroke" name="transient_stroke" />
-									<span class="fake-btn"></span>
-								</label>
-							</td>
-						</tr>
-						<tr>
-							<th>이완혈압</th>
-							<td>
-								<div class="col-xs-9">
-									<input type="text" class="col-xs-12" v-model="selected.data.blood_pressure.diastolic"/>
-								</div>
-								<span class="col-xs-1">mg/dL</span>
-							</td>
-							<th>말초혈관질환</th>
-							<td>
-								<label class="input-radio">유
-									<input type="radio" value="1" class="radio-btn" v-model="selected.data.medical_history.peripheral_vascular" name="peripheral_vascular"/>
-									<span class="fake-btn"></span>
-								</label>
-								<label class="input-radio">무
-									<input type="radio" value="0" class="radio-btn" v-model="selected.data.medical_history.peripheral_vascular" name="peripheral_vascular"/>
-									<span class="fake-btn"></span>
-								</label>
-							</td>
-							
-						</tr>
-						<tr>
 							<th>혈압 측정일자</th>
 							<td class="birth">
 								<div class="col-xs-4">
@@ -173,58 +132,45 @@
 								</div>
 								<span class="col-xs-1">일</span>
 							</td>
-							<th>경동맥질환</th>
+							<th>Total Bilirubin</th>
 							<td>
-								<label class="input-radio">유
-									<input type="radio" value="1" class="radio-btn" v-model="selected.data.medical_history.carotid" name="carotid"/>
-									<span class="fake-btn"></span>
-								</label>
-								<label class="input-radio">무
-									<input type="radio" value="0" class="radio-btn" v-model="selected.data.medical_history.carotid" name="carotid"/>
-									<span class="fake-btn"></span>
-								</label>
+								<div class="col-xs-9">
+									<input type="text" class="col-xs-12" v-model="selected.data.blood_test.total_bilirubin"/>
+								</div>
+								<span class="col-xs-1">mg/dL</span>
 							</td>
-							
 						</tr>
 						<tr>
-							<th>스타틴 첫 처방과</th>
+							<th>수축혈압</th>
 							<td>
-								<div class="col-xs-12">
-									<input type="text" class="col-xs-12" v-model="selected.data.statin_first.dept"/>
+								<div class="col-xs-9">
+									<input type="text" class="col-xs-12" v-model="selected.data.blood_pressure.systolic"/>
 								</div>
+								<span class="col-xs-1">mg/dL</span>
 							</td>
-							<th>복부동맥류</th>
+							<th>Alanine Aminotransferase(ALT)</th>
 							<td>
-								<label class="input-radio">유
-									<input type="radio" value="1" class="radio-btn" v-model="selected.data.medical_history.abdominal_aneurysm" name="abdominal_aneurysm"/>
-									<span class="fake-btn"></span>
-								</label>
-								<label class="input-radio">무
-									<input type="radio" value="0" class="radio-btn" v-model="selected.data.medical_history.abdominal_aneurysm" name="abdominal_aneurysm"/>
-									<span class="fake-btn"></span>
-								</label>
+								<div class="col-xs-9">
+									<input type="text" class="col-xs-12" v-model="selected.data.blood_test.alanine_aminotransferase"/>
+								</div>
+								<span class="col-xs-1">mg/dL</span>
 							</td>
-							
 						</tr>
 						<tr>
-							<th>스타틴 첫 처방약물코드</th>
+							<th>이완혈압</th>
 							<td>
-								<div class="col-xs-12">
-									<input type="text" class="col-xs-12" v-model="selected.data.statin_first.code"/>
+								<div class="col-xs-9">
+									<input type="text" class="col-xs-12" v-model="selected.data.blood_pressure.diastolic"/>
 								</div>
+								<span class="col-xs-1">mg/dL</span>
 							</td>
-							<th>당뇨병</th>
+							<th>Alkaline Phosphatase(ALP)</th>
 							<td>
-								<label class="input-radio">유
-									<input type="radio" value="1" class="radio-btn" v-model="selected.data.medical_history.diabetes" name="diabetes"/>
-									<span class="fake-btn"></span>
-								</label>
-								<label class="input-radio">무
-									<input type="radio" value="0" class="radio-btn" v-model="selected.data.medical_history.diabetes" name="diabetes"/>
-									<span class="fake-btn"></span>
-								</label>
+								<div class="col-xs-9">
+									<input type="text" class="col-xs-12" v-model="selected.data.blood_test.alkaline_phosphatase"/>
+								</div>
+								<span class="col-xs-1">mg/dL</span>
 							</td>
-							
 						</tr>
 						<tr>
 							<th>스타틴 첫 처방일</th>
@@ -242,58 +188,55 @@
 								</div>
 								<span class="col-xs-1">일</span>
 							</td>
-							<th>관상동맥질환</th>
+							<th>일과성 뇌졸중 발작</th>
 							<td>
 								<label class="input-radio">유
-									<input type="radio" value="1" class="radio-btn" v-model="selected.data.family_history.coronary_artery" name="coronary_artery"/>
+									<input type="radio" value="1" class="radio-btn" v-model="selected.data.medical_history.transient_stroke" name="transient_stroke" />
 									<span class="fake-btn"></span>
 								</label>
 								<label class="input-radio">무
-									<input type="radio" value="0" class="radio-btn" v-model="selected.data.family_history.coronary_artery" name="coronary_artery"/>
+									<input type="radio" value="0" class="radio-btn" v-model="selected.data.medical_history.transient_stroke" name="transient_stroke" />
 									<span class="fake-btn"></span>
 								</label>
 							</td>
-							
 						</tr>
 						<tr>
-							<th>스타틴 최근 처방 과</th>
+							<th>스타틴 첫 처방과</th>
 							<td>
 								<div class="col-xs-12">
-									<input type="text" class="col-xs-12" v-model="selected.data.statin_last.dept"/>
+									<input type="text" class="col-xs-12" v-model="selected.data.statin_first.dept" id="selected_data_statin_first_dept"/>
 								</div>
 							</td>
-							<th>허혈성 뇌졸중</th>
+							<th>말초혈관질환</th>
 							<td>
 								<label class="input-radio">유
-									<input type="radio" value="1" class="radio-btn" v-model="selected.data.medical_history.ischemic_stroke" name="ischemic_stroke"/>
+									<input type="radio" value="1" class="radio-btn" v-model="selected.data.medical_history.peripheral_vascular" name="peripheral_vascular"/>
 									<span class="fake-btn"></span>
 								</label>
 								<label class="input-radio">무
-									<input type="radio" value="0" class="radio-btn" v-model="selected.data.medical_history.ischemic_stroke" name="ischemic_stroke"/>
+									<input type="radio" value="0" class="radio-btn" v-model="selected.data.medical_history.peripheral_vascular" name="peripheral_vascular"/>
 									<span class="fake-btn"></span>
 								</label>
 							</td>
-							
 						</tr>
 						<tr>
-							<th>스타틴 최근 처방 약물 코드</th>
+							<th>스타틴 첫 처방약물코드</th>
 							<td>
 								<div class="col-xs-12">
-									<input type="text" class="col-xs-12" v-model="selected.data.statin_last.code"/>
+									<input type="text" class="col-xs-12" v-model="selected.data.statin_first.code" id="selected_data_statin_first_code"/>
 								</div>
 							</td>
-							<th>고혈압 이력 유무</th>
+							<th>경동맥질환</th>
 							<td>
 								<label class="input-radio">유
-									<input type="radio" value="1" class="radio-btn" v-model="selected.data.medical_history.high_blood_pressure" name="high_blood_pressure" />
+									<input type="radio" value="1" class="radio-btn" v-model="selected.data.medical_history.carotid" name="carotid"/>
 									<span class="fake-btn"></span>
 								</label>
 								<label class="input-radio">무
-									<input type="radio" value="0" class="radio-btn" v-model="selected.data.medical_history.high_blood_pressure" name="high_blood_pressure"/>
+									<input type="radio" value="0" class="radio-btn" v-model="selected.data.medical_history.carotid" name="carotid"/>
 									<span class="fake-btn"></span>
 								</label>
 							</td>
-							
 						</tr>
 						<tr>
 							<th>스타틴 가장 최근 처방일</th>
@@ -311,6 +254,116 @@
 								</div>
 								<span class="col-xs-1">일</span>
 							</td>
+							<th>복부동맥류</th>
+							<td>
+								<label class="input-radio">유
+									<input type="radio" value="1" class="radio-btn" v-model="selected.data.medical_history.abdominal_aneurysm" name="abdominal_aneurysm"/>
+									<span class="fake-btn"></span>
+								</label>
+								<label class="input-radio">무
+									<input type="radio" value="0" class="radio-btn" v-model="selected.data.medical_history.abdominal_aneurysm" name="abdominal_aneurysm"/>
+									<span class="fake-btn"></span>
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<th>스타틴 최근 처방 과</th>
+							<td>
+								<div class="col-xs-12">
+									<input type="text" class="col-xs-12" v-model="selected.data.statin_last.dept" id="selected_data_statin_last_dept"/>
+								</div>
+							</td>
+							<th>당뇨병</th>
+							<td>
+								<label class="input-radio">유
+									<input type="radio" value="1" class="radio-btn" v-model="selected.data.medical_history.diabetes" name="diabetes"/>
+									<span class="fake-btn"></span>
+								</label>
+								<label class="input-radio">무
+									<input type="radio" value="0" class="radio-btn" v-model="selected.data.medical_history.diabetes" name="diabetes"/>
+									<span class="fake-btn"></span>
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<th>스타틴 최근 처방 약물 코드</th>
+							<td>
+								<div class="col-xs-12">
+									<input type="text" class="col-xs-12" v-model="selected.data.statin_last.code" id="selected_data_statin_last_code"/>
+								</div>
+							</td>
+							<th>허혈성 뇌졸중</th>
+							<td>
+								<label class="input-radio">유
+									<input type="radio" value="1" class="radio-btn" v-model="selected.data.medical_history.ischemic_stroke" name="ischemic_stroke"/>
+									<span class="fake-btn"></span>
+								</label>
+								<label class="input-radio">무
+									<input type="radio" value="0" class="radio-btn" v-model="selected.data.medical_history.ischemic_stroke" name="ischemic_stroke"/>
+									<span class="fake-btn"></span>
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<th>Warfarin 복용 여부</th>
+							<td>
+								<label class="input-radio">유
+									<input type="radio" value="1" class="radio-btn" v-model="selected.data.drug_history.warfarin" name="warfarin"/>
+									<span class="fake-btn"></span>
+								</label>
+								<label class="input-radio">무
+									<input type="radio" value="0" class="radio-btn" v-model="selected.data.drug_history.warfarin" name="warfarin"/>
+									<span class="fake-btn"></span>
+								</label>
+							</td>
+							<th>고혈압 이력 유무</th>
+							<td>
+								<label class="input-radio">유
+									<input type="radio" value="1" class="radio-btn" v-model="selected.data.medical_history.high_blood_pressure" name="high_blood_pressure" />
+									<span class="fake-btn"></span>
+								</label>
+								<label class="input-radio">무
+									<input type="radio" value="0" class="radio-btn" v-model="selected.data.medical_history.high_blood_pressure" name="high_blood_pressure"/>
+									<span class="fake-btn"></span>
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<th>Thyroxine 복용 여부</th>
+							<td>
+								<label class="input-radio">유
+									<input type="radio" value="1" class="radio-btn" v-model="selected.data.drug_history.thyroxine" name="thyroxine"/>
+									<span class="fake-btn"></span>
+								</label>
+								<label class="input-radio">무
+									<input type="radio" value="0" class="radio-btn" v-model="selected.data.drug_history.thyroxine" name="thyroxine"/>
+									<span class="fake-btn"></span>
+								</label>
+							</td>
+							<th>활성간장애 유무(스타틴 처방 1년 이내)</th>
+							<td>
+								<label class="input-radio">유
+									<input type="radio" value="1" class="radio-btn" v-model="selected.data.medical_history.active_liver_disorder" name="active_liver_disorder" />
+									<span class="fake-btn"></span>
+								</label>
+								<label class="input-radio">무
+									<input type="radio" value="0" class="radio-btn" v-model="selected.data.medical_history.active_liver_disorder" name="active_liver_disorder"/>
+									<span class="fake-btn"></span>
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<th>Bisphosphonate 복용 유무</th>
+							<td>
+								<label class="input-radio">유
+									<input type="radio" value="1" class="radio-btn" v-model="selected.data.drug_history.bisphosphonate" name="bisphosphonate" />
+									<span class="fake-btn"></span>
+								</label>
+								<label class="input-radio">무
+									<input type="radio" value="0" class="radio-btn" v-model="selected.data.drug_history.bisphosphonate" name="bisphosphonate"/>
+									<span class="fake-btn"></span>
+								</label>
+							</td>
 							<th>흡연 유무</th>
 							<td>
 								<label class="input-radio">유
@@ -319,6 +372,30 @@
 								</label>
 								<label class="input-radio">무
 									<input type="radio" value="0" class="radio-btn" v-model="selected.data.medical_history.smoking" name="smoking"/>
+									<span class="fake-btn"></span>
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<th>기타 병용약물 복용 유무</th>
+							<td>
+								<label class="input-radio">유
+									<input type="radio" value="1" class="radio-btn" v-model="selected.data.drug_history.etc" name="etc" />
+									<span class="fake-btn"></span>
+								</label>
+								<label class="input-radio">무
+									<input type="radio" value="0" class="radio-btn" v-model="selected.data.drug_history.etc" name="etc"/>
+									<span class="fake-btn"></span>
+								</label>
+							</td>
+							<th>관상동맥질환(가족력)</th>
+							<td>
+								<label class="input-radio">유
+									<input type="radio" value="1" class="radio-btn" v-model="selected.data.family_history.coronary_artery" name="coronary_artery"/>
+									<span class="fake-btn"></span>
+								</label>
+								<label class="input-radio">무
+									<input type="radio" value="0" class="radio-btn" v-model="selected.data.family_history.coronary_artery" name="coronary_artery"/>
 									<span class="fake-btn"></span>
 								</label>
 							</td>
@@ -379,103 +456,118 @@
 					selected.data.statin_last.date = date.statin_last.year +'-'+ date.statin_last.month +'-'+ date.statin_last.day;
 
 					// parseFloat
-					selected.data.demography.height = parseFloat(selected.data.demography.height);
-					selected.data.demography.weight = parseFloat(selected.data.demography.weight);
-					selected.data.blood_test.ldl_c = parseFloat(selected.data.blood_test.ldl_c);
-					selected.data.blood_test.hdl = parseFloat(selected.data.blood_test.hdl); 
-					selected.data.blood_test.total_cholesterol = parseFloat(selected.data.blood_test.total_cholesterol);
-					selected.data.blood_test.glucose = parseFloat(selected.data.blood_test.glucose);
+					selected.data.demography.height = this.parseFloat(selected.data.demography.height);
+					selected.data.demography.weight = this.parseFloat(selected.data.demography.weight);
+					selected.data.blood_test.ldl_c = this.parseFloat(selected.data.blood_test.ldl_c);
+					selected.data.blood_test.hdl = this.parseFloat(selected.data.blood_test.hdl); 
+					selected.data.blood_test.total_cholesterol = this.parseFloat(selected.data.blood_test.total_cholesterol);
+					selected.data.blood_test.glucose = this.parseFloat(selected.data.blood_test.glucose);
+					selected.data.blood_test.total_bilirubin = this.parseFloat(selected.data.blood_test.total_bilirubin);
+					selected.data.blood_test.alanine_aminotransferase = this.parseFloat(selected.data.blood_test.alanine_aminotransferase);
+					selected.data.blood_test.alkaline_phosphatase = this.parseFloat(selected.data.blood_test.alkaline_phosphatase);
 
 					// parseInt
-					selected.data.demography.age = parseInt(selected.data.demography.age);
-					selected.data.blood_pressure.systolic = parseInt(selected.data.blood_pressure.systolic);
-					selected.data.blood_pressure.diastolic = parseInt(selected.data.blood_pressure.diastolic);
+					selected.data.demography.age = this.parseInt(selected.data.demography.age);
+					selected.data.blood_pressure.systolic = this.parseInt(selected.data.blood_pressure.systolic);
+					selected.data.blood_pressure.diastolic = this.parseInt(selected.data.blood_pressure.diastolic);
 
-					function parseBool(boolObj){
-						for (var key in boolObj){
-							if(boolObj[key] == "0"){
-								boolObj[key] = false;
-							}else{
-								boolObj[key] = true;
-							}
-						}
-					}
-					
-					parseBool(selected.data.medical_history);
-					parseBool(selected.data.family_history);
+					selected.data.statin_first.dept = $("#selected_data_statin_first_dept").val();
+					selected.data.statin_first.code = $("#selected_data_statin_first_code").val();
+					selected.data.statin_last.dept = $("#selected_data_statin_last_dept").val();
+					selected.data.statin_last.code = $("#selected_data_statin_last_code").val();
 
 					if(date.birth.birth_year.length != 4 || date.birth.birth_month.length !=2 || date.birth.birth_day.length != 2) {
 						alert("생년월일(1900-00-00)을 올바르게 입력하셔야 합니다.");
 						return;
 					}
-					if(date.blood_test.year.length != 4 || date.blood_test.month.length !=2 || date.blood_test.day.length != 2) {
-						alert("혈액 검사일자(1900-00-00)를 올바르게 입력하셔야 합니다.");
+					if(selected.data.demography.age == null){
+						alert("나이를 입력하셔야 합니다.");
+						return;
+					}
+					if(selected.data.demography.sex.length == 0){
+						alert("성별을 입력하셔야 합니다.");
+						return;
+					}
+					if(selected.data.demography.height == null){
+						alert("키를 입력하셔야 합니다.");
+						return;
+					}
+					if(selected.data.demography.weight == null){
+						alert("몸무게를 입력하셔야 합니다.");
 						return;
 					}
 					if(date.blood_pressure.year.length != 4 || date.blood_pressure.month.length !=2 || date.blood_pressure.day.length != 2) {
 						alert("혈압 측정일자(1900-00-00)를 올바르게 입력하셔야 합니다.");
 						return;
 					}
+					if(selected.data.blood_pressure.systolic == null){
+						alert("수축혈압을 입력하셔야 합니다.");
+						return;
+					}
+					if(selected.data.blood_pressure.diastolic == null){
+						alert("이완혈압을 입력하셔야 합니다.");
+						return;
+					}
 					if(date.statin_first.year.length != 4 || date.statin_first.month.length !=2 || date.statin_first.day.length != 2) {
 						alert("스타틴 첫 처방일(1900-00-00)을 올바르게 입력하셔야 합니다.");
-						return;
-					}
-					if(date.statin_last.year.length != 4 || date.statin_last.month.length !=2 || date.statin_last.day.length != 2) {
-						alert("스타틴 가장 최근 처방일(1900-00-00)을 올바르게 입력하셔야 합니다.");
-						return;
-					}
-					if(selected.data.demography.age.length <= 0){
-						alert("나이를 입력하셔야 합니다.");
-						return;
-					}
-					if(selected.data.demography.height.length <= 0){
-						alert("키를 입력하셔야 합니다.");
-						return;
-					}
-					if(selected.data.demography.weight.length <= 0){
-						alert("몸무게를 입력하셔야 합니다.");
-						return;
-					}
-					if(selected.data.blood_pressure.systolic.length <= 0){
-						alert("수축혈압을 입력하셔야 합니다.");
-						return;
-					}
-					if(selected.data.blood_pressure.diastolic.length <= 0){
-						alert("수축혈압을 입력하셔야 합니다.");
 						return;
 					}
 					if(selected.data.statin_first.dept.length == 0){
 						alert("스타틴 첫 처방과를 입력하셔야 합니다.");
 						return;
 					}
-					if(selected.data.statin_first.dept.length == 0){
+					if(selected.data.statin_first.code.length == 0){
 						alert("스타틴 첫 처방약물코드를 입력하셔야 합니다.");
+						return;
+					}
+					if(date.statin_last.year.length != 4 || date.statin_last.month.length !=2 || date.statin_last.day.length != 2) {
+						alert("스타틴 가장 최근 처방일(1900-00-00)을 올바르게 입력하셔야 합니다.");
 						return;
 					}
 					if(selected.data.statin_last.dept.length == 0){
 						alert("스타틴 최근 처방과를 입력하셔야 합니다.");
 						return;
 					}
-					if(selected.data.statin_last.dept.length == 0){
+					if(selected.data.statin_last.code.length == 0){
 						alert("스타틴 최근 처방약물코드를 입력하셔야 합니다.");
 						return;
 					}
-					if(selected.data.blood_test.ldl_c.length < 0){
+					if(date.blood_test.year.length != 4 || date.blood_test.month.length !=2 || date.blood_test.day.length != 2) {
+						alert("혈액 검사일자(1900-00-00)를 올바르게 입력하셔야 합니다.");
+						return;
+					}
+					if(selected.data.blood_test.ldl_c == null){
 						alert("LDL-C 수치를 입력하셔야 합니다.");
 						return;
 					}
-					if(selected.data.blood_test.hdl.length < 0){
+					if(selected.data.blood_test.hdl == null){
 						alert("HDL 수치를 입력하셔야 합니다.");
 						return;
 					}
-					if(selected.data.blood_test.total_cholesterol.length < 0){
+					if(selected.data.blood_test.total_cholesterol == null){
 						alert("T-cholesterol 수치를 입력하셔야 합니다.");
 						return;
 					}
-					if(selected.data.blood_test.glucose.length < 0){
+					if(selected.data.blood_test.glucose == null){
 						alert("공복시 혈당 수치를 입력하셔야 합니다.");
 						return;
 					}
+					if(selected.data.blood_test.total_bilirubin == null){
+						alert("Total Bilirubin 수치를 입력하셔야 합니다.");
+						return;
+					}
+					if(selected.data.blood_test.alanine_aminotransferase == null){
+						alert("Alanine Aminotransferase 수치를 입력하셔야 합니다.");
+						return;
+					}
+					if(selected.data.blood_test.alkaline_phosphatase == null){
+						alert("Alkaline Phosphatase 수치를 입력하셔야 합니다.");
+						return;
+					}
+
+					this.parseBoolObject(selected.data.drug_history);
+					this.parseBoolObject(selected.data.medical_history);
+					this.parseBoolObject(selected.data.family_history);
 
 					this.doAddInfo();
 				},
@@ -509,10 +601,36 @@
 							}
 						}
 					}
+					parseVal(item.data.drug_history);
 					parseVal(item.data.medical_history);
 					parseVal(item.data.family_history);
 
 					this.selected = $.extend(true, {}, item);
+				},
+				parseBoolObject: function(boolObj){
+					for (var key in boolObj){
+						if(boolObj[key] == "1"){
+							boolObj[key] = true;
+						} else {
+							boolObj[key] = false;
+						}
+					}
+				},
+				parseInt: function(val) {
+					val = parseInt(val);
+					if(isNaN(val)) {
+						return null;
+					} else {
+						return val;
+					}
+				},
+				parseFloat: function(val) {
+					val = parseFloat(val);
+					if(isNaN(val)) {
+						return null;
+					} else {
+						return val;
+					}
 				}
 			}
 		</script>

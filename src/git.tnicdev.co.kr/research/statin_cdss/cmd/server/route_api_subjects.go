@@ -116,6 +116,7 @@ func route_api_subjects(g *echo.Group) {
 				BloodPressure  subject.BloodPressure  `json:"blood_pressure"`
 				StatinFirst    subject.StatinFirst    `json:"statin_first"`
 				StatinsLast    subject.StatinsLast    `json:"statin_last"`
+				DrugHistory    subject.DrugHistory    `json:"drug_history"`
 				BloodTest      subject.BloodTest      `json:"blood_test"`
 				MedicalHistory subject.MedicalHistory `json:"medical_history"`
 				FamilyHistory  subject.FamilyHistory  `json:"family_history"`
@@ -140,6 +141,7 @@ func route_api_subjects(g *echo.Group) {
 				BloodPressure:  item.BloodPressure,
 				StatinFirst:    item.StatinFirst,
 				StatinsLast:    item.StatinsLast,
+				DrugHistory:    item.DrugHistory,
 				BloodTest:      item.BloodTest,
 				MedicalHistory: item.MedicalHistory,
 				FamilyHistory:  item.FamilyHistory,
@@ -174,6 +176,7 @@ func route_api_subjects(g *echo.Group) {
 				BloodPressure  subject.BloodPressure  `json:"blood_pressure"`
 				StatinFirst    subject.StatinFirst    `json:"statin_first"`
 				StatinsLast    subject.StatinsLast    `json:"statin_last"`
+				DrugHistory    subject.DrugHistory    `json:"drug_history"`
 				BloodTest      subject.BloodTest      `json:"blood_test"`
 				MedicalHistory subject.MedicalHistory `json:"medical_history"`
 				FamilyHistory  subject.FamilyHistory  `json:"family_history"`
@@ -205,11 +208,23 @@ func route_api_subjects(g *echo.Group) {
 				item.BloodPressure = last.BloodPressure
 			}
 			item.StatinFirst = last.StatinFirst
-			if len(item.StatinsLast.Dept) == 0 || len(item.StatinsLast.Code) == 0 || len(item.StatinsLast.Date) == 0 || item.StatinsLast.Period == 0 {
+			if len(item.StatinsLast.Dept) == 0 || len(item.StatinsLast.Code) == 0 || len(item.StatinsLast.Date) == 0 {
 				item.StatinsLast = last.StatinsLast
 			}
 			if len(item.BloodTest.Date) == 0 || item.BloodTest.HDL == 0 || item.BloodTest.TotalCholesterol == 0 || item.BloodTest.Glucose == 0 {
 				item.BloodTest = last.BloodTest
+			}
+			if last.DrugHistory.Warfarin {
+				item.DrugHistory.Warfarin = last.DrugHistory.Warfarin
+			}
+			if last.DrugHistory.Thyroxine {
+				item.DrugHistory.Thyroxine = last.DrugHistory.Thyroxine
+			}
+			if last.DrugHistory.Bisphosphonate {
+				item.DrugHistory.Bisphosphonate = last.DrugHistory.Bisphosphonate
+			}
+			if last.DrugHistory.Etc {
+				item.DrugHistory.Etc = last.DrugHistory.Etc
 			}
 			if last.MedicalHistory.TransientStroke {
 				item.MedicalHistory.TransientStroke = last.MedicalHistory.TransientStroke
@@ -235,6 +250,9 @@ func route_api_subjects(g *echo.Group) {
 			if last.MedicalHistory.HighBloodPressure {
 				item.MedicalHistory.HighBloodPressure = last.MedicalHistory.HighBloodPressure
 			}
+			if last.MedicalHistory.ActiveLiverDisorder {
+				item.MedicalHistory.ActiveLiverDisorder = last.MedicalHistory.ActiveLiverDisorder
+			}
 			if last.MedicalHistory.Smoking {
 				item.MedicalHistory.Smoking = last.MedicalHistory.Smoking
 			}
@@ -247,6 +265,7 @@ func route_api_subjects(g *echo.Group) {
 				BloodPressure:  item.BloodPressure,
 				StatinFirst:    item.StatinFirst,
 				StatinsLast:    item.StatinsLast,
+				DrugHistory:    item.DrugHistory,
 				BloodTest:      item.BloodTest,
 				MedicalHistory: item.MedicalHistory,
 				FamilyHistory:  item.FamilyHistory,
@@ -455,6 +474,7 @@ type DAO_Select_Subject struct {
 	Share     bool           `json:"share"`
 	Own       bool           `json:"own"`
 	Data      *subject.Data  `json:"data"`
+	Init      *subject.Data  `json:"init"`
 	History   []*DAO_History `json:"history"`
 	TCreate   string         `json:"t_create"`
 }
@@ -486,6 +506,7 @@ func Select_Subject(Uid string, subject *subject.Subject) (*DAO_Select_Subject, 
 		TCreate:   convert.String(subject.TCreate)[:10],
 	}
 	if len(subject.Datas) > 0 {
+		dao.Init = subject.Datas[0]
 		dao.Data = subject.Datas[len(subject.Datas)-1]
 	}
 	for i, _ := range subject.Datas {

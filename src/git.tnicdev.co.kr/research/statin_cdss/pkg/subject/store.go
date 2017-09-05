@@ -32,6 +32,7 @@ type Data struct {
 	BloodPressure  BloodPressure  `json:"blood_pressure"`
 	StatinFirst    StatinFirst    `json:"statin_first"`
 	StatinsLast    StatinsLast    `json:"statin_last"`
+	DrugHistory    DrugHistory    `json:"drug_history"`
 	BloodTest      BloodTest      `json:"blood_test"`
 	MedicalHistory MedicalHistory `json:"medical_history"`
 	FamilyHistory  FamilyHistory  `json:"family_history"`
@@ -55,37 +56,46 @@ type BloodPressure struct {
 }
 
 type StatinFirst struct {
-	Dept   string `json:"dept"`
-	Code   string `json:"code"`
-	Date   string `json:"date"`
-	Period int64  `json:"period"`
+	Dept string `json:"dept"`
+	Code string `json:"code"`
+	Date string `json:"date"`
 }
 
 type StatinsLast struct {
-	Dept   string `json:"dept"`
-	Code   string `json:"code"`
-	Date   string `json:"date"`
-	Period int64  `json:"period"`
+	Dept string `json:"dept"`
+	Code string `json:"code"`
+	Date string `json:"date"`
+}
+
+type DrugHistory struct {
+	Warfarin       bool `json:"warfarin"`
+	Thyroxine      bool `json:"thyroxine"`
+	Bisphosphonate bool `json:"bisphosphonate"`
+	Etc            bool `json:"etc"`
 }
 
 type BloodTest struct {
-	Date             string  `json:"date"`
-	LDL              float64 `json:"ldl_c"`
-	HDL              float64 `json:"hdl"`
-	TotalCholesterol float64 `json:"total_cholesterol"`
-	Glucose          float64 `json:"glucose"`
+	Date                    string  `json:"date"`
+	LDL                     float64 `json:"ldl_c"`
+	HDL                     float64 `json:"hdl"`
+	TotalCholesterol        float64 `json:"total_cholesterol"`
+	Glucose                 float64 `json:"glucose"`
+	TotalBilirubin          float64 `json:"total_bilirubin"`
+	AlanineAminotransferase float64 `json:"alanine_aminotransferase"`
+	AlkalinePhosphatase     float64 `json:"alkaline_phosphatase"`
 }
 
 type MedicalHistory struct {
-	TransientStroke    bool `json:"transient_stroke"`
-	PeripheralVascular bool `json:"peripheral_vascular"`
-	Carotid            bool `json:"carotid"`
-	AbdominalAneurysm  bool `json:"abdominal_aneurysm"`
-	Diabetes           bool `json:"diabetes"`
-	CoronaryArtery     bool `json:"coronary_artery"`
-	IschemicStroke     bool `json:"ischemic_stroke"`
-	HighBloodPressure  bool `json:"high_blood_pressure"`
-	Smoking            bool `json:"smoking"`
+	TransientStroke     bool `json:"transient_stroke"`
+	PeripheralVascular  bool `json:"peripheral_vascular"`
+	Carotid             bool `json:"carotid"`
+	AbdominalAneurysm   bool `json:"abdominal_aneurysm"`
+	Diabetes            bool `json:"diabetes"`
+	CoronaryArtery      bool `json:"coronary_artery"`
+	IschemicStroke      bool `json:"ischemic_stroke"`
+	HighBloodPressure   bool `json:"high_blood_pressure"`
+	ActiveLiverDisorder bool `json:"active_liver_disorder"`
+	Smoking             bool `json:"smoking"`
 }
 
 type FamilyHistory struct {

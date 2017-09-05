@@ -20,88 +20,114 @@
 							<div class="content clearfix content-subject-info">
 								<table class="table-default table-subject-info">
 									<colgroup>
-										<col width="10%">
-										<col width="10%">
-										<col width="10%">
-										<col width="10%">
-										<col width="10%">
-										<col width="10%">
-										<col width="10%">
-										<col width="10%">
-										<col width="10%">
-										<col width="10%">
+										<col width="12.5%">
+										<col width="12.5%">
+										<col width="12.5%">
+										<col width="12.5%">
+										<col width="12.5%">
+										<col width="12.5%">
+										<col width="12.5%">
+										<col width="12.5%">
 									</colgroup>
 									<tr>
 										<th>일련번호</th>
 										<td>{{selected.subject_id}}</td>
-										<th>수축혈압</th>
-										<td>{{selected.data.blood_pressure.systolic}}</td>
-										<th>스타틴 첫 처방과</th>
-										<td>{{selected.data.statin_first.dept}}</td>
+										<th>스타틴 처음 처방일</th>
+										<td>{{selected.data.statin_first.date}}</td>
+										<th>혈액 검사 일자</th>
+										<td>{{selected.data.blood_test.date}}</td>
 										<th>일과성 뇌졸중 발작</th>
 										<td>{{constants.bool_hash[selected.data.medical_history.transient_stroke]}}</td>
-										<th>허혈성 뇌졸중</th>
-										<td>{{constants.bool_hash[selected.data.medical_history.ischemic_stroke]}}</td>
 									</tr>
 									<tr>
 										<th>생년월일</th>
 										<td>{{selected.data.demography.birth_date}}</td>
-										<th>이완혈압</th>
-										<td>{{selected.data.blood_pressure.diastolic}}</td>
-										<th>스타틴 첫 처방 약물코드</th>
-										<td>{{selected.data.statin_first.code}}</td>
+										<th>스타틴 첫 처방과</th>
+										<td>{{selected.data.statin_first.dept}}</td>
+										<th>현재 LDL-C</th>
+										<td>{{selected.data.blood_test.ldl_c}}</td>
 										<th>말초혈관질환</th>
 										<td>{{constants.bool_hash[selected.data.medical_history.peripheral_vascular]}}</td>
-										<th>고혈압 이력 유무</th>
-										<td>{{constants.bool_hash[selected.data.medical_history.high_blood_pressure]}}</td>
 									</tr>
 									<tr>
 										<th>나이</th>
 										<td>{{selected.data.demography.age}}</td>
-										<th>현재 LDL-C</th>
-										<td>{{selected.data.blood_test.ldl_c}}</td>
-										<th>스타틴 처음 처방일</th>
-										<td>{{selected.data.statin_first.date}}</td>
+										<th>스타틴 첫 처방 약물코드</th>
+										<td>{{selected.data.statin_first.code}}</td>
+										<th>HDL 수치</th>
+										<td>{{selected.data.blood_test.hdl}}</td>
 										<th>경동맥 질환</th>
 										<td>{{constants.bool_hash[selected.data.medical_history.carotid]}}</td>
-										<th>흡연</th>
-										<td>{{constants.bool_hash[selected.data.medical_history.smoking]}}</td>
 									</tr>
 									<tr>
 										<th>성별</th>
 										<td>{{constants.sex_hash[selected.data.demography.sex]}}</td>
-										<th>HDL 수치</th>
-										<td>{{selected.data.blood_test.hdl}}</td>
-										<th>스타틴 최근 처방과</th>
-										<td>{{selected.data.statin_last.dept}}</td>
+										<th>스타틴 가장 최근 처방일</th>
+										<td>{{selected.data.statin_last.date}}</td>
+										<th>T-cholesterol 수치</th>
+										<td>{{selected.data.blood_test.total_cholesterol}}</td>
 										<th>복부동맥류</th>
 										<td>{{constants.bool_hash[selected.data.medical_history.abdominal_aneurysm]}}</td>
-										<td></td>
-										<td></td>
 									</tr>
 									<tr>
 										<th>키</th>
 										<td>{{selected.data.demography.height}}</td>
-										<th>T-cholesterol 수치</th>
-										<td>{{selected.data.blood_test.total_cholesterol}}</td>
-										<th>스타틴 최근 처방 약물코드</th>
-										<td>{{selected.data.statin_last.code}}</td>
+										<th>스타틴 최근 처방과</th>
+										<td>{{selected.data.statin_last.dept}}</td>
+										<th>공복 시 혈당</th>
+										<td>{{selected.data.blood_test.glucose}}</td>
 										<th>당뇨병</th>
 										<td>{{constants.bool_hash[selected.data.medical_history.diabetes]}}</td>
-										<td></td>
-										<td></td>
 									</tr>
 									<tr>
 										<th>몸무게</th>
 										<td>{{selected.data.demography.weight}}</td>
-										<th>공복 시 혈당</th>
-										<td>{{selected.data.blood_test.glucose}}</td>
-										<th>스타틴 가장 최근 처방일</th>
-										<td>{{selected.data.statin_last.date}}</td>
-										<th>관상동맥질환</th>
+										<th>스타틴 최근 처방 약물코드</th>
+										<td>{{selected.data.statin_last.code}}</td>
+										<th>Total Bilirubin</th>
+										<td>{{selected.data.blood_test.total_bilirubin}}</td>
+										<th>허혈성 뇌졸중</th>
+										<td>{{constants.bool_hash[selected.data.medical_history.ischemic_stroke]}}</td>
+									</tr>
+									<tr>
+										<th>혈압 측정 일자</th>
+										<td>{{selected.data.blood_pressure.date}}</td>
+										<th>Warfarin 복용 여부</th>
+										<td>{{constants.bool_hash[selected.data.drug_history.warfarin]}}</td>
+										<th>Alanine Aminotransferase(ALT)</th>
+										<td>{{selected.data.blood_test.alanine_aminotransferase}}</td>
+										<th>고혈압 이력 유무</th>
+										<td>{{constants.bool_hash[selected.data.medical_history.high_blood_pressure]}}</td>
+									</tr>
+									<tr>
+										<th>수축혈압</th>
+										<td>{{selected.data.blood_pressure.systolic}}</td>
+										<th>Thyroxine 복용 여부</th>
+										<td>{{constants.bool_hash[selected.data.drug_history.thyroxine]}}</td>
+										<th>Alkaline Phosphatase(ALP)</th>
+										<td>{{selected.data.blood_test.alkaline_phosphatase}}</td>
+										<th>활성간장애(스타틴 처방 1년이내)</th>
+										<td>{{constants.bool_hash[selected.data.medical_history.active_liver_disorder]}}</td>
+									</tr>
+									<tr>
+										<th>이완혈압</th>
+										<td>{{selected.data.blood_pressure.diastolic}}</td>
+										<th>Bisphosphonate  복용 여부</th>
+										<td>{{constants.bool_hash[selected.data.drug_history.bisphosphonate ]}}</td>
+										<th></th>
+										<td></td>
+										<th>흡연</th>
+										<td>{{constants.bool_hash[selected.data.medical_history.smoking]}}</td>
+									</tr>
+									<tr>
+										<th></th>
+										<td></td>
+										<th>기타 병용약물 복용 여부</th>
+										<td>{{constants.bool_hash[selected.data.drug_history.etc]}}</td>
+										<th></th>
+										<td></td>
+										<th>관상동맥질환(가족력)</th>
 										<td>{{constants.bool_hash[selected.data.family_history.coronary_artery]}}</td>
-										<td></td>
-										<td></td>
 									</tr>
 								</table>
 							</div>
@@ -327,21 +353,28 @@
 									statin_first : {
 										dept :'',
 										code : '',
-										date : '',
-										period : ''
+										date : ''
 									},
 									statin_last : {
 										dept :'',
 										code : '',
-										date : '',
-										period : ''
+										date : ''
+									},
+									drug_history: {
+										warfarin: '',
+										thyroxine: '',
+										bisphosphonate: '',
+										etc: ''
 									},
 									blood_test : {
 										date : '',
 										ldl_c : '',
 										hdl : '',
 										total_cholesterol : '',
-										glucose : ''
+										glucose : '',
+										total_bilirubin: '',
+										alanine_aminotransferase: '',
+										alkaline_phosphatase: ''
 									},
 									medical_history : {
 										transient_stroke: '',
@@ -351,6 +384,7 @@
 										diabetes : '',
 										ischemic_stroke :'',
 										high_blood_pressure : '',
+										active_liver_disorder: '',
 										smoking: ''
 									},
 									family_history : {

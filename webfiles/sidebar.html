@@ -55,8 +55,6 @@
 					if(res.body.error != null) {
 						alert(res.body.error);
 					} else {
-						console.log(res.body.result);
-						//TODO
 						Callback.call("update-subject-list", res.body.result);
 					}
 				}, function(err) {
