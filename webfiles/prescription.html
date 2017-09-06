@@ -1,1177 +1,1177 @@
 <prescription-content>
-			<div class="content clearfix" id="prescription-content" style="display:block" v-if="selected != null">
-				<div class="col-xs-12">
-					<section class="box box-height-sm box-status-info" v-bind:class="{red : (selected.data.estimation.dangerous_group == 'extream'), yellow : (selected.data.estimation.dangerous_group == 'high'), skyblue : (selected.data.estimation.dangerous_group == 'danger2'), aqua : (selected.data.estimation.dangerous_group == 'danger1')}">
-						<h1>대상자는 <span>{{selected.follow=='initial' ? '-' : constants.dangerous_hash[selected.data.estimation.dangerous_group]}}</span> 입니다.</h1>
-						<h1>대상자의 LDL-C 목표는 <span>{{selected.data.estimation.target_ldl}}mg/dL</span> 입니다.</h1>
-						<h1>대상자의 추천 강도는 <span>{{constants.level_hash[selected.recommend_level]}}</span> 입니다.</h1>
-						<p class="">대상자의 공복혈당은 <span class="point">{{selected.data.blood_test.glucose}}mg/dL</span>으로 <span class="point" v-if="selected.data.blood_test.glucose < 100">정상혈당</span><span class="point" v-else>당뇨병 전단계</span>입니다.</p>
-					</section>
+	<div class="content clearfix" id="prescription-content" style="display:none;" v-if="selected != null">
+		<div class="col-xs-12">
+			<section class="box box-height-sm box-status-info" v-bind:class="{red : (selected.data.estimation.dangerous_group == 'extream'), yellow : (selected.data.estimation.dangerous_group == 'high'), skyblue : (selected.data.estimation.dangerous_group == 'danger2'), aqua : (selected.data.estimation.dangerous_group == 'danger1')}">
+				<h1>대상자는 <span>{{selected.follow=='initial' ? '-' : constants.dangerous_hash[selected.data.estimation.dangerous_group]}}</span> 입니다.</h1>
+				<h1>대상자의 LDL-C 목표는 <span>{{selected.data.estimation.target_ldl}}mg/dL</span> 입니다.</h1>
+				<h1>대상자의 추천 강도는 <span>{{constants.level_hash[selected.recommend_level]}}</span> 입니다.</h1>
+				<p class="">대상자의 공복혈당은 <span class="point">{{selected.data.blood_test.glucose}}mg/dL</span>으로 <span class="point" v-if="selected.data.blood_test.glucose < 100">정상혈당</span><span class="point" v-else>당뇨병 전단계</span>입니다.</p>
+			</section>
+		</div>
+		<div class="col-xs-6">
+			<section class="box box-height-sm">
+				<h3 class="title">
+					강도 <span class="sub-title">스타틴 처방 강도를 선택해 주세요</span><br/>
+					<span class="sub-title">강도에 맞는 스타틴이 필요합니다.</span>
+				</h3>
+				<div class="content">
+					<div class="btn-grp btn-strong-grp">
+						<button class="btn btn-gray" type="button" v-for="item in levels" v-bind:value="item.val" v-bind:class="{'active' : item.selected}" v-on:click="selectBtn(item)">{{item.name}}<br/><span v-if="item.val == selected.recommend_level">(
+						추천)</span></button>
+					</div>
+					<h4 v-for="item in levels" v-if="item.selected">
+						{{constants.level_hash[item.val]}}의 스타틴에는 <span class="point" style="color:#f4d033;" v-for="(statin, index) in item.statins">{{(index > 0 ? ", " : "") + statin.name + "(" + statin.amount + "ml)"}}</span>가 있습니다.
+					</h4>
 				</div>
-				<div class="col-xs-6">
-					<section class="box box-height-sm">
-						<h3 class="title">
-							강도 <span class="sub-title">스타틴 처방 강도를 선택해 주세요</span><br/>
-							<span class="sub-title">강도에 맞는 스타틴이 필요합니다.</span>
-						</h3>
-						<div class="content">
-							<div class="btn-grp btn-strong-grp">
-								<button class="btn btn-gray" type="button" v-for="item in levels" v-bind:value="item.val" v-bind:class="{'active' : item.selected}" v-on:click="selectBtn(item)">{{item.name}}<br/><span v-if="item.val == selected.recommend_level">(
-								추천)</span></button>
-							</div>
-							<h4 v-for="item in levels" v-if="item.selected">
-								{{constants.level_hash[item.val]}}의 스타틴에는 <span class="point" style="color:#f4d033;" v-for="(statin, index) in item.statins">{{(index > 0 ? ", " : "") + statin.name + "(" + statin.amount + "ml)"}}</span>가 있습니다.
-							</h4>
+			</section>
+		</div>
+		<div class="col-xs-6">
+			<section class="box box-height-sm">
+				<h3 class="title">스타틴 <span class="sub-title">선호하는 스타틴의 종류를 선택해 주세요.</span></h3>
+				<div class="content clearfix">
+					<div class="btn-grp btn-statin-grp">
+						<button class="btn btn-gray" type="button" v-for="item in statins" v-bind:disabled="!selected_levels_statin[item.name]" v-bind:value="item.name" v-bind:class="{'active' : item.selected}" v-on:click="selectBtn(item)">{{item.name}}</button>
+					</div>
+				</div>
+					<h4 v-for="item in statins" v-if="item.selected">
+						{{item.name}}의 강도에는 <span class="point" style="color:#f4d033;" v-for="(level, index) in item.levels">{{(index > 0 ? ", " : "") + level.name + "(" + level.amount + "ml)"}}</span>가 있습니다.
+					</h4>
+			</section>
+		</div>
+		<div class="col-xs-12">
+			<section class="box box-height-sm">
+				<h3 class="title">
+					스타틴 처방강도와 종류에 따른 LDL-C 변화 예측<span class="sub-title">스타틴 처방 강도와 종류를 선택해 주세요</span>
+				</h3>
+				<div class="content">
+					<h4 v-for="item in next_ldls">
+						<span class="point" style="color:#fd7a76;">{{item.level}}</span>로 <span class="point" style="color:#2980b9;">{{item.statin}} ({{item.amount}}ml)</span>을 처방 시 <span class="point" style="color:#f4d033;">{{Math.floor(item.ldl_c)}}</span>으로 예측됨.
+					</h4>
+				</div>
+			</section>
+		</div>
+		<div class="col-sm-12" id="prescription-table">
+			<section class="box box-height-md">
+				<div class="content clearfix">
+					<div class="col-xs-3">
+						<ul class="nav-list" id="table_nav">
+							<li class="nav-item"><a href="#container" class="active">처방선택</a></li>
+							<li class="nav-item"><a href="#table_compare_grf">GRF 비교 테이블</a></li>
+							<li class="nav-item"><a href="#table_compare_dm">DM 비교 테이블</a></li>
+							<li class="nav-item"><a href="#table_amount">스타틴 용량표</a></li>
+							<li class="nav-item"><a href="#table_individual_cost">스타틴 개개별 가격 테이블</a></li>
+							<li class="nav-item"><a href="#table_cost">스타틴 경제성 분석</a></li>
+						</ul>
+					</div>
+					<div class="col-xs-9">
+						<div id="table_compare_grf" style="margin-top:-70px;"></div>
+						<div class="content clearfix" style="margin-top:70px;"> 
+							<h3 class="title">스타틴 사용시 예상 GRF 변화표(용량별)</h3>
+							<table class="table-default">
+								<thead>
+									<th></th>
+									<th>3달 뒤 예상 GFR 변화</th>
+									<th>4년 뒤 예상 GFR 변화</th>
+								</thead>
+								<tbody v-if="selected.data.blood_test.glucose < 100">
+									<tr v-if="selected_levels['high']">
+										<td>고강도 스타틴</td>
+										<td>2.6±2.2</td>
+										<td>-6.5±2.5*</td>
+									</tr>
+									<tr v-if="selected_levels['middle-high']">
+										<td>중고강도 스타틴</td>
+										<td>3.9±0.4**</td>
+										<td>-2.6±0.7**</td>
+									</tr>
+									<tr v-if="selected_levels['middle-low']">
+										<td>중저강도 스타틴</td>
+										<td>3.1±0.3**</td>
+										<td>-3.2±0.5**</td>
+									</tr>
+									<tr v-if="selected_levels['low']">
+										<td>저강도 스타틴</td>
+										<td>2.1±0.8*</td>
+										<td>-3.1±1.3*</td>
+									</tr>
+								</tbody>
+								<tbody v-else>
+									<tr v-if="selected_levels['high']">
+										<td>고강도 스타틴</td>
+										<td>2.6±2.2</td>
+										<td>-6.5±2.5*</td>
+									</tr>
+									<tr v-if="selected_levels['middle-high']">
+										<td>중고강도 스타틴</td>
+										<td>3.9±0.4**</td>
+										<td>-2.6±0.7**</td>
+									</tr>
+									<tr v-if="selected_levels['middle-low']">
+										<td>중저강도 스타틴</td>
+										<td>3.1±0.3**</td>
+										<td>-3.2±0.5**</td>
+									</tr>
+									<tr v-if="selected_levels['low']">
+										<td>저강도 스타틴</td>
+										<td>2.1±0.8*</td>
+										<td>-3.13±1.3*</td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<td colspan='5' class="align-left">
+											<p><strong>* p &lt; 0.05 versus baseline</strong></p>
+											<p><strong>** p &lt; 0.001 versus baseline</strong></p>
+										</td>
+									</tr>
+								</tfoot>
+							</table>
 						</div>
-					</section>
-				</div>
-				<div class="col-xs-6">
-					<section class="box box-height-sm">
-						<h3 class="title">스타틴 <span class="sub-title">선호하는 스타틴의 종류를 선택해 주세요.</span></h3>
-						<div class="content clearfix">
-							<div class="btn-grp btn-statin-grp">
-								<button class="btn btn-gray" type="button" v-for="item in statins" v-bind:disabled="!selected_levels_statin[item.name]" v-bind:value="item.name" v-bind:class="{'active' : item.selected}" v-on:click="selectBtn(item)">{{item.name}}</button>
-							</div>
+						<div class="content clearfix"> 
+							<h3 class="title">스타틴 사용시 예상 GRF 변화표(스타틴별)</h3>
+							<table class="table-default">
+								<thead>
+									<th></th>
+									<th>3달 뒤 예상 GFR 변화</th>
+									<th colspan="2">4년 뒤 예상 GFR 변화</th>
+								</thead>
+								<tbody v-if="selected.data.blood_test.glucose < 100">
+									<tr v-if="selected_statins['Atorvastatin']">
+										<td>Atorvastatin</td>
+										<td>2.2±0.4**</td>
+										<td>-5.3±0.7**</td>
+										<td>Reference</td>
+									</tr>
+									<tr v-if="selected_statins['Fluvastatin']">
+										<td>Fluvastatin</td>
+										<td>4.0±1.2**</td>
+										<td>1.2±2.2</td>
+										<td>1.01 (0.61-1.70)</td>
+									</tr>
+									<tr v-if="selected_statins['Pitavastatin']">
+										<td>Pitavastatin</td>
+										<td>3.5±0.6**</td>
+										<td>-2.9±0.8**</td>
+										<td>0.64 (0.46-0.87)*</td>
+									</tr>
+									<tr v-if="selected_statins['Pravastatin']">
+										<td>Pravastatin</td>
+										<td>0.9±0.7</td>
+										<td>-4.7±1.2**</td>
+										<td>0.79 (0.56-1.13)</td>
+									</tr>
+									<tr v-if="selected_statins['Rosuvastatin']">
+										<td>Rosuvastatin</td>
+										<td>4.3±0.5**</td>
+										<td>-2.8±0.8**</td>
+										<td>0.89 (0.69-1.14)</td>
+									</tr>
+									<tr v-if="selected_statins['Simvastatin']">
+										<td>Simvastatin</td>
+										<td>0.2±0.5**</td>
+										<td>-0.7±0.8**</td>
+										<td>0.69 (0.53-0.91)*</td>
+									</tr>
+								</tbody>
+								<tbody v-else>
+									<tr v-if="selected_statins['Atorvastatin']">
+										<td>Atorvastatin</td>
+										<td>2.2±0.4**</td>
+										<td>-5.3±0.7**</td>
+										<td>Reference</td>
+									</tr>
+									<tr v-if="selected_statins['Fluvastatin']">
+										<td>Fluvastatin</td>
+										<td>4.0±1.2**</td>
+										<td>1.2±2.2</td>
+										<td>1.01 (0.61-1.70)</td>
+									</tr>
+									<tr v-if="selected_statins['Pitavastatin']">
+										<td>Pitavastatin</td>
+										<td>3.5±0.6**</td>
+										<td>-2.9±0.8**</td>
+										<td>0.64 (0.46-0.87)*</td>
+									</tr>
+									<tr v-if="selected_statins['Pravastatin']">
+										<td>Pravastatin</td>
+										<td>0.9±0.7</td>
+										<td>-4.7±1.2**</td>
+										<td>0.79 (0.56-1.13)</td>
+									</tr>
+									<tr v-if="selected_statins['Rosuvastatin']">
+										<td>Rosuvastatin</td>
+										<td>4.3±0.5**</td>
+										<td>-2.8±0.8**</td>
+										<td>0.89 (0.69-1.14)</td>
+									</tr>
+									<tr v-if="selected_statins['Simvastatin']">
+										<td>Simvastatin</td>
+										<td>0.2±0.5**</td>
+										<td>-0.7±0.8**</td>
+										<td>0.69 (0.53-0.91)*</td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<td colspan='6' class="align-left">
+											<p><strong>* p &lt; 0.05 versus baseline</strong></p>
+											<p><strong>** p &lt; 0.001 versus baseline</strong></p>
+										</td>
+									</tr>
+								</tfoot>
+							</table>
 						</div>
-							<h4 v-for="item in statins" v-if="item.selected">
-								{{item.name}}의 강도에는 <span class="point" style="color:#f4d033;" v-for="(level, index) in item.levels">{{(index > 0 ? ", " : "") + level.name + "(" + level.amount + "ml)"}}</span>가 있습니다.
-							</h4>
-					</section>
-				</div>
-				<div class="col-xs-12">
-					<section class="box box-height-sm">
-						<h3 class="title">
-							스타틴 처방강도와 종류에 따른 LDL-C 변화 예측<span class="sub-title">스타틴 처방 강도와 종류를 선택해 주세요</span>
-						</h3>
-						<div class="content">
-							<h4 v-for="item in next_ldls">
-								<span class="point" style="color:#fd7a76;">{{item.level}}</span>로 <span class="point" style="color:#2980b9;">{{item.statin}} ({{item.amount}}ml)</span>을 처방 시 <span class="point" style="color:#f4d033;">{{Math.floor(item.ldl_c)}}</span>으로 예측됨.
-							</h4>
+						<div id="table_compare_dm" style="margin-top:-70px;"></div>
+						<div class="content" style="margin-top:70px;"> 
+							<h3 class="title">스타틴 사용시 예상 DM 변화표(용량별)</h3>
+							<table class="table-default">
+								<thead>
+									<th></th>
+									<th>From Prediabetes to DM</th>
+									<th v-if="selected.data.blood_test.glucose < 100">From Normal to DM</th>
+								</thead>
+								<tbody v-if="selected.data.blood_test.glucose < 100">
+									<tr v-if="selected_levels['high']">
+										<td>고강도 스타틴</td>
+										<td>0.61</td>
+										<td>1.21</td>
+									</tr>
+									<tr v-if="selected_levels['middle-high']">
+										<td>중고강도 스타틴</td>
+										<td>0.99</td>
+										<td>1.09</td>
+									</tr>
+									<tr v-if="selected_levels['middle-low']">
+										<td>중저강도 스타틴</td>
+										<td>1.0 (Reference)</td>
+										<td>1.0 (Reference)</td>
+									</tr>
+									<tr v-if="selected_levels['low']">
+										<td>저강도 스타틴</td>
+										<td>1.07</td>
+										<td>1.28</td>
+									</tr>
+								</tbody>
+								<tbody v-else>
+									<tr v-if="selected_levels['high']">
+										<td>고강도 스타틴</td>
+										<td>1.26</td>
+									</tr>
+									<tr v-if="selected_levels['middle-high']">
+										<td>중고강도 스타틴</td>
+										<td>1.17</td>
+									</tr>
+									<tr v-if="selected_levels['middle-low']">
+										<td>중저강도 스타틴</td>
+										<td>1.00</td>
+									</tr>
+									<tr v-if="selected_levels['low']">
+										<td>저강도 스타틴</td>
+										<td>0.99</td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<td colspan='5' class="align-left">
+											<p><strong>* p &lt; 0.05 versus baseline</strong></p>
+											<p><strong>** p &lt; 0.001 versus baseline</strong></p>
+										</td>
+									</tr>
+								</tfoot>
+							</table>
 						</div>
-					</section>
-				</div>
-				<div class="col-sm-12" id="prescription-table">
-					<section class="box box-height-md">
-						<div class="content clearfix">
-							<div class="col-xs-3">
-								<ul class="nav-list" id="table_nav">
-									<li class="nav-item"><a href="#container" class="active">처방선택</a></li>
-									<li class="nav-item"><a href="#table_compare_grf">GRF 비교 테이블</a></li>
-									<li class="nav-item"><a href="#table_compare_dm">DM 비교 테이블</a></li>
-									<li class="nav-item"><a href="#table_amount">스타틴 용량표</a></li>
-									<li class="nav-item"><a href="#table_individual_cost">스타틴 개개별 가격 테이블</a></li>
-									<li class="nav-item"><a href="#table_cost">스타틴 경제성 분석</a></li>
-								</ul>
-							</div>
-							<div class="col-xs-9">
-								<div id="table_compare_grf" style="margin-top:-70px;"></div>
-								<div class="content clearfix" style="margin-top:70px;"> 
-									<h3 class="title">스타틴 사용시 예상 GRF 변화표(용량별)</h3>
-									<table class="table-default">
-										<thead>
-											<th></th>
-											<th>3달 뒤 예상 GFR 변화</th>
-											<th>4년 뒤 예상 GFR 변화</th>
-										</thead>
-										<tbody v-if="selected.data.blood_test.glucose < 100">
-											<tr v-if="selected_levels['high']">
-												<td>고강도 스타틴</td>
-												<td>2.6±2.2</td>
-												<td>-6.5±2.5*</td>
-											</tr>
-											<tr v-if="selected_levels['middle-high']">
-												<td>중고강도 스타틴</td>
-												<td>3.9±0.4**</td>
-												<td>-2.6±0.7**</td>
-											</tr>
-											<tr v-if="selected_levels['middle-low']">
-												<td>중저강도 스타틴</td>
-												<td>3.1±0.3**</td>
-												<td>-3.2±0.5**</td>
-											</tr>
-											<tr v-if="selected_levels['low']">
-												<td>저강도 스타틴</td>
-												<td>2.1±0.8*</td>
-												<td>-3.1±1.3*</td>
-											</tr>
-										</tbody>
-										<tbody v-else>
-											<tr v-if="selected_levels['high']">
-												<td>고강도 스타틴</td>
-												<td>2.6±2.2</td>
-												<td>-6.5±2.5*</td>
-											</tr>
-											<tr v-if="selected_levels['middle-high']">
-												<td>중고강도 스타틴</td>
-												<td>3.9±0.4**</td>
-												<td>-2.6±0.7**</td>
-											</tr>
-											<tr v-if="selected_levels['middle-low']">
-												<td>중저강도 스타틴</td>
-												<td>3.1±0.3**</td>
-												<td>-3.2±0.5**</td>
-											</tr>
-											<tr v-if="selected_levels['low']">
-												<td>저강도 스타틴</td>
-												<td>2.1±0.8*</td>
-												<td>-3.13±1.3*</td>
-											</tr>
-										</tbody>
-										<tfoot>
-											<tr>
-												<td colspan='5' class="align-left">
-													<p><strong>* p &lt; 0.05 versus baseline</strong></p>
-													<p><strong>** p &lt; 0.001 versus baseline</strong></p>
-												</td>
-											</tr>
-										</tfoot>
-									</table>
-								</div>
-								<div class="content clearfix"> 
-									<h3 class="title">스타틴 사용시 예상 GRF 변화표(스타틴별)</h3>
-									<table class="table-default">
-										<thead>
-											<th></th>
-											<th>3달 뒤 예상 GFR 변화</th>
-											<th colspan="2">4년 뒤 예상 GFR 변화</th>
-										</thead>
-										<tbody v-if="selected.data.blood_test.glucose < 100">
-											<tr v-if="selected_statins['Atorvastatin']">
-												<td>Atorvastatin</td>
-												<td>2.2±0.4**</td>
-												<td>-5.3±0.7**</td>
-												<td>Reference</td>
-											</tr>
-											<tr v-if="selected_statins['Fluvastatin']">
-												<td>Fluvastatin</td>
-												<td>4.0±1.2**</td>
-												<td>1.2±2.2</td>
-												<td>1.01 (0.61-1.70)</td>
-											</tr>
-											<tr v-if="selected_statins['Pitavastatin']">
-												<td>Pitavastatin</td>
-												<td>3.5±0.6**</td>
-												<td>-2.9±0.8**</td>
-												<td>0.64 (0.46-0.87)*</td>
-											</tr>
-											<tr v-if="selected_statins['Pravastatin']">
-												<td>Pravastatin</td>
-												<td>0.9±0.7</td>
-												<td>-4.7±1.2**</td>
-												<td>0.79 (0.56-1.13)</td>
-											</tr>
-											<tr v-if="selected_statins['Rosuvastatin']">
-												<td>Rosuvastatin</td>
-												<td>4.3±0.5**</td>
-												<td>-2.8±0.8**</td>
-												<td>0.89 (0.69-1.14)</td>
-											</tr>
-											<tr v-if="selected_statins['Simvastatin']">
-												<td>Simvastatin</td>
-												<td>0.2±0.5**</td>
-												<td>-0.7±0.8**</td>
-												<td>0.69 (0.53-0.91)*</td>
-											</tr>
-										</tbody>
-										<tbody v-else>
-											<tr v-if="selected_statins['Atorvastatin']">
-												<td>Atorvastatin</td>
-												<td>2.2±0.4**</td>
-												<td>-5.3±0.7**</td>
-												<td>Reference</td>
-											</tr>
-											<tr v-if="selected_statins['Fluvastatin']">
-												<td>Fluvastatin</td>
-												<td>4.0±1.2**</td>
-												<td>1.2±2.2</td>
-												<td>1.01 (0.61-1.70)</td>
-											</tr>
-											<tr v-if="selected_statins['Pitavastatin']">
-												<td>Pitavastatin</td>
-												<td>3.5±0.6**</td>
-												<td>-2.9±0.8**</td>
-												<td>0.64 (0.46-0.87)*</td>
-											</tr>
-											<tr v-if="selected_statins['Pravastatin']">
-												<td>Pravastatin</td>
-												<td>0.9±0.7</td>
-												<td>-4.7±1.2**</td>
-												<td>0.79 (0.56-1.13)</td>
-											</tr>
-											<tr v-if="selected_statins['Rosuvastatin']">
-												<td>Rosuvastatin</td>
-												<td>4.3±0.5**</td>
-												<td>-2.8±0.8**</td>
-												<td>0.89 (0.69-1.14)</td>
-											</tr>
-											<tr v-if="selected_statins['Simvastatin']">
-												<td>Simvastatin</td>
-												<td>0.2±0.5**</td>
-												<td>-0.7±0.8**</td>
-												<td>0.69 (0.53-0.91)*</td>
-											</tr>
-										</tbody>
-										<tfoot>
-											<tr>
-												<td colspan='6' class="align-left">
-													<p><strong>* p &lt; 0.05 versus baseline</strong></p>
-													<p><strong>** p &lt; 0.001 versus baseline</strong></p>
-												</td>
-											</tr>
-										</tfoot>
-									</table>
-								</div>
-								<div id="table_compare_dm" style="margin-top:-70px;"></div>
-								<div class="content" style="margin-top:70px;"> 
-									<h3 class="title">스타틴 사용시 예상 DM 변화표(용량별)</h3>
-									<table class="table-default">
-										<thead>
-											<th></th>
-											<th>From Prediabetes to DM</th>
-											<th v-if="selected.data.blood_test.glucose < 100">From Normal to DM</th>
-										</thead>
-										<tbody v-if="selected.data.blood_test.glucose < 100">
-											<tr v-if="selected_levels['high']">
-												<td>고강도 스타틴</td>
-												<td>0.61</td>
-												<td>1.21</td>
-											</tr>
-											<tr v-if="selected_levels['middle-high']">
-												<td>중고강도 스타틴</td>
-												<td>0.99</td>
-												<td>1.09</td>
-											</tr>
-											<tr v-if="selected_levels['middle-low']">
-												<td>중저강도 스타틴</td>
-												<td>1.0 (Reference)</td>
-												<td>1.0 (Reference)</td>
-											</tr>
-											<tr v-if="selected_levels['low']">
-												<td>저강도 스타틴</td>
-												<td>1.07</td>
-												<td>1.28</td>
-											</tr>
-										</tbody>
-										<tbody v-else>
-											<tr v-if="selected_levels['high']">
-												<td>고강도 스타틴</td>
-												<td>1.26</td>
-											</tr>
-											<tr v-if="selected_levels['middle-high']">
-												<td>중고강도 스타틴</td>
-												<td>1.17</td>
-											</tr>
-											<tr v-if="selected_levels['middle-low']">
-												<td>중저강도 스타틴</td>
-												<td>1.00</td>
-											</tr>
-											<tr v-if="selected_levels['low']">
-												<td>저강도 스타틴</td>
-												<td>0.99</td>
-											</tr>
-										</tbody>
-										<tfoot>
-											<tr>
-												<td colspan='5' class="align-left">
-													<p><strong>* p &lt; 0.05 versus baseline</strong></p>
-													<p><strong>** p &lt; 0.001 versus baseline</strong></p>
-												</td>
-											</tr>
-										</tfoot>
-									</table>
-								</div>
-								<div class="content clearfix"> 
-									<h3 class="title">스타틴 사용시 예상 DM 변화표 (스타틴별)</h3>
-									<table class="table-default">
-										<thead>
-											<th></th>
-											<th>From Prediabetes to DM</th>
-											<th v-if="selected.data.blood_test.glucose < 100">From Normal to DM</th>
-										</thead>
-										<tbody v-if="selected.data.blood_test.glucose < 100">
-											<tr v-if="selected_statins['Atorvastatin']">
-												<td>Atorvastatin</td>
-												<td>1.0 (Reference)</td>
-												<td>1.0 (Reference)</td>
-											</tr>
-											<tr v-if="selected_statins['Fluvastatin']">
-												<td>Fluvastatin</td>
-												<td>1.02 (0.48-2.17)</td>
-												<td>1.30 (0.74-2.28)</td>
-											</tr>
-											<tr v-if="selected_statins['Pitavastatin']">
-												<td>Pitavastatin</td>
-												<td>0.62 (0.40-0.96)*</td>
-												<td>1.19 (0.83-1.69)</td>
-											</tr>
-											<tr v-if="selected_statins['Pravastatin']">
-												<td>Pravastatin</td>
-												<td>0.83 (0.54-1.28)</td>
-												<td>1.07 (0.75-1.53)</td>
-											</tr>
-											<tr v-if="selected_statins['Rosuvastatin']">
-												<td>Rosuvastatin</td>
-												<td>0.87 (0.61-1.23)</td>
-												<td>1.03 (0.75-1.40)</td>
-											</tr>
-											<tr v-if="selected_statins['Simvastatin']">
-												<td>Simvastatin</td>
-												<td>0.90 (0.62-1.31)</td>
-												<td>0.88 (0.62-1.25)</td>
-											</tr>
-										</tbody>
-										<tbody v-else>
-											<tr v-if="selected_statins['Atorvastatin']">
-												<td>Atorvastatin</td>
-												<td>Reference</td>
-												<td>1.0 (Reference)</td>
-											</tr>
-											<tr v-if="selected_statins['Fluvastatin']">
-												<td>Fluvastatin</td>
-												<td>1.01 (0.61-1.70)</td>
-												<td>0.79 (0.24-2.57)</td>
-											</tr>
-											<tr v-if="selected_statins['Pitavastatin']">
-												<td>Pitavastatin</td>
-												<td>0.64 (0.46-0.87)*</td>
-												<td>0.94 (0.55-1.60)*</td>
-											</tr>
-											<tr v-if="selected_statins['Pravastatin']">
-												<td>Pravastatin</td>
-												<td>0.79 (0.56-1.13)</td>
-												<td>0.77 (0.43-1.36)</td>
-											</tr>
-											<tr v-if="selected_statins['Rosuvastatin']">
-												<td>Rosuvastatin</td>
-												<td>0.89 (0.69-1.14)</td>
-												<td>1.21 (0.75-1.94)</td>
-											</tr>
-											<tr v-if="selected_statins['Simvastatin']">
-												<td>Simvastatin</td>
-												<td>0.69 (0.53-0.91)*</td>
-												<td>0.83 (0.49-1.42)</td>
-											</tr>
-										</tbody>
-										<tfoot>
-											<tr>
-												<td colspan='6' class="align-left">
-													<p><strong>* p &lt; 0.05 versus baseline</strong></p>
-													<p><strong>** p &lt; 0.001 versus baseline</strong></p>
-												</td>
-											</tr>
-										</tfoot>
-									</table>
-								</div>
-								<div class="content clearfix" id="table_amount"> 
-									<h3 class="title">스타틴 용량표</h3>
-									<table class="table-default">
-										<thead>
-											<tr>
-												<th>강도</th>
-												<th>스타틴</th>
-												<th>DM</th>
-												<th>MDRD reduction %(SE)</th>
-												<th>MDRD reduction P value</th>
-											</tr>
-										</thead>
-										<tbody>
-											<tr v-if="selected_levels['high'] || selected_statins['Atorvastatin'] || selected_statins['Rosuvastatin']">
-												<td rowspan="2">고강도 스타틴</td>
-												<td v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">Atorvastatin (40 mg)</td>
-												<td rowspan="2">&lt; 0.05</td>
-												<td v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">11.4±3.1**</td>
-												<td rowspan="2">0.094</td>
-											</tr>
-											<tr v-if="selected_levels['high'] || selected_statins['Atorvastatin'] || selected_statins['Rosuvastatin']">
-												<td v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}">Rosuvastatin (20 mg)</td>
-												<td v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}"><span v-if="selected_statins['Rosuvastatin']">-3.5±3.4</td>
-											</tr>
-											<tr v-if="selected_levels['middle-high'] || selected_statins['Atorvastatin'] || selected_statins['Rosuvastatin'] || selected_statins['Simvastatin']">
-												<td rowspan="3">중고강도 스타틴</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">Atorvastatin (20 mg)</td>
-												<td rowspan="3">0.182</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">-3.5±2.0</td>
-												<td rowspan="3">0.234</td>
-											</tr>
-											<tr v-if="selected_levels['middle-high'] || selected_statins['Atorvastatin'] || selected_statins['Rosuvastatin'] || selected_statins['Simvastatin']">
-												<td v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}">Rosuvastatin (10 mg)</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}">2.7±0.8**</td>
-											</tr>
-											<tr v-if="selected_levels['middle-high'] || selected_statins['Atorvastatin'] || selected_statins['Rosuvastatin'] || selected_statins['Simvastatin']">
-												<td v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Simvastatin'] ? '' : 'white')}">Simvastatin (40 mg)</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Simvastatin'] ? '' : 'white')}">3.5±3.2</td>
-											</tr>
-											<tr v-if="selected_levels['middle-low'] || selected_statins['Atorvastatin'] || selected_statins['Fluvastatin'] || selected_statins['Pitavastatin'] || selected_statins['Pravastatin'] || selected_statins['Simvastatin']">
-												<td rowspan="5">중저강도 스타틴</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Atorvastatin'] ? '' : 'white')}">Atorvastatin (10 mg)</td>
-												<td rowspan="5">0.109</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Atorvastatin'] ? '' : 'white')}">-5.5±0.8**</td>
-												<td rowspan="5">&lt;.001</td>
-											</tr>
-											<tr v-if="selected_levels['middle-low'] || selected_statins['Atorvastatin'] || selected_statins['Fluvastatin'] || selected_statins['Pitavastatin'] || selected_statins['Pravastatin'] || selected_statins['Simvastatin']">
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Fluvastatin'] ? '' : 'white')}">Fluvastatin (80 mg)</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Fluvastatin'] ? '' : 'white')}">0.4±3.1</td>
-											</tr>
-											<tr v-if="selected_levels['middle-low'] || selected_statins['Atorvastatin'] || selected_statins['Fluvastatin'] || selected_statins['Pitavastatin'] || selected_statins['Pravastatin'] || selected_statins['Simvastatin']">
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pitavastatin'] ? '' : 'white')}">Pitavastatin (2 mg)</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pitavastatin'] ? '' : 'white')}">-2.9±0.8**</td>
-											</tr>
-											<tr v-if="selected_levels['middle-low'] || selected_statins['Atorvastatin'] || selected_statins['Fluvastatin'] || selected_statins['Pitavastatin'] || selected_statins['Pravastatin'] || selected_statins['Simvastatin']">
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pravastatin'] ? '' : 'white')}">Pravastatin (40 mg)</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pravastatin'] ? '' : 'white')}">-5.2±1.9**</td>
-											</tr>
-											<tr v-if="selected_levels['middle-low'] || selected_statins['Atorvastatin'] || selected_statins['Fluvastatin'] || selected_statins['Pitavastatin'] || selected_statins['Pravastatin'] || selected_statins['Simvastatin']">
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Simvastatin'] ? '' : 'white')}">Simvastatin (20 mg)</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Simvastatin'] ? '' : 'white')}">-0.9±0.8</td>
-											</tr>
-											<tr v-if="selected_levels['low'] || selected_statins['Fluvastatin'] || selected_statins['Pravastatin']">
-												<td rowspan="3">저강도 스타틴</td>
-												<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Fluvastatin'] ? '' : 'white')}">Fluvastatin (40 mg)</td>
-												<td rowspan="3">0.123</td>
-												<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Fluvastatin'] ? '' : 'white')}">2.8±2.7</td>
-												<td rowspan="3">0.117</td>
-											</tr>
-											<tr v-if="selected_levels['low'] || selected_statins['Fluvastatin'] || selected_statins['Pravastatin']">
-												<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">Pravastatin (20 mg)</td>
-												<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">-4.0±1.9**</td>
-											</tr>
-											<tr v-if="selected_levels['low'] || selected_statins['Fluvastatin'] || selected_statins['Pravastatin']">
-												<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">Pravastatin (10 mg)</td>
-												<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">-4.8±2.2</td>
-											</tr>
-										</tbody>
-										<tfoot>
-											<tr>
-												<td colspan='5' class="align-left">
-													<p><strong>* p &lt; 0.05 versus baseline</strong></p>
-													<p><strong>** p &lt; 0.001 versus baseline</strong></p>
-												</td>
-											</tr>
-										</tfoot>
-									</table>
-								</div>
-								<div class="content clearfix" id="table_individual_cost"> 
-									<h3 class="title">스타틴 개개별 가격표</h3>
-									<table class="table-default">
-										<thead>
-											<tr>
-												<th>강도</th>
-												<th>스타틴</th>
-												<th>Daily cost(원)</th>
-												<th>Yealy cost(원)</th>
-												<th>LDL-C Rediction rate(&#37;)</th>
-												<th>CEA-PR(원 / &#37;)</th>
-											</tr>
-										</thead>
-										<tbody>
-											<tr v-if="selected_levels['high'] || selected_statins['Atorvastatin'] || selected_statins['Rosuvastatin']">
-												<td rowspan="2">고강도 스타틴</td>
-												<td v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">Atorvastatin (40 mg)</td>
-												<td  v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">1389</td>
-												<td v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">506985 </td>
-												<td  v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">51.3 &#177; 2.2</td>
-												<td  v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">17785.7 &#177; 5369.3</td>
-											</tr>
-											<tr v-if="selected_levels['high'] || selected_statins['Atorvastatin'] || selected_statins['Rosuvastatin']">
-												<td v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}">Rosuvastatin (20 mg)</td>
-												<td v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}"><span v-if="selected_statins['Rosuvastatin']">686</td>
-												<td v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}"><span v-if="selected_statins['Rosuvastatin']">250390</td>
-												<td v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}"><span v-if="selected_statins['Rosuvastatin']">49.4 &#177; 1.6</td>
-												<td v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}"><span v-if="selected_statins['Rosuvastatin']">55258.8 &#177; 1230.5</td>
-											</tr>
-											<tr v-if="selected_levels['middle-high'] || selected_statins['Atorvastatin'] || selected_statins['Rosuvastatin']">
-												<td rowspan="2">중고강도 스타틴</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">Atorvastatin (20 mg)</td>
-												<td  v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">711</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">259515 </td>
-												<td  v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">44.4 &#177; 1.0</td>
-												<td  v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">8948.8 &#177; 783.0</td>
-											</tr>
-											<tr v-if="selected_levels['middle-high'] || selected_statins['Atorvastatin'] || selected_statins['Rosuvastatin']">
-												<td v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}">Rosuvastatin (10 mg)</td>
-												<td  v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}">612</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}">223380 </td>
-												<td  v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}">47.6 &#177; 0.5</td>
-												<td  v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}">7382.8 &#177; 447.4</td>
-											</tr>
-											<tr v-if="selected_levels['middle-low'] || selected_statins['Atorvastatin'] || selected_statins['Fluvastatin'] || selected_statins['Pitavastatin'] || selected_statins['Pravastatin'] || selected_statins['Simvastatin']">
-												<td rowspan="5">중저강도 스타틴</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Atorvastatin'] ? '' : 'white')}">Atorvastatin (10 mg)</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Atorvastatin'] ? '' : 'white')}">561</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Atorvastatin'] ? '' : 'white')}">204765</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Atorvastatin'] ? '' : 'white')}">38.4 ± 0.5</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Atorvastatin'] ? '' : 'white')}">10626.7 ± 559.3</td>
-											</tr>
-											<tr v-if="selected_levels['middle-low'] || selected_statins['Atorvastatin'] || selected_statins['Fluvastatin'] || selected_statins['Pitavastatin'] || selected_statins['Pravastatin'] || selected_statins['Simvastatin']">
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Fluvastatin'] ? '' : 'white')}">Fluvastatin (80 mg)</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Fluvastatin'] ? '' : 'white')}">711</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Fluvastatin'] ? '' : 'white')}">259515</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Fluvastatin'] ? '' : 'white')}">38.0 ± 0.6</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Fluvastatin'] ? '' : 'white')}">8948.8 ± 671.2</td>
-											</tr>
-											<tr v-if="selected_levels['middle-low'] || selected_statins['Atorvastatin'] || selected_statins['Fluvastatin'] || selected_statins['Pitavastatin'] || selected_statins['Pravastatin'] || selected_statins['Simvastatin']">
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pitavastatin'] ? '' : 'white')}">Pitavastatin (2 mg)</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pitavastatin'] ? '' : 'white')}">346</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pitavastatin'] ? '' : 'white')}">126290</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pitavastatin'] ? '' : 'white')}">31.9 ± 0.9</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pitavastatin'] ? '' : 'white')}">12863.9 ± 1006.7</td>
-											</tr>
-											<tr v-if="selected_levels['middle-low'] || selected_statins['Atorvastatin'] || selected_statins['Fluvastatin'] || selected_statins['Pitavastatin'] || selected_statins['Pravastatin'] || selected_statins['Simvastatin']">
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pravastatin'] ? '' : 'white')}">Pravastatin (40 mg)</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pravastatin'] ? '' : 'white')}">670</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pravastatin'] ? '' : 'white')}">244550</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pravastatin'] ? '' : 'white')}">41.5 ± 1.6</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pravastatin'] ? '' : 'white')}">4474.4 ± 671.2</td>
-											</tr>
-											<tr v-if="selected_levels['middle-low'] || selected_statins['Atorvastatin'] || selected_statins['Fluvastatin'] || selected_statins['Pitavastatin'] || selected_statins['Pravastatin'] || selected_statins['Simvastatin']">
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Simvastatin'] ? '' : 'white')}">Simvastatin (20 mg)</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Simvastatin'] ? '' : 'white')}">577</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Simvastatin'] ? '' : 'white')}">210605</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Simvastatin'] ? '' : 'white')}">36.5 ± 1.0</td>
-												<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Simvastatin'] ? '' : 'white')}">12080.9 ± 1230.5</td>
-											</tr>
-											<tr v-if="selected_levels['low'] || selected_statins['Pravastatin']">
-												<td rowspan="3">저강도 스타틴</td>
-												<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">Pravastatin (20 mg)</td>
-												<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">1391</td>
-												<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">507715</td>
-												<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">27.6 ± 0.8</td>
-												<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">12080.9 ± 894.9</td>
-											</tr>
-											<tr v-if="selected_levels['low'] || selected_statins['Pravastatin']">
-												<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">Pravastatin (10 mg)</td>
-												<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">995</td>
-												<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">363175</td>
-												<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">22.4 ± 1.2</td>
-												<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">12752.0 ± 2013.5</td>
-											</tr>
-										</tbody>
-										<tfoot>
-											<tr>
-												<td colspan='6' class="align-left">
-													<p><strong>* p &lt; 0.05 versus baseline</strong></p>
-													<p><strong>** p &lt; 0.001 versus baseline</strong></p>
-												</td>
-											</tr>
-										</tfoot>
-									</table>
-								</div>
-								<div class="content clearfix" id="table_cost"> 
-									<h3 class="title">고강도 스타틴 사용시 경제성 분석 그래프</h3>
-									<div class="graph-wrapper col-lg-6 col-md-12 col-sm-12"><canvas id="precanvas" height="160"></canvas></div>
-									<div class="graph-wrapper col-lg-6 col-md-12 col-sm-12"><canvas id="precanvas2" height="160"></canvas></div>
-									<div class="graph-wrapper col-lg-6 col-md-12 col-sm-12"><canvas id="precanvas3" height="160"></canvas></div>
-									<div class="graph-wrapper col-lg-6 col-md-12 col-sm-12"><canvas id="precanvas4" height="160"></canvas></div>
-								</div>
-							</div>
+						<div class="content clearfix"> 
+							<h3 class="title">스타틴 사용시 예상 DM 변화표 (스타틴별)</h3>
+							<table class="table-default">
+								<thead>
+									<th></th>
+									<th>From Prediabetes to DM</th>
+									<th v-if="selected.data.blood_test.glucose < 100">From Normal to DM</th>
+								</thead>
+								<tbody v-if="selected.data.blood_test.glucose < 100">
+									<tr v-if="selected_statins['Atorvastatin']">
+										<td>Atorvastatin</td>
+										<td>1.0 (Reference)</td>
+										<td>1.0 (Reference)</td>
+									</tr>
+									<tr v-if="selected_statins['Fluvastatin']">
+										<td>Fluvastatin</td>
+										<td>1.02 (0.48-2.17)</td>
+										<td>1.30 (0.74-2.28)</td>
+									</tr>
+									<tr v-if="selected_statins['Pitavastatin']">
+										<td>Pitavastatin</td>
+										<td>0.62 (0.40-0.96)*</td>
+										<td>1.19 (0.83-1.69)</td>
+									</tr>
+									<tr v-if="selected_statins['Pravastatin']">
+										<td>Pravastatin</td>
+										<td>0.83 (0.54-1.28)</td>
+										<td>1.07 (0.75-1.53)</td>
+									</tr>
+									<tr v-if="selected_statins['Rosuvastatin']">
+										<td>Rosuvastatin</td>
+										<td>0.87 (0.61-1.23)</td>
+										<td>1.03 (0.75-1.40)</td>
+									</tr>
+									<tr v-if="selected_statins['Simvastatin']">
+										<td>Simvastatin</td>
+										<td>0.90 (0.62-1.31)</td>
+										<td>0.88 (0.62-1.25)</td>
+									</tr>
+								</tbody>
+								<tbody v-else>
+									<tr v-if="selected_statins['Atorvastatin']">
+										<td>Atorvastatin</td>
+										<td>Reference</td>
+										<td>1.0 (Reference)</td>
+									</tr>
+									<tr v-if="selected_statins['Fluvastatin']">
+										<td>Fluvastatin</td>
+										<td>1.01 (0.61-1.70)</td>
+										<td>0.79 (0.24-2.57)</td>
+									</tr>
+									<tr v-if="selected_statins['Pitavastatin']">
+										<td>Pitavastatin</td>
+										<td>0.64 (0.46-0.87)*</td>
+										<td>0.94 (0.55-1.60)*</td>
+									</tr>
+									<tr v-if="selected_statins['Pravastatin']">
+										<td>Pravastatin</td>
+										<td>0.79 (0.56-1.13)</td>
+										<td>0.77 (0.43-1.36)</td>
+									</tr>
+									<tr v-if="selected_statins['Rosuvastatin']">
+										<td>Rosuvastatin</td>
+										<td>0.89 (0.69-1.14)</td>
+										<td>1.21 (0.75-1.94)</td>
+									</tr>
+									<tr v-if="selected_statins['Simvastatin']">
+										<td>Simvastatin</td>
+										<td>0.69 (0.53-0.91)*</td>
+										<td>0.83 (0.49-1.42)</td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<td colspan='6' class="align-left">
+											<p><strong>* p &lt; 0.05 versus baseline</strong></p>
+											<p><strong>** p &lt; 0.001 versus baseline</strong></p>
+										</td>
+									</tr>
+								</tfoot>
+							</table>
 						</div>
-					</section>
+						<div class="content clearfix" id="table_amount"> 
+							<h3 class="title">스타틴 용량표</h3>
+							<table class="table-default">
+								<thead>
+									<tr>
+										<th>강도</th>
+										<th>스타틴</th>
+										<th>DM</th>
+										<th>MDRD reduction %(SE)</th>
+										<th>MDRD reduction P value</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-if="selected_levels['high'] || selected_statins['Atorvastatin'] || selected_statins['Rosuvastatin']">
+										<td rowspan="2">고강도 스타틴</td>
+										<td v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">Atorvastatin (40 mg)</td>
+										<td rowspan="2">&lt; 0.05</td>
+										<td v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">11.4±3.1**</td>
+										<td rowspan="2">0.094</td>
+									</tr>
+									<tr v-if="selected_levels['high'] || selected_statins['Atorvastatin'] || selected_statins['Rosuvastatin']">
+										<td v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}">Rosuvastatin (20 mg)</td>
+										<td v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}"><span v-if="selected_statins['Rosuvastatin']">-3.5±3.4</td>
+									</tr>
+									<tr v-if="selected_levels['middle-high'] || selected_statins['Atorvastatin'] || selected_statins['Rosuvastatin'] || selected_statins['Simvastatin']">
+										<td rowspan="3">중고강도 스타틴</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">Atorvastatin (20 mg)</td>
+										<td rowspan="3">0.182</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">-3.5±2.0</td>
+										<td rowspan="3">0.234</td>
+									</tr>
+									<tr v-if="selected_levels['middle-high'] || selected_statins['Atorvastatin'] || selected_statins['Rosuvastatin'] || selected_statins['Simvastatin']">
+										<td v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}">Rosuvastatin (10 mg)</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}">2.7±0.8**</td>
+									</tr>
+									<tr v-if="selected_levels['middle-high'] || selected_statins['Atorvastatin'] || selected_statins['Rosuvastatin'] || selected_statins['Simvastatin']">
+										<td v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Simvastatin'] ? '' : 'white')}">Simvastatin (40 mg)</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Simvastatin'] ? '' : 'white')}">3.5±3.2</td>
+									</tr>
+									<tr v-if="selected_levels['middle-low'] || selected_statins['Atorvastatin'] || selected_statins['Fluvastatin'] || selected_statins['Pitavastatin'] || selected_statins['Pravastatin'] || selected_statins['Simvastatin']">
+										<td rowspan="5">중저강도 스타틴</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Atorvastatin'] ? '' : 'white')}">Atorvastatin (10 mg)</td>
+										<td rowspan="5">0.109</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Atorvastatin'] ? '' : 'white')}">-5.5±0.8**</td>
+										<td rowspan="5">&lt;.001</td>
+									</tr>
+									<tr v-if="selected_levels['middle-low'] || selected_statins['Atorvastatin'] || selected_statins['Fluvastatin'] || selected_statins['Pitavastatin'] || selected_statins['Pravastatin'] || selected_statins['Simvastatin']">
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Fluvastatin'] ? '' : 'white')}">Fluvastatin (80 mg)</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Fluvastatin'] ? '' : 'white')}">0.4±3.1</td>
+									</tr>
+									<tr v-if="selected_levels['middle-low'] || selected_statins['Atorvastatin'] || selected_statins['Fluvastatin'] || selected_statins['Pitavastatin'] || selected_statins['Pravastatin'] || selected_statins['Simvastatin']">
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pitavastatin'] ? '' : 'white')}">Pitavastatin (2 mg)</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pitavastatin'] ? '' : 'white')}">-2.9±0.8**</td>
+									</tr>
+									<tr v-if="selected_levels['middle-low'] || selected_statins['Atorvastatin'] || selected_statins['Fluvastatin'] || selected_statins['Pitavastatin'] || selected_statins['Pravastatin'] || selected_statins['Simvastatin']">
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pravastatin'] ? '' : 'white')}">Pravastatin (40 mg)</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pravastatin'] ? '' : 'white')}">-5.2±1.9**</td>
+									</tr>
+									<tr v-if="selected_levels['middle-low'] || selected_statins['Atorvastatin'] || selected_statins['Fluvastatin'] || selected_statins['Pitavastatin'] || selected_statins['Pravastatin'] || selected_statins['Simvastatin']">
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Simvastatin'] ? '' : 'white')}">Simvastatin (20 mg)</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Simvastatin'] ? '' : 'white')}">-0.9±0.8</td>
+									</tr>
+									<tr v-if="selected_levels['low'] || selected_statins['Fluvastatin'] || selected_statins['Pravastatin']">
+										<td rowspan="3">저강도 스타틴</td>
+										<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Fluvastatin'] ? '' : 'white')}">Fluvastatin (40 mg)</td>
+										<td rowspan="3">0.123</td>
+										<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Fluvastatin'] ? '' : 'white')}">2.8±2.7</td>
+										<td rowspan="3">0.117</td>
+									</tr>
+									<tr v-if="selected_levels['low'] || selected_statins['Fluvastatin'] || selected_statins['Pravastatin']">
+										<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">Pravastatin (20 mg)</td>
+										<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">-4.0±1.9**</td>
+									</tr>
+									<tr v-if="selected_levels['low'] || selected_statins['Fluvastatin'] || selected_statins['Pravastatin']">
+										<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">Pravastatin (10 mg)</td>
+										<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">-4.8±2.2</td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<td colspan='5' class="align-left">
+											<p><strong>* p &lt; 0.05 versus baseline</strong></p>
+											<p><strong>** p &lt; 0.001 versus baseline</strong></p>
+										</td>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+						<div class="content clearfix" id="table_individual_cost"> 
+							<h3 class="title">스타틴 개개별 가격표</h3>
+							<table class="table-default">
+								<thead>
+									<tr>
+										<th>강도</th>
+										<th>스타틴</th>
+										<th>Daily cost(원)</th>
+										<th>Yealy cost(원)</th>
+										<th>LDL-C Rediction rate(&#37;)</th>
+										<th>CEA-PR(원 / &#37;)</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-if="selected_levels['high'] || selected_statins['Atorvastatin'] || selected_statins['Rosuvastatin']">
+										<td rowspan="2">고강도 스타틴</td>
+										<td v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">Atorvastatin (40 mg)</td>
+										<td  v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">1389</td>
+										<td v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">506985 </td>
+										<td  v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">51.3 &#177; 2.2</td>
+										<td  v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">17785.7 &#177; 5369.3</td>
+									</tr>
+									<tr v-if="selected_levels['high'] || selected_statins['Atorvastatin'] || selected_statins['Rosuvastatin']">
+										<td v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}">Rosuvastatin (20 mg)</td>
+										<td v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}"><span v-if="selected_statins['Rosuvastatin']">686</td>
+										<td v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}"><span v-if="selected_statins['Rosuvastatin']">250390</td>
+										<td v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}"><span v-if="selected_statins['Rosuvastatin']">49.4 &#177; 1.6</td>
+										<td v-bind:style="{color: (this.selected_levels['high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}"><span v-if="selected_statins['Rosuvastatin']">55258.8 &#177; 1230.5</td>
+									</tr>
+									<tr v-if="selected_levels['middle-high'] || selected_statins['Atorvastatin'] || selected_statins['Rosuvastatin']">
+										<td rowspan="2">중고강도 스타틴</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">Atorvastatin (20 mg)</td>
+										<td  v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">711</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">259515 </td>
+										<td  v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">44.4 &#177; 1.0</td>
+										<td  v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Atorvastatin'] ? '' : 'white')}">8948.8 &#177; 783.0</td>
+									</tr>
+									<tr v-if="selected_levels['middle-high'] || selected_statins['Atorvastatin'] || selected_statins['Rosuvastatin']">
+										<td v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}">Rosuvastatin (10 mg)</td>
+										<td  v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}">612</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}">223380 </td>
+										<td  v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}">47.6 &#177; 0.5</td>
+										<td  v-bind:style="{color: (this.selected_levels['middle-high'] && selected_statins['Rosuvastatin'] ? '' : 'white')}">7382.8 &#177; 447.4</td>
+									</tr>
+									<tr v-if="selected_levels['middle-low'] || selected_statins['Atorvastatin'] || selected_statins['Fluvastatin'] || selected_statins['Pitavastatin'] || selected_statins['Pravastatin'] || selected_statins['Simvastatin']">
+										<td rowspan="5">중저강도 스타틴</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Atorvastatin'] ? '' : 'white')}">Atorvastatin (10 mg)</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Atorvastatin'] ? '' : 'white')}">561</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Atorvastatin'] ? '' : 'white')}">204765</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Atorvastatin'] ? '' : 'white')}">38.4 ± 0.5</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Atorvastatin'] ? '' : 'white')}">10626.7 ± 559.3</td>
+									</tr>
+									<tr v-if="selected_levels['middle-low'] || selected_statins['Atorvastatin'] || selected_statins['Fluvastatin'] || selected_statins['Pitavastatin'] || selected_statins['Pravastatin'] || selected_statins['Simvastatin']">
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Fluvastatin'] ? '' : 'white')}">Fluvastatin (80 mg)</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Fluvastatin'] ? '' : 'white')}">711</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Fluvastatin'] ? '' : 'white')}">259515</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Fluvastatin'] ? '' : 'white')}">38.0 ± 0.6</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Fluvastatin'] ? '' : 'white')}">8948.8 ± 671.2</td>
+									</tr>
+									<tr v-if="selected_levels['middle-low'] || selected_statins['Atorvastatin'] || selected_statins['Fluvastatin'] || selected_statins['Pitavastatin'] || selected_statins['Pravastatin'] || selected_statins['Simvastatin']">
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pitavastatin'] ? '' : 'white')}">Pitavastatin (2 mg)</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pitavastatin'] ? '' : 'white')}">346</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pitavastatin'] ? '' : 'white')}">126290</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pitavastatin'] ? '' : 'white')}">31.9 ± 0.9</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pitavastatin'] ? '' : 'white')}">12863.9 ± 1006.7</td>
+									</tr>
+									<tr v-if="selected_levels['middle-low'] || selected_statins['Atorvastatin'] || selected_statins['Fluvastatin'] || selected_statins['Pitavastatin'] || selected_statins['Pravastatin'] || selected_statins['Simvastatin']">
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pravastatin'] ? '' : 'white')}">Pravastatin (40 mg)</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pravastatin'] ? '' : 'white')}">670</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pravastatin'] ? '' : 'white')}">244550</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pravastatin'] ? '' : 'white')}">41.5 ± 1.6</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Pravastatin'] ? '' : 'white')}">4474.4 ± 671.2</td>
+									</tr>
+									<tr v-if="selected_levels['middle-low'] || selected_statins['Atorvastatin'] || selected_statins['Fluvastatin'] || selected_statins['Pitavastatin'] || selected_statins['Pravastatin'] || selected_statins['Simvastatin']">
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Simvastatin'] ? '' : 'white')}">Simvastatin (20 mg)</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Simvastatin'] ? '' : 'white')}">577</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Simvastatin'] ? '' : 'white')}">210605</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Simvastatin'] ? '' : 'white')}">36.5 ± 1.0</td>
+										<td v-bind:style="{color: (this.selected_levels['middle-low'] && selected_statins['Simvastatin'] ? '' : 'white')}">12080.9 ± 1230.5</td>
+									</tr>
+									<tr v-if="selected_levels['low'] || selected_statins['Pravastatin']">
+										<td rowspan="3">저강도 스타틴</td>
+										<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">Pravastatin (20 mg)</td>
+										<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">1391</td>
+										<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">507715</td>
+										<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">27.6 ± 0.8</td>
+										<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">12080.9 ± 894.9</td>
+									</tr>
+									<tr v-if="selected_levels['low'] || selected_statins['Pravastatin']">
+										<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">Pravastatin (10 mg)</td>
+										<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">995</td>
+										<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">363175</td>
+										<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">22.4 ± 1.2</td>
+										<td v-bind:style="{color: (this.selected_levels['low'] && selected_statins['Pravastatin'] ? '' : 'white')}">12752.0 ± 2013.5</td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<td colspan='6' class="align-left">
+											<p><strong>* p &lt; 0.05 versus baseline</strong></p>
+											<p><strong>** p &lt; 0.001 versus baseline</strong></p>
+										</td>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+						<div class="content clearfix" id="table_cost"> 
+							<h3 class="title">고강도 스타틴 사용시 경제성 분석 그래프</h3>
+							<div class="graph-wrapper col-lg-6 col-md-12 col-sm-12"><canvas id="precanvas" height="160"></canvas></div>
+							<div class="graph-wrapper col-lg-6 col-md-12 col-sm-12"><canvas id="precanvas2" height="160"></canvas></div>
+							<div class="graph-wrapper col-lg-6 col-md-12 col-sm-12"><canvas id="precanvas3" height="160"></canvas></div>
+							<div class="graph-wrapper col-lg-6 col-md-12 col-sm-12"><canvas id="precanvas4" height="160"></canvas></div>
+						</div>
+					</div>
 				</div>
-				<div class="col-xs-12 align-center btn-presciption-wrapper">
-					<button type="button" class="btn btn-dark btn-presciption" v-on:click="doPrescription()">처 방</button>
-				</div>
-			</div>
-			<script type="vue">
-				data : function(){
-					var obj = {
-						constants : {
-							dangerous_hash : {
-								'extream' : '초고위험군',
-								'high' : '고위험군',
-								'danger2' : '위험인자2',
-								'danger1' : '위험인자1'
-							},
-							level_hash: {
-								'high': '고강도',
-								'middle-high': '중고강도',
-								'middle-low': '중저강도',
-								'low': '저강도'
-							}
-						},
-						levels : [{
-							val : 'high',
-							name : '고강도',
-							statins: [{
-								name: "Atorvastatin",
-								amount: 40,
-								coefficient: -19.5
-							}, {
-								name: "Rosuvastatin",
-								amount: 20,
-								coefficient: -10.4
-							}],
-							selected : false
-						},{
-							val : 'middle-high',
-							name : '중고강도',
-							statins: [{
-								name: "Atorvastatin",
-								amount: 20,
-								coefficient: -6.4
-							}, {
-								name: "Rosuvastatin",
-								amount: 10,
-								coefficient: -7.7
-							}, {
-								name: "Simvastatin",
-								amount: 40,
-								coefficient: undefined
-							}],
-							selected : false
-						},{
-							val : 'middle-low',
-							name : '중저강도',
-							statins: [{
-								name: "Atorvastatin",
-								amount: 10,
-								coefficient: 0
-							}, {
-								name: "Fluvastatin",
-								amount: 80,
-								coefficient: 8.7
-							}, {
-								name: "Pitavastatin",
-								amount: 2,
-								coefficient: 0.9
-							}, {
-								name: "Pravastatin",
-								amount: 40,
-								coefficient: 4.4
-							}, {
-								name: "Simvastatin",
-								amount: 20,
-								coefficient: 1.1
-							}],
-							selected : false
-						},{
-							val : 'low',
-							name : '저강도',
-							statins: [{
-								name: "Fluvastatin",
-								amount: 40,
-								coefficient: 12.9
-							}, {
-								name: "Pravastatin",
-								amount: 20,
-								coefficient: 8.5
-							}, {
-								name: "Pravastatin",
-								amount: 10,
-								coefficient: 12.9
-							}],
-							selected : false
-						}],
-						statins : [{
-							name : 'Atorvastatin',
-							selected : false
-						},{
-							name : 'Fluvastatin',
-							selected : false
-						},{
-							name : 'Pitavastatin',
-							selected : false
-						},{
-							name : 'Pravastatin',
-							selected : false
-						},{
-							name : 'Rosuvastatin',
-							selected : false
-						},{
-							name : 'Simvastatin',
-							selected : false
-						}],
-						selected : null
+			</section>
+		</div>
+		<div class="col-xs-12 align-center btn-presciption-wrapper">
+			<button type="button" class="btn btn-dark btn-presciption" v-on:click="doPrescription()">처 방</button>
+		</div>
+	</div>
+	<script type="vue">
+		data : function(){
+			var obj = {
+				constants : {
+					dangerous_hash : {
+						'extream' : '초고위험군',
+						'high' : '고위험군',
+						'danger2' : '위험인자2',
+						'danger1' : '위험인자1'
+					},
+					level_hash: {
+						'high': '고강도',
+						'middle-high': '중고강도',
+						'middle-low': '중저강도',
+						'low': '저강도'
 					}
-					Callback.add("select_subject", this.select_subject);
-					var statin_hash = {};
-					for(var i=0; i<obj.statins.length; i++) {
-						var statin = obj.statins[i];
-						statin.levels = [];
-						statin_hash[statin.name] = statin;
-					}
-					for(var i=0; i<obj.levels.length; i++) {
-						var level = obj.levels[i];
-						for(var j=0; j<level.statins.length; j++) {
-							var statin = level.statins[j];
-							statin_hash[statin.name].levels.push({
-								name: level.name,
-								amount: statin.amount,
-								coefficient: statin.coefficient
-							});
-						}
-					}
-					return obj;
 				},
-				mounted: function() {
-					$(window).scroll(function() {
-						var scrtop = $(window).scrollTop();
-						if($("#prescription-table").length > 0 ) {
-							var diff = scrtop - $("#prescription-table").position().top + 50;
-							if(diff < 0) {
-								diff = 0;
-							}
-							$("#table_nav").css("margin-top", diff + "px");
-						}
+				levels : [{
+					val : 'high',
+					name : '고강도',
+					statins: [{
+						name: "Atorvastatin",
+						amount: 40,
+						coefficient: -19.5
+					}, {
+						name: "Rosuvastatin",
+						amount: 20,
+						coefficient: -10.4
+					}],
+					selected : false
+				},{
+					val : 'middle-high',
+					name : '중고강도',
+					statins: [{
+						name: "Atorvastatin",
+						amount: 20,
+						coefficient: -6.4
+					}, {
+						name: "Rosuvastatin",
+						amount: 10,
+						coefficient: -7.7
+					}, {
+						name: "Simvastatin",
+						amount: 40,
+						coefficient: undefined
+					}],
+					selected : false
+				},{
+					val : 'middle-low',
+					name : '중저강도',
+					statins: [{
+						name: "Atorvastatin",
+						amount: 10,
+						coefficient: 0
+					}, {
+						name: "Fluvastatin",
+						amount: 80,
+						coefficient: 8.7
+					}, {
+						name: "Pitavastatin",
+						amount: 2,
+						coefficient: 0.9
+					}, {
+						name: "Pravastatin",
+						amount: 40,
+						coefficient: 4.4
+					}, {
+						name: "Simvastatin",
+						amount: 20,
+						coefficient: 1.1
+					}],
+					selected : false
+				},{
+					val : 'low',
+					name : '저강도',
+					statins: [{
+						name: "Fluvastatin",
+						amount: 40,
+						coefficient: 12.9
+					}, {
+						name: "Pravastatin",
+						amount: 20,
+						coefficient: 8.5
+					}, {
+						name: "Pravastatin",
+						amount: 10,
+						coefficient: 12.9
+					}],
+					selected : false
+				}],
+				statins : [{
+					name : 'Atorvastatin',
+					selected : false
+				},{
+					name : 'Fluvastatin',
+					selected : false
+				},{
+					name : 'Pitavastatin',
+					selected : false
+				},{
+					name : 'Pravastatin',
+					selected : false
+				},{
+					name : 'Rosuvastatin',
+					selected : false
+				},{
+					name : 'Simvastatin',
+					selected : false
+				}],
+				selected : null
+			}
+			Callback.add("select_subject", this.select_subject);
+			var statin_hash = {};
+			for(var i=0; i<obj.statins.length; i++) {
+				var statin = obj.statins[i];
+				statin.levels = [];
+				statin_hash[statin.name] = statin;
+			}
+			for(var i=0; i<obj.levels.length; i++) {
+				var level = obj.levels[i];
+				for(var j=0; j<level.statins.length; j++) {
+					var statin = level.statins[j];
+					statin_hash[statin.name].levels.push({
+						name: level.name,
+						amount: statin.amount,
+						coefficient: statin.coefficient
 					});
-				},
-				computed: {
-					selected_levels: function() {
-						var hash = {};
-						for(var i=0; i<this.levels.length; i++) {
-							var level = this.levels[i];
-							if(level.selected) {
-								hash[level.val] = true;
-							}
-						}
-						return hash;
-					},
-					selected_statins: function() {
-						var hash = {};
-						for(var i=0; i<this.statins.length; i++) {
-							var statin = this.statins[i];
-							if(statin.selected) {
-								hash[statin.name] = true;
-							}
-						}
-						return hash;
-					},
-					selected_levels_statin: function() {
-						var hash = {};
-						for(var i=0; i<this.levels.length; i++) {
-							var level = this.levels[i];
-							if(level.selected) {
-								for(var j=0; j<level.statins.length; j++) {
-									hash[level.statins[j].name] = true;
-								}
-							}
-						}
-						return hash;
-					},
-					next_ldls: function() {
-						var list = [];
-						if(this.selected != null) {
-							var ldl_base = this.get_ldl_base();
-							for(var i=0; i<this.statins.length; i++) {
-								var statin = this.statins[i];
-								if(statin.selected) {
-									for(var j=0; j<statin.levels.length; j++) {
-										var level = statin.levels[j];
-										if(level.coefficient != null) {
-											var statin_score = 0;
-											list.push({
-												level: level.name,
-												statin: statin.name,
-												amount: level.amount,
-												ldl_c: ldl_base + statin_score + level.coefficient
-											});
-										} else {
-											list.push({
-												name: level.name,
-												statin: statin.name,
-												amount: level.amount,
-												ldl_c: undefined
-											});
-										}
-									}
-								}
-							}
-						}
-						return list;
+				}
+			}
+			return obj;
+		},
+		mounted: function() {
+			$(window).scroll(function() {
+				var scrtop = $(window).scrollTop();
+				if($("#prescription-table").length > 0 ) {
+					var diff = scrtop - $("#prescription-table").position().top + 50;
+					if(diff < 0) {
+						diff = 0;
 					}
-				},
-				methods : {
-					get_ldl_base: function() {
-						var ldl_c = this.selected.data.blood_test.ldl_c;
-						//var ldl_c = this.selected.init.blood_test.ldl_c;
-						var ldl_delta = -0.1*this.selected.data.demography.age
-						+(this.selected.data.demography.sex == 'F' ? 1.4 : 0)
-						+0.5*(this.selected.data.demography.weight/(this.selected.data.demography.height/100)/(this.selected.data.demography.height/100))
-						-0.2*ldl_c
-						-3.1*this.selected.data.blood_test.total_bilirubin
-						-4.1*(this.selected.data.medical_history.diabetes ? 1 : 0)
-						-11.4*(this.selected.data.drug_history.warfarin ? 1 : 0)
-						+5.3*(this.selected.data.drug_history.thyroxine ? 1 : 0)
-						-6.4*(this.selected.data.drug_history.bisphosphonate ? 1 : 0)
-						-8.8;
-						return ldl_delta + ldl_c;
-					},
-					initData: function(recommend_level) {
-						for(var i=0; i<this.levels.length; i++) {
-							var level = this.levels[i];
-							level.selected = (level.val == recommend_level);
-						}
-						for(var i=0; i<this.statins.length; i++) {
-							var statin = this.statins[i];
-							statin.selected = false;
-						}
-					},
-					selectBtn : function(item){
-						if(!item.selected){
-							item.selected = true;
-						}else{
-							item.selected = false;
-						}
-						var _this = this;
-						setTimeout(function() {
-							_this.updateChart();
-						});
-					},
-					updateChart: function() {
-						if(window.pre_chart1 != null) {
-							window.pre_chart1.destroy();
-						}
-						if(window.pre_chart2 != null) {
-							window.pre_chart2.destroy();
-						}
-						if(window.pre_chart3 != null) {
-							window.pre_chart3.destroy();
-						}
-						if(window.pre_chart4 != null) {
-							window.pre_chart4.destroy();
-						}
-
-						var labels = ["100-129", "130-159", "160-189", ">=190"];
-						var datas = [];
-
-						datas = [];
-						if(this.selected_levels['high'] && this.selected_statins['Atorvastatin']) {
-							datas.push({
-								label : 'Atorvastatin',
-								backgroundColor: window.chartColors.red,
-								borderColor: window.chartColors.red,
-								data: [
-									9980,
-									35470,
-									10131,
-									9049
-								],
-								fill: false,
-							});
-						}
-						if(this.selected_levels['high'] && this.selected_statins['Rosuvastatin']) {
-							datas.push({
-								label : 'Rosuvastatin',
-								backgroundColor: window.chartColors.blue,
-								borderColor: window.chartColors.blue,
-								data: [
-									8150,
-									10224,
-									11436,
-									7126
-								],
-								fill: false,
-							});
-						}
-						window.pre_chart1 = new Chart(document.getElementById("precanvas").getContext("2d"), {
-							type: 'line',
-							data: {
-								labels: labels,
-								datasets: datas
-							},
-							options: {
-								animation: false,
-								responsive: true,
-								hover: {
-									mode: 'nearest',
-									intersect: true
-								},
-								scales: {
-									xAxes: [{
-										display: true,
-										scaleLabel: {
-											display: true,
-											labelString: 'Baseline LDL- cholesterol(mg/dL)'
-										}
-									}],
-									yAxes: [{
-										display: true,
-										scaleLabel: {
-											display: true,
-											labelString: 'CEA-RR'
-										}
-									}]
-								}
-							}
-						});
-						
-						datas = [];
-						if(this.selected_levels['middle-high'] && this.selected_statins['Atorvastatin']) {
-							datas.push({
-								label : 'Atorvastatin',
-								backgroundColor: window.chartColors.red,
-								borderColor: window.chartColors.red,
-								data: [
-									10294,
-									9834,
-									6920,
-									6114
-								],
-								fill: false,
-							});
-						}
-						if(this.selected_levels['middle-high'] && this.selected_statins['Rosuvastatin']) {
-							datas.push({
-								label : 'Rosuvastatin',
-								backgroundColor: window.chartColors.blue,
-								borderColor: window.chartColors.blue,
-								data: [
-									8715,
-									7320,
-									6330,
-									6297
-								],
-								fill: false,
-							});
-						}
-						window.pre_chart2 = new Chart(document.getElementById("precanvas2").getContext("2d"), {
-							type: 'line',
-							data: {
-								labels: labels,
-								datasets: datas
-							},
-							options: {
-								animation: false,
-								responsive: true,
-								hover: {
-									mode: 'nearest',
-									intersect: true
-								},
-								scales: {
-									xAxes: [{
-										display: true,
-										scaleLabel: {
-											display: true,
-											labelString: 'Baseline LDL- cholesterol(mg/dL)'
-										}
-									}],
-									yAxes: [{
-										display: true,
-										scaleLabel: {
-											display: true,
-											labelString: 'CEA-RR'
-										}
-									}]
-								}
-							}
-						});
-						
-						datas = [];
-						if(this.selected_levels['middle-low'] && this.selected_statins['Atorvastatin']) {
-							datas.push({
-								label : 'Atorvastatin',
-								backgroundColor: window.chartColors.red,
-								borderColor: window.chartColors.red,
-								data: [
-									11766,
-									10525,
-									8253,
-									7858
-								],
-								fill: false,
-							});
-						}
-						if(this.selected_levels['middle-low'] && this.selected_statins['Pitavastatin']) {
-							datas.push({
-								label : 'Pitavastatin',
-								backgroundColor: window.chartColors.orange,
-								borderColor: window.chartColors.orange,
-								data: [
-									10418,
-									8653,
-									8038,
-									5090
-								],
-								fill: false,
-							});
-						}
-						if(this.selected_levels['middle-low'] && this.selected_statins['Pravastatin']) {
-							datas.push({
-								label : 'Pravastatin',
-								backgroundColor: window.chartColors.green,
-								borderColor: window.chartColors.green,
-								data: [
-									15645,
-									12906,
-									10405,
-									11022
-								],
-								fill: false,
-							});
-						}
-						if(this.selected_levels['middle-low'] && this.selected_statins['Rosuvastatin']) {
-							datas.push({
-								label : 'Rosuvastatin',
-								backgroundColor: window.chartColors.blue,
-								borderColor: window.chartColors.blue,
-								data: [
-									5382,
-									3640,
-									5494,
-									2506
-								],
-								fill: false,
-							});
-						}
-						if(this.selected_levels['middle-low'] && this.selected_statins['Simvastatin']) {
-							datas.push({
-								label : 'Simvastatin',
-								backgroundColor: window.chartColors.purple,
-								borderColor: window.chartColors.purple,
-								data: [
-									16132,
-									8492,
-									10897,
-									7779
-								],
-								fill: false,
-							});
-						}
-						window.pre_chart3 = new Chart(document.getElementById("precanvas3").getContext("2d"), {
-							type: 'line',
-							data: {
-								labels: labels,
-								datasets: datas
-							},
-							options: {
-								animation: false,
-								responsive: true,
-								hover: {
-									mode: 'nearest',
-									intersect: true
-								},
-								scales: {
-									xAxes: [{
-										display: true,
-										scaleLabel: {
-											display: true,
-											labelString: 'Baseline LDL- cholesterol(mg/dL)'
-										}
-									}],
-									yAxes: [{
-										display: true,
-										scaleLabel: {
-											display: true,
-											labelString: 'CEA-RR'
-										}
-									}]
-								}
-							}
-						});
-
-						datas = [];
-						if(this.selected_levels['low'] && this.selected_statins['Pravastatin']) {
-							datas.push({
-								label : 'Pravastatin',
-								backgroundColor: window.chartColors.green,
-								borderColor: window.chartColors.green,
-								data: [
-									20053,
-									10205,
-									6931,
-									8916
-								],
-								fill: false,
-							});
-						}
-						if(this.selected_levels['low'] && this.selected_statins['Pravastatin']) {
-							datas.push({
-								label : 'Pravastatin',
-								backgroundColor: window.chartColors.green,
-								borderColor: window.chartColors.green,
-								borderDash: [10, 15],
-								data: [
-									13870,
-									10538,
-									10871,
-									16302
-								],
-								fill: false,
-							});
-						}
-						window.pre_chart4 = new Chart(document.getElementById("precanvas4").getContext("2d"), {
-							type: 'line',
-							data: {
-								labels: labels,
-								datasets: datas
-							},
-							options: {
-								animation: false,
-								responsive: true,
-								hover: {
-									mode: 'nearest',
-									intersect: true
-								},
-								scales: {
-									xAxes: [{
-										display: true,
-										scaleLabel: {
-											display: true,
-											labelString: 'Baseline LDL- cholesterol(mg/dL)'
-										}
-									}],
-									yAxes: [{
-										display: true,
-										scaleLabel: {
-											display: true,
-											labelString: 'CEA-RR'
-										}
-									}]
-								}
-							}
-						});
-					},
-					showMainContent : function(){
-						$("#prescription-content").hide();
-						$("#main-content").show();
-					},
-					doPrescription :function(){
-						var levels = [];
-						var statins = [];
-						for (var i in this.levels){
-							if(this.levels[i]['selected'] == true){
-								levels.push(this.levels[i]['val']);
-							}
-						}
-						for (var i in this.statins){
-							if(this.statins[i]['selected'] == true){
-								statins.push(this.statins[i]['name']);
-							}
-						}
-						if(levels.length == 0 && statins.length == 0) {
-							alert("강도 또는 스타틴을 하나 이상 선택하여야 합니다.");
-							return;
-						}
-						this.$http.post("/api/subjects/"+this.selected.subject_id+"/prescription", {
-							prescription: {
-								'statins' : statins,
-								'levels' : levels
-							}
-						}).then(function(res) {
-							if(res.body.error != null) {
-								alert(res.body.error);
-							} else {
-								Callback.call("load-subject-data");
-								this.showMainContent();
-							}
-						}, function(err) {
-							console.error(err.body);
-						});
-					},
-					select_subject : function(item){
-						this.selected = item;
-						this.initData(this.selected.recommend_level);
-						var _this = this;
-						setTimeout(function() {
-							_this.updateChart();
-							if(!$("#table_nav").hasClass("applied")) {
-								$("#table_nav .nav-item a").click(function() {
-									$(this).parent().parent().find(".active").removeClass("active");
-									$(this).addClass("active");
-									$("#table_nav").addClass("applied");
-								});
-							}
-						});
+					$("#table_nav").css("margin-top", diff + "px");
+				}
+			});
+		},
+		computed: {
+			selected_levels: function() {
+				var hash = {};
+				for(var i=0; i<this.levels.length; i++) {
+					var level = this.levels[i];
+					if(level.selected) {
+						hash[level.val] = true;
 					}
 				}
-			</script>
-		</prescription-content>
+				return hash;
+			},
+			selected_statins: function() {
+				var hash = {};
+				for(var i=0; i<this.statins.length; i++) {
+					var statin = this.statins[i];
+					if(statin.selected) {
+						hash[statin.name] = true;
+					}
+				}
+				return hash;
+			},
+			selected_levels_statin: function() {
+				var hash = {};
+				for(var i=0; i<this.levels.length; i++) {
+					var level = this.levels[i];
+					if(level.selected) {
+						for(var j=0; j<level.statins.length; j++) {
+							hash[level.statins[j].name] = true;
+						}
+					}
+				}
+				return hash;
+			},
+			next_ldls: function() {
+				var list = [];
+				if(this.selected != null) {
+					var ldl_base = this.get_ldl_base();
+					for(var i=0; i<this.statins.length; i++) {
+						var statin = this.statins[i];
+						if(statin.selected) {
+							for(var j=0; j<statin.levels.length; j++) {
+								var level = statin.levels[j];
+								if(level.coefficient != null) {
+									var statin_score = 0;
+									list.push({
+										level: level.name,
+										statin: statin.name,
+										amount: level.amount,
+										ldl_c: ldl_base + statin_score + level.coefficient
+									});
+								} else {
+									list.push({
+										name: level.name,
+										statin: statin.name,
+										amount: level.amount,
+										ldl_c: undefined
+									});
+								}
+							}
+						}
+					}
+				}
+				return list;
+			}
+		},
+		methods : {
+			get_ldl_base: function() {
+				var ldl_c = this.selected.data.blood_test.ldl_c;
+				//var ldl_c = this.selected.init.blood_test.ldl_c;
+				var ldl_delta = -0.1*this.selected.data.demography.age
+				+(this.selected.data.demography.sex == 'F' ? 1.4 : 0)
+				+0.5*(this.selected.data.demography.weight/(this.selected.data.demography.height/100)/(this.selected.data.demography.height/100))
+				-0.2*ldl_c
+				-3.1*this.selected.data.blood_test.total_bilirubin
+				-4.1*(this.selected.data.medical_history.diabetes ? 1 : 0)
+				-11.4*(this.selected.data.drug_history.warfarin ? 1 : 0)
+				+5.3*(this.selected.data.drug_history.thyroxine ? 1 : 0)
+				-6.4*(this.selected.data.drug_history.bisphosphonate ? 1 : 0)
+				-8.8;
+				return ldl_delta + ldl_c;
+			},
+			initData: function(recommend_level) {
+				for(var i=0; i<this.levels.length; i++) {
+					var level = this.levels[i];
+					level.selected = (level.val == recommend_level);
+				}
+				for(var i=0; i<this.statins.length; i++) {
+					var statin = this.statins[i];
+					statin.selected = false;
+				}
+			},
+			selectBtn : function(item){
+				if(!item.selected){
+					item.selected = true;
+				}else{
+					item.selected = false;
+				}
+				var _this = this;
+				setTimeout(function() {
+					_this.updateChart();
+				});
+			},
+			updateChart: function() {
+				if(window.pre_chart1 != null) {
+					window.pre_chart1.destroy();
+				}
+				if(window.pre_chart2 != null) {
+					window.pre_chart2.destroy();
+				}
+				if(window.pre_chart3 != null) {
+					window.pre_chart3.destroy();
+				}
+				if(window.pre_chart4 != null) {
+					window.pre_chart4.destroy();
+				}
+
+				var labels = ["100-129", "130-159", "160-189", ">=190"];
+				var datas = [];
+
+				datas = [];
+				if(this.selected_levels['high'] && this.selected_statins['Atorvastatin']) {
+					datas.push({
+						label : 'Atorvastatin',
+						backgroundColor: window.chartColors.red,
+						borderColor: window.chartColors.red,
+						data: [
+							9980,
+							35470,
+							10131,
+							9049
+						],
+						fill: false,
+					});
+				}
+				if(this.selected_levels['high'] && this.selected_statins['Rosuvastatin']) {
+					datas.push({
+						label : 'Rosuvastatin',
+						backgroundColor: window.chartColors.blue,
+						borderColor: window.chartColors.blue,
+						data: [
+							8150,
+							10224,
+							11436,
+							7126
+						],
+						fill: false,
+					});
+				}
+				window.pre_chart1 = new Chart(document.getElementById("precanvas").getContext("2d"), {
+					type: 'line',
+					data: {
+						labels: labels,
+						datasets: datas
+					},
+					options: {
+						animation: false,
+						responsive: true,
+						hover: {
+							mode: 'nearest',
+							intersect: true
+						},
+						scales: {
+							xAxes: [{
+								display: true,
+								scaleLabel: {
+									display: true,
+									labelString: 'Baseline LDL- cholesterol(mg/dL)'
+								}
+							}],
+							yAxes: [{
+								display: true,
+								scaleLabel: {
+									display: true,
+									labelString: 'CEA-RR'
+								}
+							}]
+						}
+					}
+				});
+				
+				datas = [];
+				if(this.selected_levels['middle-high'] && this.selected_statins['Atorvastatin']) {
+					datas.push({
+						label : 'Atorvastatin',
+						backgroundColor: window.chartColors.red,
+						borderColor: window.chartColors.red,
+						data: [
+							10294,
+							9834,
+							6920,
+							6114
+						],
+						fill: false,
+					});
+				}
+				if(this.selected_levels['middle-high'] && this.selected_statins['Rosuvastatin']) {
+					datas.push({
+						label : 'Rosuvastatin',
+						backgroundColor: window.chartColors.blue,
+						borderColor: window.chartColors.blue,
+						data: [
+							8715,
+							7320,
+							6330,
+							6297
+						],
+						fill: false,
+					});
+				}
+				window.pre_chart2 = new Chart(document.getElementById("precanvas2").getContext("2d"), {
+					type: 'line',
+					data: {
+						labels: labels,
+						datasets: datas
+					},
+					options: {
+						animation: false,
+						responsive: true,
+						hover: {
+							mode: 'nearest',
+							intersect: true
+						},
+						scales: {
+							xAxes: [{
+								display: true,
+								scaleLabel: {
+									display: true,
+									labelString: 'Baseline LDL- cholesterol(mg/dL)'
+								}
+							}],
+							yAxes: [{
+								display: true,
+								scaleLabel: {
+									display: true,
+									labelString: 'CEA-RR'
+								}
+							}]
+						}
+					}
+				});
+				
+				datas = [];
+				if(this.selected_levels['middle-low'] && this.selected_statins['Atorvastatin']) {
+					datas.push({
+						label : 'Atorvastatin',
+						backgroundColor: window.chartColors.red,
+						borderColor: window.chartColors.red,
+						data: [
+							11766,
+							10525,
+							8253,
+							7858
+						],
+						fill: false,
+					});
+				}
+				if(this.selected_levels['middle-low'] && this.selected_statins['Pitavastatin']) {
+					datas.push({
+						label : 'Pitavastatin',
+						backgroundColor: window.chartColors.orange,
+						borderColor: window.chartColors.orange,
+						data: [
+							10418,
+							8653,
+							8038,
+							5090
+						],
+						fill: false,
+					});
+				}
+				if(this.selected_levels['middle-low'] && this.selected_statins['Pravastatin']) {
+					datas.push({
+						label : 'Pravastatin',
+						backgroundColor: window.chartColors.green,
+						borderColor: window.chartColors.green,
+						data: [
+							15645,
+							12906,
+							10405,
+							11022
+						],
+						fill: false,
+					});
+				}
+				if(this.selected_levels['middle-low'] && this.selected_statins['Rosuvastatin']) {
+					datas.push({
+						label : 'Rosuvastatin',
+						backgroundColor: window.chartColors.blue,
+						borderColor: window.chartColors.blue,
+						data: [
+							5382,
+							3640,
+							5494,
+							2506
+						],
+						fill: false,
+					});
+				}
+				if(this.selected_levels['middle-low'] && this.selected_statins['Simvastatin']) {
+					datas.push({
+						label : 'Simvastatin',
+						backgroundColor: window.chartColors.purple,
+						borderColor: window.chartColors.purple,
+						data: [
+							16132,
+							8492,
+							10897,
+							7779
+						],
+						fill: false,
+					});
+				}
+				window.pre_chart3 = new Chart(document.getElementById("precanvas3").getContext("2d"), {
+					type: 'line',
+					data: {
+						labels: labels,
+						datasets: datas
+					},
+					options: {
+						animation: false,
+						responsive: true,
+						hover: {
+							mode: 'nearest',
+							intersect: true
+						},
+						scales: {
+							xAxes: [{
+								display: true,
+								scaleLabel: {
+									display: true,
+									labelString: 'Baseline LDL- cholesterol(mg/dL)'
+								}
+							}],
+							yAxes: [{
+								display: true,
+								scaleLabel: {
+									display: true,
+									labelString: 'CEA-RR'
+								}
+							}]
+						}
+					}
+				});
+
+				datas = [];
+				if(this.selected_levels['low'] && this.selected_statins['Pravastatin']) {
+					datas.push({
+						label : 'Pravastatin',
+						backgroundColor: window.chartColors.green,
+						borderColor: window.chartColors.green,
+						data: [
+							20053,
+							10205,
+							6931,
+							8916
+						],
+						fill: false,
+					});
+				}
+				if(this.selected_levels['low'] && this.selected_statins['Pravastatin']) {
+					datas.push({
+						label : 'Pravastatin',
+						backgroundColor: window.chartColors.green,
+						borderColor: window.chartColors.green,
+						borderDash: [10, 15],
+						data: [
+							13870,
+							10538,
+							10871,
+							16302
+						],
+						fill: false,
+					});
+				}
+				window.pre_chart4 = new Chart(document.getElementById("precanvas4").getContext("2d"), {
+					type: 'line',
+					data: {
+						labels: labels,
+						datasets: datas
+					},
+					options: {
+						animation: false,
+						responsive: true,
+						hover: {
+							mode: 'nearest',
+							intersect: true
+						},
+						scales: {
+							xAxes: [{
+								display: true,
+								scaleLabel: {
+									display: true,
+									labelString: 'Baseline LDL- cholesterol(mg/dL)'
+								}
+							}],
+							yAxes: [{
+								display: true,
+								scaleLabel: {
+									display: true,
+									labelString: 'CEA-RR'
+								}
+							}]
+						}
+					}
+				});
+			},
+			showMainContent : function(){
+				$("#prescription-content").hide();
+				$("#main-content").show();
+			},
+			doPrescription :function(){
+				var levels = [];
+				var statins = [];
+				for (var i in this.levels){
+					if(this.levels[i]['selected'] == true){
+						levels.push(this.levels[i]['val']);
+					}
+				}
+				for (var i in this.statins){
+					if(this.statins[i]['selected'] == true){
+						statins.push(this.statins[i]['name']);
+					}
+				}
+				if(levels.length == 0 && statins.length == 0) {
+					alert("강도 또는 스타틴을 하나 이상 선택하여야 합니다.");
+					return;
+				}
+				this.$http.post("/api/subjects/"+this.selected.subject_id+"/prescription", {
+					prescription: {
+						'statins' : statins,
+						'levels' : levels
+					}
+				}).then(function(res) {
+					if(res.body.error != null) {
+						alert(res.body.error);
+					} else {
+						Callback.call("load-subject-data");
+						this.showMainContent();
+					}
+				}, function(err) {
+					console.error(err.body);
+				});
+			},
+			select_subject : function(item){
+				this.selected = item;
+				this.initData(this.selected.recommend_level);
+				var _this = this;
+				setTimeout(function() {
+					_this.updateChart();
+					if(!$("#table_nav").hasClass("applied")) {
+						$("#table_nav .nav-item a").click(function() {
+							$(this).parent().parent().find(".active").removeClass("active");
+							$(this).addClass("active");
+							$("#table_nav").addClass("applied");
+						});
+					}
+				});
+			}
+		}
+	</script>
+</prescription-content>

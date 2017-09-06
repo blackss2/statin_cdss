@@ -167,6 +167,14 @@
 				</div>
 				<div class="col-xs-12" v-show="selected.follow == 'followup'">
 					<section class="box box-height-sm">
+						<h3 class="title">스타틴과 간 손상과의 연관성 추정</h3>
+						<div class="content clearfix">
+							{{liver_injury}}
+						</div>
+					</section>
+				</div>
+				<div class="col-xs-12" v-show="selected.follow == 'followup'">
+					<section class="box box-height-sm">
 						<h3 class="title">경제성 그래프</h3>
 						<div class="content clearfix">
 							<div class="graph-wrapper col-lg-3 col-md-6 col-sm-12"><canvas id="canvas" height="230"></canvas></div>
@@ -274,6 +282,30 @@
 							hash[statin] = true;
 						}
 						return hash;
+					},
+					liver_injury: function() {
+						if(this.selected.data != null) {
+							if(this.selected.data.medical_history.liver_disorder_active) {
+								return "Indeterminable";
+							} else {
+								if(this.selected.data.blood_test.alanine_aminotransferase  >= 3*45 || this.selected.data.blood_test.alkaline_phosphatase  >= 2*120) {
+									if(this.selected.data.drug_history.etc) {
+										return "Little association";
+									} else {
+										if(9 <= this.selected.init.blood_test.alanine_aminotransferase && this.selected.init.blood_test.alanine_aminotransferase <= 45) {
+											return "Strong association";
+										} else if(30 <= this.selected.data.blood_test.alkaline_phosphatase && this.selected.data.blood_test.alkaline_phosphatase <= 120) {
+											return "Strong association";
+										} else {
+											return "Weak association";
+										}
+									}
+								} else {
+									return "ALT 및 ALP가 UNL의 3배 이상이 아닙니다.";
+								}
+							}
+							return "Unknown";
+						}
 					}
 				},
 				methods :{
@@ -283,8 +315,10 @@
 					},
 					showPreContent : function(){
 						Callback.call("select_subject", this.selected);
-						$("#main-content").hide();
-						$("#prescription-content").show();
+						setTimeout(function() {
+							$("#main-content").hide();
+							$("#prescription-content").show();
+						});
 					},
 					showMainContent : function(){
 						$("#prescription-content").hide();
@@ -333,78 +367,73 @@
 						if(item == null){
 							this.selected = '';
 						} else if(item.data == null){
-							this.selected = {
-								subject_id : item.subject_id, 
-								share: item.share,
-								own: item.own,
-								data : {
-									demography : {
-										birth_date : '',
-										age : '',
-										sex : '',
-										height : '',
-										weight: ''
-									},
-									blood_pressure : {
-										date : '',
-										systolic : '',
-										diastolic : '',
-									},
-									statin_first : {
-										dept :'',
-										code : '',
-										date : ''
-									},
-									statin_last : {
-										dept :'',
-										code : '',
-										date : ''
-									},
-									drug_history: {
-										warfarin: '',
-										thyroxine: '',
-										bisphosphonate: '',
-										etc: ''
-									},
-									blood_test : {
-										date : '',
-										ldl_c : '',
-										hdl : '',
-										total_cholesterol : '',
-										glucose : '',
-										total_bilirubin: '',
-										alanine_aminotransferase: '',
-										alkaline_phosphatase: ''
-									},
-									medical_history : {
-										transient_stroke: '',
-										peripheral_vascular : '',
-										carotid : '',
-										abdominal_aneurysm : '',
-										diabetes : '',
-										ischemic_stroke :'',
-										high_blood_pressure : '',
-										active_liver_disorder: '',
-										smoking: ''
-									},
-									family_history : {
-										coronary_artery :''
-									},
-									estimation : {
-										dangerous_group : '',
-										target_ldl : ''
-									},
-									prescription : {
-										statins : '',
-										levels : ''
-									}
+							this.selected = item;
+							item.data = {
+								demography : {
+									birth_date : '',
+									age : '',
+									sex : '',
+									height : '',
+									weight: ''
 								},
-								t_create :item.t_create,
-								follow : 'initial',
-								bmi : '',
-								recommend_level:''
-							};
-						}else{
+								blood_pressure : {
+									date : '',
+									systolic : '',
+									diastolic : '',
+								},
+								statin_first : {
+									dept :'',
+									code : '',
+									date : ''
+								},
+								statin_last : {
+									dept :'',
+									code : '',
+									date : ''
+								},
+								drug_history: {
+									warfarin: '',
+									thyroxine: '',
+									bisphosphonate: '',
+									etc: ''
+								},
+								blood_test : {
+									date : '',
+									ldl_c : '',
+									hdl : '',
+									total_cholesterol : '',
+									glucose : '',
+									total_bilirubin: '',
+									alanine_aminotransferase: '',
+									alkaline_phosphatase: ''
+								},
+								medical_history : {
+									transient_stroke: '',
+									peripheral_vascular : '',
+									carotid : '',
+									abdominal_aneurysm : '',
+									diabetes : '',
+									ischemic_stroke :'',
+									high_blood_pressure : '',
+									active_liver_disorder: '',
+									smoking: ''
+								},
+								family_history : {
+									coronary_artery :''
+								},
+								estimation : {
+									dangerous_group : '',
+									target_ldl : ''
+								},
+								prescription : {
+									statins : '',
+									levels : ''
+								}
+							},
+							this.selected.follow = 'initial';
+							this.selected.bmi = '';
+							this.selected.recommend_level = '';
+						} else {
 							this.selected = item;
 							this.selected.follow = 'followup';
 							//BMI
